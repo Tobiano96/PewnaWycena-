@@ -1,0 +1,778 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PewnaWycena 1.9 — wygodna na telefonie</title>
+<style>
+:root{--green:#176b52;--dark:#143b31;--bg:#f3f7f4;--border:#dce7df;--muted:#607269}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font:15px/1.5 system-ui,Arial,sans-serif;color:#18251e}
+header{background:var(--dark);color:white;padding:20px max(20px,calc((100% - 1120px)/2));font-size:23px;font-weight:800}header span{color:#a5e6c6}
+main{max-width:1120px;margin:26px auto;padding:0 16px}h1{font-size:clamp(25px,4vw,34px);margin:0 0 6px}h2{font-size:19px;margin:0 0 14px}p{color:var(--muted)}
+.layout{display:grid;grid-template-columns:330px minmax(0,1fr);gap:18px}.panel{background:white;border:1px solid var(--border);border-radius:15px;padding:19px;min-width:0}
+label{display:block;font-weight:700;font-size:13px;margin:14px 0 5px}input,select,textarea{width:100%;font:inherit;padding:9px;border:1px solid #cbd9d0;border-radius:8px;background:white;color:#18251e}textarea{height:145px;resize:vertical}
+button{font:inherit;font-weight:700;border:0;border-radius:8px;padding:10px 13px;cursor:pointer}.primary{background:var(--green);color:white;width:100%;margin-top:17px}.secondary{background:#e5f3eb;color:#175a45}.neutral{background:#edf1ee;color:#34433a}.danger{background:#fbe9e6;color:#8f2b23;padding:5px 9px}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #8bd3b0;outline-offset:2px}.hint{font-size:12px}.notice{background:#fff7de;border:1px solid #efdda4;border-radius:9px;padding:11px;font-size:12px;color:#6a541b;margin-top:15px}
+.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:14px 0}.metric{background:#f5f9f6;border:1px solid var(--border);border-radius:10px;padding:10px}.metric small{display:block;color:var(--muted)}.metric strong{font-size:clamp(14px,2vw,21px);overflow-wrap:anywhere}
+.table-scroll{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:650px}th{text-align:left;color:var(--muted);font-size:11px;text-transform:uppercase;border-bottom:1px solid var(--border);padding:9px 5px}td{padding:7px 5px;border-bottom:1px solid #edf1ee}td input,td select{font-size:13px;padding:7px 5px}td .item-name{min-width:170px}td .small-input{width:76px}td .unit-input{width:66px}td .line-total{white-space:nowrap;font-weight:700}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.options{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:15px}.summary{border-top:1px solid var(--border);margin-top:16px;padding-top:8px}.sum-row{display:flex;justify-content:space-between;gap:12px;padding:5px 0}.sum-row.final{border-top:1px solid var(--border);font-size:21px;font-weight:800;color:var(--green);margin-top:8px;padding-top:11px}.footer{text-align:center;font-size:12px;margin:24px 0}
+@media(max-width:800px){.layout{grid-template-columns:1fr}}@media(max-width:460px){.metrics{grid-template-columns:1fr}.options{grid-template-columns:1fr}}
+
+.client-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.client-grid label{margin-top:0}.details{margin-bottom:18px}.details h2{margin-bottom:14px}.details h3{font-size:15px;margin:4px 0 12px}.details textarea{height:78px}.pdf-btn{background:#176b52;color:#fff}.pdf-hint{font-size:12px;margin:10px 0 0}.print-document{display:none}.print-header{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;border-bottom:3px solid #176b52;padding-bottom:16px;margin-bottom:20px}.print-brand{font-size:24px;font-weight:800;color:#176b52}.print-title{font-size:25px;margin:0}.print-meta{color:#52665b;font-size:12px}.print-columns{display:grid;grid-template-columns:1fr 1fr;gap:25px;margin:18px 0}.print-columns h3{font-size:12px;text-transform:uppercase;color:#176b52;margin:0 0 6px}.print-columns p{white-space:pre-line;margin:0;color:#18251e}.print-table{width:100%;min-width:0;border-collapse:collapse;font-size:11px}.print-table th,.print-table td{padding:8px 6px;border-bottom:1px solid #dce7df;text-align:left;vertical-align:top}.print-table th{background:#edf6f0;color:#264737}.print-table .right{text-align:right;white-space:nowrap}.print-totals{margin:20px 0 0 auto;width:min(350px,100%)}.print-totals div{display:flex;justify-content:space-between;gap:12px;padding:5px 0}.print-totals .final{font-size:17px;font-weight:800;border-top:2px solid #176b52;padding-top:10px;color:#176b52}.print-note{white-space:pre-line;margin-top:22px;font-size:11px;color:#4e5d55}.print-footer{font-size:10px;color:#63716a;margin-top:24px;border-top:1px solid #dce7df;padding-top:10px}
+@media(max-width:600px){.client-grid{grid-template-columns:1fr}}
+/* PewnaWycena — dopracowany dokument PDF z bezpiecznymi marginesami A4 */
+@media print{
+  @page{size:A4 portrait;margin:22mm 20mm 22mm 20mm}
+  html,body{margin:0!important;padding:0!important;width:auto!important;background:#fff!important;color:#1d2c25!important;font:10.5pt/1.5 Arial,Helvetica,sans-serif!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body>header,body>main{display:none!important}
+  .print-document{display:block!important;width:100%!important;max-width:100%!important;margin:0!important;padding:0!important;overflow:visible!important}
+  .print-header{display:flex;align-items:flex-start;justify-content:space-between;gap:16mm;border-bottom:2px solid #176b52;padding:0 0 9mm;margin:0 0 10mm}
+  .print-brand{font-size:21pt;line-height:1.1;letter-spacing:-.5px}
+  .print-title{font-size:19pt;line-height:1.2;margin:0 0 2mm}
+  .print-meta{font-size:9pt;line-height:1.6}
+  .print-columns{display:grid;grid-template-columns:1fr 1fr;gap:12mm;margin:0 0 9mm}
+  .print-columns h3{font-size:9pt;letter-spacing:.7px;margin:0 0 3mm}
+  .print-columns p{font-size:10pt;line-height:1.55;overflow-wrap:anywhere}
+  .print-document>h3{font-size:11pt;margin:0 0 3mm;color:#176b52;break-after:avoid}
+  #print-description{font-size:10pt;line-height:1.55;margin:0 0 9mm;overflow-wrap:anywhere}
+  .print-table{width:100%!important;min-width:0!important;table-layout:fixed;border-collapse:collapse;font-size:8.4pt;line-height:1.4;margin:0 0 7mm}
+  .print-table th,.print-table td{padding:3mm 1.5mm!important;border-bottom:1px solid #dce7df;vertical-align:top;overflow-wrap:anywhere}
+  .print-table th{background:#edf6f0!important;color:#264737;font-size:8pt}
+  .print-table th:nth-child(1),.print-table td:nth-child(1){width:6%}
+  .print-table th:nth-child(2),.print-table td:nth-child(2){width:30%}
+  .print-table th:nth-child(3),.print-table td:nth-child(3){width:14%}
+  .print-table th:nth-child(4),.print-table td:nth-child(4){width:9%}
+  .print-table th:nth-child(5),.print-table td:nth-child(5){width:8%}
+  .print-table th:nth-child(6),.print-table td:nth-child(6){width:16%}
+  .print-table th:nth-child(7),.print-table td:nth-child(7){width:17%}
+  .print-table .right{text-align:right;white-space:normal}
+  .print-table thead{display:table-header-group}
+  .print-table tr{break-inside:avoid;page-break-inside:avoid}
+  .print-totals{width:76%;max-width:100%;margin:6mm 0 0 auto;padding:4mm 0 0;border-top:1px solid #dce7df;break-inside:avoid;page-break-inside:avoid}
+  .print-totals div{padding:1.8mm 0;font-size:9.5pt}
+  .print-totals .final{font-size:13pt;line-height:1.35;margin-top:3mm;padding-top:4mm}
+  .print-note{font-size:9.5pt;line-height:1.6;margin-top:10mm;white-space:pre-line;overflow-wrap:anywhere;break-inside:avoid}
+  .print-footer{font-size:8pt;line-height:1.5;margin-top:12mm;padding-top:4mm;border-top:1px solid #dce7df;color:#607269}
+}
+
+/* Identyfikacja wizualna PewnaWycena */
+header{display:flex;align-items:center;gap:10px;flex-wrap:wrap;letter-spacing:-.5px}
+header span:not(.brand-mark){color:#b8f3d7}
+.brand-mark{display:inline-flex;align-items:center;justify-content:center;width:35px;height:35px;border-radius:11px;background:#c9f3df;color:#124d39;font-size:23px;font-weight:900;flex-shrink:0}
+.brand-slogan{font-size:12px;font-weight:500;color:#c6e4d5;letter-spacing:0;margin-left:auto}
+.print-brand-mark{display:inline-flex;align-items:center;justify-content:center;background:#176b52;color:white;border-radius:6px;width:26px;height:26px;font-size:18px;margin-right:5px;vertical-align:middle}
+@media(max-width:600px){.brand-slogan{width:100%;margin-left:45px}}
+@media print{.print-brand-mark{width:22px;height:22px;font-size:15px}}
+[hidden]{display:none!important}
+
+/* PewnaWycena 1.5 — przejrzysty panel z trzema zakładkami */
+.app-nav{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0 18px;padding:7px;background:#e8f0ea;border:1px solid var(--border);border-radius:13px}
+.app-nav .nav-tab{flex:1 1 160px;background:transparent;color:#2e5947;border-radius:9px;padding:12px 14px}
+.app-nav .nav-tab.active{background:#176b52;color:#fff;box-shadow:0 2px 6px #143b3120}
+.app-view[hidden]{display:none!important}
+#saved-estimates,#pricebook{margin-top:0!important}
+#saved-estimates>.actions .primary{width:auto;margin-top:0}
+@media(max-width:520px){.app-nav .nav-tab{flex:1 1 100%;text-align:left}}
+@media print{.app-nav,.app-view{display:none!important}}
+.clientbook-row{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 0;border-top:1px solid #dce7df}.clientbook-row>div:first-child{flex:1 1 220px;min-width:0}.clientbook-row .hint{margin:5px 0 0;overflow-wrap:anywhere}
+/* Autozapis roboczej wyceny */
+.autosave-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;background:#eaf5ef;border:1px solid #c6dfd1;padding:11px 15px;border-radius:12px;margin:10px 0 16px;color:#143b31}
+.autosave-bar button{padding:7px 12px}
+@media print{.autosave-bar{display:none!important}}
+
+/* 1.9: Mobilny układ kosztorysu, cennika i nawigacji; wydruk pozostaje bez zmian. */
+@media screen and (max-width:700px){
+  body{font-size:16px;overflow-x:hidden}
+  header{padding:15px 16px;font-size:20px}
+  main{margin:16px auto;padding:0 12px}
+  h1{font-size:clamp(23px,6vw,29px);line-height:1.2}
+  .panel{padding:15px;border-radius:12px}
+  .app-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;padding:7px;margin:16px 0}
+  .app-nav .nav-tab{min-width:0;min-height:48px;flex:auto!important;padding:10px 8px;text-align:center;font-size:14px}
+  input,select,textarea{font-size:16px;min-height:45px}
+  textarea{min-height:90px}
+  button{min-height:44px}
+  .actions{display:flex;flex-wrap:wrap;gap:8px}
+  .actions>button{flex:1 1 135px}
+  .actions>.primary{margin-top:0}
+  .metrics{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+  .metric{padding:9px 6px;min-width:0}
+  .metric strong{font-size:clamp(13px,3.5vw,17px);overflow-wrap:anywhere}
+  .autosave-bar{flex-wrap:wrap;gap:8px}
+  .autosave-bar button{width:100%}
+  #view-estimate .table-scroll,#view-prices .table-scroll{overflow:visible}
+  #view-estimate .table-scroll>table,#view-prices .table-scroll>table{min-width:0;width:100%;display:block}
+  #view-estimate .table-scroll thead,#view-prices .table-scroll thead{display:none}
+  #items-body,#price-rows{display:grid;gap:12px}
+  #items-body tr,#price-rows tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px 12px;background:#f7faf8;border:1px solid #dce7df;border-radius:12px;padding:12px;min-width:0}
+  #items-body td,#price-rows td{display:flex;flex-direction:column;min-width:0;padding:0;border:0;gap:3px}
+  #items-body td::before,#price-rows td::before{font-size:11px;font-weight:800;letter-spacing:.02em;color:#607269;text-transform:uppercase}
+  #items-body td:nth-child(1),#price-rows td:nth-child(1){grid-column:1/-1}
+  #items-body td:nth-child(1)::before,#price-rows td:nth-child(1)::before{content:'Pozycja'}
+  #items-body td:nth-child(2)::before{content:'Rodzaj'}
+  #items-body td:nth-child(3)::before{content:'Ilość'}
+  #items-body td:nth-child(4)::before{content:'Jednostka'}
+  #items-body td:nth-child(5)::before{content:'Stawka (zł)'}
+  #items-body td:nth-child(6)::before{content:'Razem'}
+  #items-body td:nth-child(7){grid-column:1/-1}
+  #items-body td:nth-child(7) button{width:100%;background:#fbe9e6}
+  #items-body td input,#items-body td select{width:100%;min-width:0;font-size:16px}
+  #items-body td .line-total{white-space:normal}
+  #items-body td:nth-child(6){justify-content:flex-end;font-weight:800}
+  #price-rows td:nth-child(2)::before{content:'Rodzaj'}
+  #price-rows td:nth-child(3)::before{content:'Jednostka'}
+  #price-rows td:nth-child(4)::before{content:'Stawka'}
+  #price-rows td:nth-child(5),#price-rows td:nth-child(6){grid-column:span 1}
+  #price-rows td:nth-child(5) button,#price-rows td:nth-child(6) button{width:100%;height:100%}
+  #price-rows tr:has(td[colspan]){display:block}
+  .summary{overflow-wrap:anywhere}
+}
+@media screen and (max-width:380px){.metrics{grid-template-columns:1fr}.metric strong{font-size:18px}}
+</style>
+</head>
+<body>
+<header><span class="brand-mark" aria-hidden="true">✓</span> Pewna<span>Wycena</span><small class="brand-slogan">Kosztorysy, które budzą zaufanie</small></header>
+<main>
+<h1 id="main-heading">Profesjonalna wycena usług w kilka chwil</h1>
+<p>Wprowadź opis prac, wygeneruj pozycje i dostosuj ceny. Wszystkie obliczenia odbywają się w przeglądarce.</p>
+<nav class="app-nav" aria-label="Nawigacja po aplikacji">
+<button type="button" class="nav-tab active" data-view="estimate" aria-pressed="true">Nowa wycena</button>
+<button type="button" class="nav-tab" data-view="saved" aria-pressed="false">Zapisane wyceny</button>
+<button type="button" class="nav-tab" data-view="clients" aria-pressed="false">Klienci</button>
+<button type="button" class="nav-tab" data-view="prices" aria-pressed="false">Mój cennik</button>
+</nav>
+<div id="view-estimate" class="app-view">
+<div class="autosave-bar" role="status"><span id="draft-save-state">Autozapis: gotowy</span><button type="button" id="draft-clear" class="secondary">Wyczyść wersję roboczą</button></div>
+<section class="panel details" aria-labelledby="details-heading">
+<h2 id="details-heading">Dane do profesjonalnego kosztorysu</h2>
+<div class="client-grid">
+<div><h3>Twoja firma</h3><label for="company-name">Nazwa firmy / wykonawca</label><input id="company-name" placeholder="np. Firma Kowalski"><label for="company-contact">Adres, NIP, telefon, e-mail</label><textarea id="company-contact" placeholder="Adres firmy&#10;NIP: ...&#10;tel. ...&#10;e-mail: ..."></textarea></div>
+<div><h3>Klient</h3><div class="actions"><button id="client-quick-save" class="secondary" type="button">Zapisz klienta w bazie</button><button id="client-open-list" class="neutral" type="button">Wybierz z bazy</button></div><label for="client-name">Imię i nazwisko / firma</label><input id="client-name" placeholder="np. Jan Nowak"><label for="client-contact">Adres klienta / inwestycji</label><textarea id="client-contact" placeholder="Adres klienta lub miejsce wykonania usługi"></textarea></div>
+<div><label for="estimate-number">Numer kosztorysu</label><div class="actions" style="align-items:center"><input id="estimate-number" value="PW-001" style="flex:1;min-width:130px"><button id="next-number" type="button" class="secondary">Nowy numer</button></div></div>
+<div><label for="estimate-date">Data kosztorysu</label><input id="estimate-date" type="date"></div><div><label for="estimate-status">Status oferty</label><select id="estimate-status"><option value="draft">Robocza</option><option value="sent">Wysłana</option><option value="accepted">Zaakceptowana</option><option value="rejected">Odrzucona</option></select></div>
+</div>
+<label for="estimate-notes">Uwagi / warunki wyceny</label><textarea id="estimate-notes" placeholder="np. Wycena ważna 14 dni. Termin realizacji do uzgodnienia."></textarea>
+</section>
+<div class="layout">
+<section class="panel" aria-labelledby="input-heading">
+<h2 id="input-heading">1. Opis zlecenia</h2>
+<label for="description">Opis prac</label>
+<textarea id="description">Remont łazienki. Skuć stare płytki, przygotować podłoże, wykonać hydroizolację, ułożyć nowe płytki i zamontować armaturę.</textarea>
+<label for="category">Branża / rodzaj usług</label>
+<select id="category"><option value="bath">Remonty — łazienka i płytki</option><option value="paint">Remonty — malowanie</option><option value="floor">Remonty — podłogi</option><option value="plumbing">Hydraulika</option><option value="electric">Elektryka</option><option value="cleaning">Sprzątanie</option><option value="garden">Ogrody i zieleń</option><option value="auto">Motoryzacja</option><option value="it">IT i serwis komputerowy</option><option value="general">Inne usługi / własna wycena</option></select>
+<label for="custom-category" id="custom-category-label" hidden>Własna nazwa usługi / branży</label><input id="custom-category" placeholder="np. Fotografia, transport, szkolenia" hidden>
+<div id="surface-fields"><label for="area">Powierzchnia podłogi / obszar (m²)</label><input id="area" type="number" min="0" step="0.1" value="6"><label for="walls">Powierzchnia ścian (m²)</label><input id="walls" type="number" min="0" step="0.1" value="20"></div>
+<p class="hint" id="category-hint">Wybierz branżę, aby wstawić przykładowy zakres i pozycje. Wszystkie stawki możesz zmienić.</p>
+<button id="generate" class="primary" type="button">Utwórz kosztorys</button>
+<p class="hint">Przykładowe pozycje możesz dowolnie edytować, usuwać i dodawać. Wycena wymaga sprawdzenia przez wykonawcę.</p>
+<div class="notice"><b>Wersja testowa:</b> stawki i pozycje dla każdej branży są wyłącznie przykładami, nie aktualnym cennikiem. To kalkulator szablonowy, jeszcze bez połączenia z AI. Zweryfikuj wycenę przed wysłaniem klientowi.</div>
+</section>
+<section class="panel" aria-labelledby="result-heading">
+<h2 id="result-heading">2. Twój kosztorys</h2>
+<div class="metrics"><div class="metric"><small>Robocizna</small><strong id="labor-metric">0 zł</strong></div><div class="metric"><small>Materiały</small><strong id="material-metric">0 zł</strong></div><div class="metric"><small>Cena końcowa</small><strong id="total-metric">0 zł</strong></div></div>
+<div class="table-scroll"><table><thead><tr><th>Pozycja</th><th>Typ</th><th>Ilość</th><th>Jedn.</th><th>Stawka (zł)</th><th>Razem</th><th></th></tr></thead><tbody id="items-body"></tbody></table></div>
+<div class="actions estimate-actions"><button id="quick-save" class="secondary" type="button">Zapisz wycenę</button><button id="add" class="secondary" type="button">+ Dodaj pozycję</button><button id="export" class="neutral" type="button">Eksport CSV</button><button id="pdf" class="pdf-btn" type="button">Zapisz jako PDF</button><button id="reset" class="neutral" type="button">Przywróć przykład</button></div>
+<div class="options"><div><label for="margin">Narzut (%)</label><input id="margin" type="number" min="0" step="1" value="20"></div><div><label for="extra">Koszty dodatkowe (zł)</label><input id="extra" type="number" min="0" step="0.01" value="150"></div></div>
+<div class="summary"><div class="sum-row"><span>Robocizna</span><b id="labor-sum">0 zł</b></div><div class="sum-row"><span>Materiały</span><b id="material-sum">0 zł</b></div><div class="sum-row"><span>Koszty dodatkowe</span><b id="extra-sum">0 zł</b></div><div class="sum-row"><span>Narzut</span><b id="margin-sum">0 zł</b></div><div class="sum-row final"><span>Do zapłaty</span><b id="total-sum">0 zł</b></div></div>
+<p class="hint">Narzut liczony od sumy robocizny, materiałów i kosztów dodatkowych. Podatki nie są doliczane automatycznie.</p><p class="pdf-hint">Aby otrzymać PDF, kliknij „Zapisz jako PDF”, a w oknie drukowania wybierz „Zapisz jako PDF”.</p>
+</section>
+</div>
+</div>
+<div id="view-saved" class="app-view" hidden>
+<section class="panel" id="saved-estimates" style="margin-top:18px">
+<h2>Zapisane wyceny</h2><p class="hint">Wybierz „Otwórz”, aby przejść do edycji zapisanej wyceny.</p>
+<p class="hint">Zapisz kosztorys i wróć do niego później na tym samym urządzeniu i w tej samej przeglądarce. Dodatkowo możesz pobrać kopię zapasową JSON.</p>
+<div class="actions">
+<button id="save-estimate" class="primary" type="button">Zapisz bieżącą wycenę</button>
+<button id="backup-estimates" class="secondary" type="button">Pobierz kopię zapasową</button>
+<button id="restore-estimates" class="neutral" type="button">Wczytaj kopię zapasową</button>
+<input id="restore-file" type="file" accept=".json,application/json" hidden>
+</div>
+<p id="save-status" class="hint" role="status" aria-live="polite"></p>
+<div id="saved-list"></div>
+</section>
+</div>
+<div id="view-clients" class="app-view" hidden>
+<section class="panel" id="clientbook">
+<h2>Baza klientów</h2>
+<p class="hint">Zapisz klienta raz i wybieraj go przy kolejnych kosztorysach. Dane pozostają w tej przeglądarce; regularnie pobieraj kopię zapasową.</p>
+<div class="details-grid" style="margin-top:12px">
+<div><label for="clientbook-name">Imię i nazwisko / nazwa firmy</label><input id="clientbook-name" placeholder="np. Jan Nowak"></div>
+<div><label for="clientbook-contact">Adres i dane kontaktowe</label><textarea id="clientbook-contact" placeholder="Adres, telefon, e-mail, NIP..."></textarea></div>
+</div>
+<div class="actions"><button id="clientbook-save" class="secondary" type="button">+ Zapisz klienta</button><button id="clientbook-export" class="neutral" type="button">Pobierz klientów JSON</button><button id="clientbook-import" class="neutral" type="button">Wczytaj klientów JSON</button><input id="clientbook-file" type="file" accept=".json,application/json" hidden></div>
+<label for="clientbook-search">Szukaj klienta</label><input id="clientbook-search" placeholder="Wpisz nazwę lub dane kontaktowe...">
+<p id="clientbook-status" class="hint" role="status" aria-live="polite"></p>
+<div id="clientbook-list"></div>
+</section>
+</div>
+<div id="view-prices" class="app-view" hidden>
+<section class="panel" id="pricebook" style="margin-top:18px">
+<h2>Mój cennik usług i materiałów</h2><p class="hint">Po dodaniu pozycji do kosztorysu wróć do zakładki „Nowa wycena”.</p>
+<p class="hint">Zapisz własne stawki. Potem wybierz pozycję i dodaj ją do dowolnego kosztorysu. Cennik jest lokalny dla tej przeglądarki.</p>
+<div class="details-grid" style="margin-top:12px">
+<div><label for="price-name">Nazwa usługi / materiału</label><input id="price-name" placeholder="np. Montaż gniazdka"></div>
+<div><label for="price-type">Rodzaj pozycji</label><select id="price-type"><option value="labor">Usługa / robocizna</option><option value="material">Materiał</option></select></div>
+<div><label for="price-unit">Jednostka</label><input id="price-unit" value="szt." placeholder="np. godz., m², szt."></div>
+<div><label for="price-rate">Stawka (zł)</label><input id="price-rate" type="number" min="0" step="0.01" value="0"></div>
+</div>
+<div class="actions"><button id="price-save" class="secondary" type="button">+ Dodaj do cennika</button><button id="price-backup" class="neutral" type="button">Pobierz cennik JSON</button><button id="price-import" class="neutral" type="button">Wczytaj cennik JSON</button><input id="price-import-file" type="file" accept=".json,application/json" hidden></div>
+<p id="price-status" class="hint" role="status" aria-live="polite"></p>
+<div class="table-scroll"><table><thead><tr><th>Nazwa</th><th>Rodzaj</th><th>Jedn.</th><th>Stawka</th><th>Dodaj do wyceny</th><th>Usuń</th></tr></thead><tbody id="price-rows"></tbody></table></div>
+</section>
+</div>
+<p class="footer">PewnaWycena · lokalny prototyp · wyceny i cennik przechowywane w tej przeglądarce. Pobieraj kopie zapasowe.</p>
+</main>
+<section id="print-document" class="print-document" aria-label="Kosztorys do PDF">
+  <div class="print-header"><div><div class="print-brand"><span class="print-brand-mark">✓</span> PewnaWycena</div><div class="print-meta">Profesjonalna wycena usług</div></div><div><h1 class="print-title">KOSZTORYS</h1><div class="print-meta">Numer: <span id="print-number"></span></div><div class="print-meta">Data: <span id="print-date"></span></div></div></div>
+  <div class="print-columns"><div><h3>Wykonawca</h3><p id="print-company"></p></div><div><h3>Klient / inwestycja</h3><p id="print-client"></p></div></div>
+  <h3>Zakres prac</h3><p id="print-description" style="white-space:pre-line"></p>
+  <table class="print-table"><thead><tr><th>Lp.</th><th>Pozycja</th><th>Typ</th><th class="right">Ilość</th><th>J.m.</th><th class="right">Stawka</th><th class="right">Wartość</th></tr></thead><tbody id="print-rows"></tbody></table>
+  <div class="print-totals"><div><span>Robocizna</span><b id="print-labor"></b></div><div><span>Materiały</span><b id="print-material"></b></div><div><span>Koszty dodatkowe</span><b id="print-extra"></b></div><div><span>Narzut</span><b id="print-margin"></b></div><div class="final"><span>Łączna wycena</span><span id="print-total"></span></div></div>
+  <div id="print-notes" class="print-note"></div><div class="print-footer">Wycena orientacyjna. Zakres, ceny i ilości należy potwierdzić przed realizacją. Podatki nie są doliczane automatycznie.</div>
+</section>
+<script>
+'use strict';
+const byId = id => document.getElementById(id);
+const formatMoney = amount => new Intl.NumberFormat('pl-PL', {style:'currency',currency:'PLN'}).format(amount);
+const numberAtLeastZero = value => Math.max(0, Number(value) || 0);
+const makeItem = (name, type, quantity, unit, rate) => ({name, type, quantity, unit, rate});
+let items = [];
+
+function createEstimate() {
+  const description = byId('description').value.toLowerCase().trim();
+  if (!description) { alert('Najpierw wpisz opis usługi.'); return; }
+  const category = byId('category').value;
+  const floor = numberAtLeastZero(byId('area').value);
+  const walls = numberAtLeastZero(byId('walls').value);
+  const tileArea = floor + walls;
+  const result = [];
+
+  if (category === 'bath') {
+    if (/skuć|skucie|demontaż|stare|zerwać|zrywan/.test(description)) result.push(makeItem('Demontaż starych płytek','labor',tileArea,'m²',45));
+    result.push(makeItem('Przygotowanie podłoża','labor',tileArea,'m²',25));
+    if (/hydroizol|izolac/.test(description)) result.push(makeItem('Hydroizolacja','labor',floor,'m²',35));
+    result.push(makeItem('Układanie płytek','labor',tileArea,'m²',120));
+    result.push(makeItem('Płytki ceramiczne (10% zapasu)','material',Math.round(tileArea*1.1*100)/100,'m²',90));
+    result.push(makeItem('Klej, fuga i materiały pomocnicze','material',1,'kpl.',450));
+    if (/armatur|umywalk|toalet|prysznic|bater/.test(description)) result.push(makeItem('Montaż armatury','labor',1,'kpl.',500));
+  } else if (category === 'paint') {
+    const surface = walls || 20;
+    result.push(makeItem('Zabezpieczenie pomieszczenia','labor',1,'kpl.',180));
+    result.push(makeItem('Przygotowanie ścian','labor',surface,'m²',18));
+    result.push(makeItem('Gruntowanie','labor',surface,'m²',7));
+    result.push(makeItem('Malowanie — dwie warstwy','labor',surface,'m²',22));
+    result.push(makeItem('Farba i materiały','material',surface,'m²',8));
+  } else if (category === 'floor') {
+    const surface = floor || 20;
+    result.push(makeItem('Przygotowanie podłoża','labor',surface,'m²',20));
+    result.push(makeItem('Montaż paneli','labor',surface,'m²',45));
+    result.push(makeItem('Panele (8% zapasu)','material',Math.round(surface*1.08*100)/100,'m²',65));
+    result.push(makeItem('Podkład i listwy','material',surface,'m²',18));
+  } else if (category === 'plumbing') {
+    result.push(makeItem('Diagnoza i przygotowanie instalacji','labor',1,'usł.',150));
+    result.push(makeItem('Montaż / naprawa elementu instalacji','labor',2,'godz.',130));
+    result.push(makeItem('Złączki, uszczelki i materiały','material',1,'kpl.',100));
+  } else if (category === 'electric') {
+    result.push(makeItem('Diagnostyka instalacji elektrycznej','labor',1,'usł.',150));
+    result.push(makeItem('Montaż osprzętu elektrycznego','labor',3,'szt.',90));
+    result.push(makeItem('Przewody i materiały montażowe','material',1,'kpl.',180));
+  } else if (category === 'cleaning') {
+    result.push(makeItem('Sprzątanie powierzchni','labor',60,'m²',8));
+    result.push(makeItem('Mycie okien','labor',4,'szt.',35));
+    result.push(makeItem('Środki czystości','material',1,'kpl.',65));
+  } else if (category === 'garden') {
+    result.push(makeItem('Koszenie trawnika','labor',150,'m²',2.5));
+    result.push(makeItem('Prace pielęgnacyjne','labor',3,'godz.',75));
+    result.push(makeItem('Materiały ogrodnicze','material',1,'kpl.',100));
+  } else if (category === 'auto') {
+    result.push(makeItem('Diagnostyka pojazdu','labor',1,'usł.',120));
+    result.push(makeItem('Prace serwisowe','labor',2,'godz.',150));
+    result.push(makeItem('Części i materiały eksploatacyjne','material',1,'kpl.',250));
+  } else if (category === 'it') {
+    result.push(makeItem('Diagnoza problemu','labor',1,'usł.',100));
+    result.push(makeItem('Konfiguracja / naprawa','labor',2,'godz.',120));
+    result.push(makeItem('Materiały i akcesoria','material',1,'kpl.',50));
+  } else {
+    result.push(makeItem('Usługa — wpisz nazwę','labor',1,'usł.',0));
+    result.push(makeItem('Dodatkowe prace / czas','labor',1,'godz.',0));
+    result.push(makeItem('Materiały / koszty zakupu','material',1,'kpl.',0));
+  }
+  items = result;
+  renderRows();
+}
+
+function makeInput(value, type, className, label, onChange) {
+  const input = document.createElement('input');
+  input.type = type;
+  input.value = value;
+  input.className = className || '';
+  input.setAttribute('aria-label', label);
+  if (type === 'number') { input.min = '0'; input.step = '0.01'; }
+  input.addEventListener('input', () => onChange(input.value));
+  return input;
+}
+function renderRows() {
+  const body = byId('items-body');
+  body.replaceChildren();
+  items.forEach((entry, index) => {
+    const row = document.createElement('tr');
+    const nameCell = document.createElement('td');
+    nameCell.append(makeInput(entry.name,'text','item-name','Nazwa pozycji',value => {entry.name=value;}));
+    const typeCell = document.createElement('td');
+    const select = document.createElement('select');
+    select.setAttribute('aria-label','Rodzaj kosztu');
+    [['labor','Robocizna'],['material','Materiał']].forEach(([value,label]) => {
+      const option = document.createElement('option'); option.value=value; option.textContent=label; select.append(option);
+    });
+    select.value=entry.type;
+    select.addEventListener('change', () => {entry.type=select.value; calculate();});
+    typeCell.append(select);
+    const quantityCell=document.createElement('td');
+    quantityCell.append(makeInput(entry.quantity,'number','small-input','Ilość',value => {entry.quantity=numberAtLeastZero(value);calculate();}));
+    const unitCell=document.createElement('td');
+    unitCell.append(makeInput(entry.unit,'text','unit-input','Jednostka',value => {entry.unit=value;}));
+    const rateCell=document.createElement('td');
+    rateCell.append(makeInput(entry.rate,'number','small-input','Stawka',value => {entry.rate=numberAtLeastZero(value);calculate();}));
+    const lineCell=document.createElement('td'); lineCell.className='line-total'; lineCell.id='line-'+index;
+    const deleteCell=document.createElement('td');
+    const remove=document.createElement('button'); remove.type='button';remove.className='danger';remove.textContent='×';remove.setAttribute('aria-label','Usuń pozycję');
+    remove.addEventListener('click',()=>{items.splice(index,1);renderRows();});
+    deleteCell.append(remove);
+    row.append(nameCell,typeCell,quantityCell,unitCell,rateCell,lineCell,deleteCell);
+    body.append(row);
+  });
+  calculate();
+}
+function calculate() {
+  let labor=0, materials=0;
+  items.forEach((entry,index) => {
+    const amount=numberAtLeastZero(entry.quantity)*numberAtLeastZero(entry.rate);
+    if (entry.type==='material') materials+=amount; else labor+=amount;
+    byId('line-'+index).textContent=formatMoney(amount);
+  });
+  const extra=numberAtLeastZero(byId('extra').value);
+  const markup=(labor+materials+extra)*numberAtLeastZero(byId('margin').value)/100;
+  const total=labor+materials+extra+markup;
+  byId('labor-metric').textContent=byId('labor-sum').textContent=formatMoney(labor);
+  byId('material-metric').textContent=byId('material-sum').textContent=formatMoney(materials);
+  byId('extra-sum').textContent=formatMoney(extra);
+  byId('margin-sum').textContent=formatMoney(markup);
+  byId('total-metric').textContent=byId('total-sum').textContent=formatMoney(total);
+}
+function exportCsv() {
+  const data=[['Pozycja','Typ','Ilość','Jednostka','Stawka PLN','Razem PLN']];
+  items.forEach(entry => data.push([entry.name,entry.type==='labor'?'Robocizna':'Materiał',entry.quantity,entry.unit,entry.rate,(entry.quantity*entry.rate).toFixed(2)]));
+  const csv='\ufeff'+data.map(row => row.map(cell => '"'+String(cell).replace(/"/g,'""')+'"').join(';')).join('\r\n');
+  const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  const anchor=document.createElement('a');anchor.href=url;anchor.download='pewnawycena-kosztorys.csv';
+  document.body.append(anchor);anchor.click();anchor.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+const industryExamples = {
+  bath:'Remont łazienki. Skuć stare płytki, przygotować podłoże, wykonać hydroizolację, ułożyć nowe płytki i zamontować armaturę.',
+  paint:'Malowanie ścian, gruntowanie i zabezpieczenie pomieszczenia.',
+  floor:'Przygotowanie podłoża i montaż paneli podłogowych.',
+  plumbing:'Naprawa instalacji wodnej i montaż elementów hydraulicznych.',
+  electric:'Sprawdzenie instalacji oraz montaż gniazdek i osprzętu.',
+  cleaning:'Sprzątanie lokalu po remoncie oraz mycie okien.',
+  garden:'Koszenie trawnika i pielęgnacja zieleni.',
+  auto:'Diagnostyka i serwis samochodu.',
+  it:'Diagnostyka i naprawa komputera, konfiguracja oprogramowania.',
+  general:'Wycena usługi według indywidualnego zakresu prac.'
+};
+let lastExample = industryExamples.bath;
+function updateIndustryUI() {
+  const category=byId('category').value;
+  const headings={
+    bath:'Profesjonalna wycena remontu łazienki',
+    paint:'Profesjonalna wycena prac malarskich',
+    floor:'Profesjonalna wycena prac podłogowych',
+    plumbing:'Profesjonalna wycena usług hydraulicznych',
+    electric:'Profesjonalna wycena usług elektrycznych',
+    cleaning:'Profesjonalna wycena usług sprzątania',
+    garden:'Profesjonalna wycena usług ogrodniczych',
+    auto:'Profesjonalna wycena usług motoryzacyjnych',
+    it:'Profesjonalna wycena usług IT',
+    general:'Profesjonalna wycena usług'
+  };
+  const customName=byId('custom-category').value.trim();
+  byId('main-heading').textContent=category==='general' && customName
+    ? 'Profesjonalna wycena — '+customName
+    : headings[category] || 'Profesjonalna wycena usług';
+  const custom=category==='general';
+  byId('custom-category').hidden=!custom;
+  byId('custom-category-label').hidden=!custom;
+  byId('surface-fields').hidden=!['bath','paint','floor'].includes(category);
+  const description=byId('description');
+  if (!description.value.trim() || description.value.trim()===lastExample) description.value=industryExamples[category];
+  lastExample=industryExamples[category];
+  byId('category-hint').textContent=custom?'Podaj nazwę branży, a następnie zmień przykładowe pozycje na własne.':
+    'Wstawimy przykładowe pozycje dla wybranej branży. Ilości i ceny są orientacyjne.';
+}
+byId('category').addEventListener('change',updateIndustryUI);
+byId('custom-category').addEventListener('input',updateIndustryUI);
+byId('generate').addEventListener('click',createEstimate);
+byId('add').addEventListener('click',()=>{items.push(makeItem('Nowa pozycja','labor',1,'szt.',0));renderRows();});
+byId('reset').addEventListener('click',()=>{
+  byId('description').value='Remont łazienki. Skuć stare płytki, przygotować podłoże, wykonać hydroizolację, ułożyć nowe płytki i zamontować armaturę.';
+  byId('category').value='bath';byId('area').value=6;byId('walls').value=20;byId('custom-category').value='';updateIndustryUI();
+  byId('margin').value=20;byId('extra').value=150;createEstimate();
+});
+byId('export').addEventListener('click',exportCsv);
+byId('margin').addEventListener('input',calculate);
+byId('extra').addEventListener('input',calculate);
+
+function preparePrintDocument() {
+  const companyName=byId('company-name').value.trim();
+  const companyContact=byId('company-contact').value.trim();
+  const clientName=byId('client-name').value.trim();
+  const clientContact=byId('client-contact').value.trim();
+  byId('print-company').textContent=[companyName||'Nie podano wykonawcy',companyContact].filter(Boolean).join('\n');
+  byId('print-client').textContent=[clientName||'Nie podano klienta',clientContact].filter(Boolean).join('\n');
+  byId('print-number').textContent=byId('estimate-number').value.trim()||'—';
+  const date=byId('estimate-date').value;
+  byId('print-date').textContent=date ? date.split('-').reverse().join('.') : '—';
+  const categoryText=byId('category').selectedOptions[0].textContent;
+  const industry=byId('category').value==='general'?(byId('custom-category').value.trim()||'Inne usługi'):categoryText;
+  byId('print-description').textContent='Branża: '+industry+'\n'+(byId('description').value.trim()||'—');
+  byId('print-notes').textContent=byId('estimate-notes').value.trim();
+  const tbody=byId('print-rows');tbody.replaceChildren();
+  let labor=0,materials=0;
+  items.forEach((entry,index)=>{
+    const value=numberAtLeastZero(entry.quantity)*numberAtLeastZero(entry.rate);
+    if(entry.type==='material') materials+=value;else labor+=value;
+    const row=document.createElement('tr');
+    const values=[String(index+1),entry.name,entry.type==='material'?'Materiał':'Robocizna',String(entry.quantity),entry.unit,formatMoney(numberAtLeastZero(entry.rate)),formatMoney(value)];
+    values.forEach((value,i)=>{const cell=document.createElement('td');cell.textContent=value;if([3,5,6].includes(i))cell.className='right';row.append(cell);});
+    tbody.append(row);
+  });
+  const extra=numberAtLeastZero(byId('extra').value);
+  const markup=(labor+materials+extra)*numberAtLeastZero(byId('margin').value)/100;
+  byId('print-labor').textContent=formatMoney(labor);
+  byId('print-material').textContent=formatMoney(materials);
+  byId('print-extra').textContent=formatMoney(extra);
+  byId('print-margin').textContent=formatMoney(markup);
+  byId('print-total').textContent=formatMoney(labor+materials+extra+markup);
+}
+byId('pdf').addEventListener('click',()=>{preparePrintDocument();window.print();});
+byId('estimate-date').value=new Date().toLocaleDateString('en-CA');
+createEstimate();
+
+// PewnaWycena 1.2 — lokalne zapisy oraz przenośne kopie JSON.
+const STORAGE_KEY='pewnawycena_saved_estimates_v1';
+const FIELD_IDS=['company-name','company-contact','client-name','client-contact','estimate-number','estimate-date','estimate-status','estimate-notes','description','category','custom-category','area','walls','margin','extra'];
+let savedEstimates=[];
+function statusMessage(message){byId('save-status').textContent=message;}
+function currentEstimate(){
+  const fields={};
+  FIELD_IDS.forEach(id=>fields[id]=byId(id).value);
+  return {id: String(Date.now())+'-'+Math.random().toString(36).slice(2,9),
+    savedAt:new Date().toISOString(),fields,items:items.map(x=>({...x}))};
+}
+function validEstimate(record){
+  return record && typeof record==='object' && record.fields && typeof record.fields==='object'
+    && Array.isArray(record.items) && record.items.length<=1000
+    && record.items.every(x=>x && typeof x.name==='string' && typeof x.type==='string'
+       && typeof x.unit==='string' && Number.isFinite(Number(x.quantity)) && Number.isFinite(Number(x.rate)));
+}
+function loadStoredEstimates(){
+  try{
+    const value=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
+    savedEstimates=Array.isArray(value)?value.filter(validEstimate):[];
+  }catch(err){savedEstimates=[];statusMessage('Nie można odczytać zapisów w tej przeglądarce. Użyj kopii zapasowej JSON.');}
+  renderSavedEstimates();
+}
+function persistEstimates(){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(savedEstimates));return true;}
+  catch(err){statusMessage('Nie udało się zapisać w przeglądarce. Pobierz kopię zapasową JSON.');return false;}
+}
+function restoreEstimate(record){
+  FIELD_IDS.forEach(id=>{
+    if(Object.prototype.hasOwnProperty.call(record.fields,id))byId(id).value=String(record.fields[id]??'');
+  });
+  lastExample=industryExamples[byId('category').value]||'';
+  updateIndustryUI();
+  // updateIndustryUI może zmienić tekst przykładowy, więc przywróć opis dokładnie.
+  byId('description').value=String(record.fields.description??'');
+  items=record.items.map(x=>makeItem(String(x.name),x.type==='material'?'material':'labor',
+    numberAtLeastZero(x.quantity),String(x.unit),numberAtLeastZero(x.rate)));
+  renderRows();
+  byId('estimate-status').value=record.fields['estimate-status']||'draft';
+  statusMessage('Wczytano wycenę. Możesz ją edytować i ponownie zapisać.');
+  showAppView('estimate');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function renderSavedEstimates(){
+  const list=byId('saved-list');list.replaceChildren();
+  if(!savedEstimates.length){const p=document.createElement('p');p.className='hint';p.textContent='Brak zapisanych wycen.';list.append(p);return;}
+  savedEstimates.forEach(record=>{
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px 0;border-top:1px solid #dce7df';
+    const label=document.createElement('div');
+    const title=document.createElement('strong');
+    title.textContent=(record.fields['estimate-number']||'Bez numeru')+' — '+(record.fields['client-name']||'Klient niepodany');
+    const sub=document.createElement('div');sub.className='hint';
+    sub.textContent='Status: '+statusLabel(record.fields['estimate-status'])+' · Zapisano: '+new Date(record.savedAt).toLocaleString('pl-PL')+' · '+record.items.length+' pozycji';
+    label.append(title,sub);
+    const buttons=document.createElement('div');buttons.className='actions';buttons.style.marginTop='0';
+    const open=document.createElement('button');open.type='button';open.className='secondary';open.textContent='Otwórz';
+    open.addEventListener('click',()=>restoreEstimate(record));
+    const remove=document.createElement('button');remove.type='button';remove.className='neutral';remove.textContent='Usuń';
+    remove.addEventListener('click',()=>{
+      if(!confirm('Usunąć tę zapisaną wycenę?'))return;
+      const before=savedEstimates.slice();savedEstimates=savedEstimates.filter(x=>x.id!==record.id);
+      if(!persistEstimates())savedEstimates=before;
+      renderSavedEstimates();
+    });
+    buttons.append(open,remove);row.append(label,buttons);list.append(row);
+  });
+}
+byId('save-estimate').addEventListener('click',()=>{
+  const record=currentEstimate();
+  const before=savedEstimates.slice();
+  savedEstimates.unshift(record);
+  if(persistEstimates())statusMessage('Zapisano wycenę na tym urządzeniu.');
+  else savedEstimates=before;
+  renderSavedEstimates();
+});
+byId('backup-estimates').addEventListener('click',()=>{
+  const backup={app:'PewnaWycena',version:1,exportedAt:new Date().toISOString(),estimates:savedEstimates};
+  const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const link=document.createElement('a');link.href=url;link.download='PewnaWycena-kopia-wycen.json';
+  document.body.append(link);link.click();link.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  statusMessage('Pobrano kopię zapasową wycen.');
+});
+byId('restore-estimates').addEventListener('click',()=>byId('restore-file').click());
+byId('restore-file').addEventListener('change',async event=>{
+  const file=event.target.files[0];if(!file)return;
+  try{
+    if(file.size>5_000_000)throw new Error('Plik jest zbyt duży (maksymalnie 5 MB).');
+    const data=JSON.parse(await file.text());
+    if(data.app!=='PewnaWycena'||!Array.isArray(data.estimates)||!data.estimates.every(validEstimate))
+      throw new Error('To nie jest prawidłowa kopia zapasowa PewnaWycena.');
+    if(!confirm('Wczytać kopię zapasową? Nowe wyceny zostaną dodane do obecnej listy.'))return;
+    const before=savedEstimates.slice();
+    const known=new Set(savedEstimates.map(x=>x.id));
+    const incoming=data.estimates.filter(x=>!known.has(x.id));
+    savedEstimates=[...incoming,...savedEstimates];
+    if(!persistEstimates())savedEstimates=before;
+    else statusMessage('Wczytano '+incoming.length+' nowych wycen.');
+    renderSavedEstimates();
+  }catch(err){statusMessage('Błąd importu: '+err.message);}
+  finally{event.target.value='';}
+});
+loadStoredEstimates();
+
+// PewnaWycena 1.4: cennik użytkownika, niezależny od zapisanych kosztorysów.
+const PRICE_KEY='pewnawycena_pricebook_v1';
+let pricebook=[];
+function priceStatus(message){byId('price-status').textContent=message;}
+function validPrice(x){return x && typeof x==='object' && typeof x.name==='string' && x.name.length<=250 && x.name.trim() && (x.type==='labor'||x.type==='material') && typeof x.unit==='string' && x.unit.length<=50 && Number.isFinite(Number(x.rate)) && Number(x.rate)>=0;}
+function storePrices(){try{localStorage.setItem(PRICE_KEY,JSON.stringify(pricebook));return true;}catch(e){priceStatus('Nie można zapisać cennika. Pobierz kopię JSON.');return false;}}
+function renderPrices(){
+ const body=byId('price-rows');body.replaceChildren();
+ if(!pricebook.length){const tr=document.createElement('tr');const td=document.createElement('td');td.colSpan=6;td.textContent='Cennik jest pusty. Dodaj pierwszą usługę lub materiał.';tr.append(td);body.append(tr);return;}
+ pricebook.forEach((p,index)=>{
+  const tr=document.createElement('tr');
+  [p.name,p.type==='material'?'Materiał':'Robocizna',p.unit,formatMoney(p.rate)].forEach(value=>{const td=document.createElement('td');td.textContent=value;tr.append(td);});
+  const addCell=document.createElement('td');const add=document.createElement('button');add.className='secondary';add.type='button';add.textContent='+ Do kosztorysu';
+  add.addEventListener('click',()=>{items.push(makeItem(p.name,p.type,1,p.unit,Number(p.rate)));renderRows();priceStatus('Dodano pozycję do bieżącej wyceny.');});addCell.append(add);tr.append(addCell);
+  const delCell=document.createElement('td');const del=document.createElement('button');del.className='danger';del.type='button';del.textContent='Usuń';
+  del.addEventListener('click',()=>{if(!confirm('Usunąć tę pozycję z cennika?'))return;const old=pricebook.slice();pricebook.splice(index,1);if(!storePrices())pricebook=old;renderPrices();});delCell.append(del);tr.append(delCell);body.append(tr);
+ });
+}
+function loadPrices(){try{const data=JSON.parse(localStorage.getItem(PRICE_KEY)||'[]');pricebook=Array.isArray(data)?data.filter(validPrice):[];}catch(e){pricebook=[];priceStatus('Nie udało się odczytać cennika. Możesz wczytać kopię JSON.');}renderPrices();}
+byId('price-save').addEventListener('click',()=>{
+ const p={name:byId('price-name').value.trim(),type:byId('price-type').value,unit:byId('price-unit').value.trim(),rate:Number(byId('price-rate').value)};
+ if(!validPrice(p)){priceStatus('Podaj nazwę, jednostkę i prawidłową stawkę (0 zł lub więcej).');return;}
+ const old=pricebook.slice();pricebook.push(p);
+ if(storePrices()){byId('price-name').value='';priceStatus('Dodano pozycję do Twojego cennika.');}else pricebook=old;
+ renderPrices();
+});
+byId('price-backup').addEventListener('click',()=>{
+ const data={app:'PewnaWycena',kind:'pricebook',version:1,prices:pricebook};
+ const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));
+ const a=document.createElement('a');a.href=url;a.download='PewnaWycena-moj-cennik.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+ priceStatus('Pobrano kopię cennika.');
+});
+byId('price-import').addEventListener('click',()=>byId('price-import-file').click());
+byId('price-import-file').addEventListener('change',async e=>{
+ const file=e.target.files[0];if(!file)return;
+ try{
+  if(file.size>2000000)throw new Error('Plik jest za duży.');
+  const data=JSON.parse(await file.text());
+  if(data.app!=='PewnaWycena'||data.kind!=='pricebook'||!Array.isArray(data.prices)||data.prices.length>2000||!data.prices.every(validPrice))throw new Error('Nieprawidłowy plik cennika.');
+  if(!confirm('Dodać pozycje z kopii do obecnego cennika?'))return;
+  const old=pricebook.slice();const seen=new Set(pricebook.map(p=>JSON.stringify(p)));
+  for(const p of data.prices){const key=JSON.stringify(p);if(!seen.has(key)){pricebook.push({name:p.name,type:p.type,unit:p.unit,rate:Number(p.rate)});seen.add(key);}}
+  if(storePrices())priceStatus('Cennik został wczytany.');else pricebook=old;
+  renderPrices();
+ }catch(err){priceStatus('Błąd importu: '+err.message);}finally{e.target.value='';}
+});
+loadPrices();
+
+// Nawigacja zakładkowa — nie zmienia zawartości formularzy ani zapisanych danych.
+function showAppView(view) {
+  const valid=['estimate','saved','clients','prices'];
+  if(!valid.includes(view))return;
+  valid.forEach(name=>{
+    const panel=byId('view-'+name);
+    panel.hidden=name!==view;
+  });
+  document.querySelectorAll('[data-view]').forEach(button=>{
+    const selected=button.dataset.view===view;
+    button.classList.toggle('active',selected);
+    button.setAttribute('aria-pressed',String(selected));
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('[data-view]').forEach(button=>
+  button.addEventListener('click',()=>showAppView(button.dataset.view))
+);
+
+// PewnaWycena 1.6 — prywatna, lokalna baza klientów.
+const CLIENTS_STORAGE_KEY='pewnawycena_clients_v1';
+let clientbook=[];
+function clientbookStatus(message){byId('clientbook-status').textContent=message;}
+function isValidClient(c){return c && typeof c==='object' && typeof c.id==='string' && typeof c.name==='string' && c.name.length<=300 && c.name.trim() && typeof c.contact==='string' && c.contact.length<=5000;}
+function readClients(){
+ try{const parsed=JSON.parse(localStorage.getItem(CLIENTS_STORAGE_KEY)||'[]');clientbook=Array.isArray(parsed)?parsed.filter(isValidClient):[];}
+ catch(e){clientbook=[];clientbookStatus('Nie udało się odczytać bazy klientów. Możesz wczytać kopię JSON.');}
+ renderClientbook();
+}
+function storeClients(){
+ try{localStorage.setItem(CLIENTS_STORAGE_KEY,JSON.stringify(clientbook));return true;}
+ catch(e){clientbookStatus('Brak możliwości zapisania klientów. Sprawdź ustawienia przeglądarki.');return false;}
+}
+function saveClient(name,contact){
+ name=name.trim();contact=contact.trim();
+ if(!name){clientbookStatus('Wpisz nazwę klienta.');return false;}
+ if(name.length>300||contact.length>5000){clientbookStatus('Dane klienta są za długie.');return false;}
+ const existing=clientbook.find(c=>c.name.toLocaleLowerCase('pl-PL')===name.toLocaleLowerCase('pl-PL'));
+ if(existing && !confirm('Klient o tej nazwie już istnieje. Zaktualizować jego dane?'))return false;
+ const old=clientbook.map(c=>({...c}));
+ if(existing){existing.name=name;existing.contact=contact;}else clientbook.unshift({id:Date.now().toString(36)+Math.random().toString(36).slice(2,9),name,contact});
+ if(!storeClients()){clientbook=old;return false;}
+ clientbookStatus(existing?'Zaktualizowano dane klienta.':'Dodano klienta do bazy.');renderClientbook();return true;
+}
+function renderClientbook(){
+ const list=byId('clientbook-list');list.replaceChildren();
+ const term=byId('clientbook-search').value.trim().toLocaleLowerCase('pl-PL');
+ const matches=clientbook.filter(c=>(c.name+' '+c.contact).toLocaleLowerCase('pl-PL').includes(term));
+ if(!matches.length){const p=document.createElement('p');p.className='hint';p.textContent=term?'Nie znaleziono klientów.':'Baza klientów jest pusta.';list.append(p);return;}
+ matches.forEach(c=>{
+  const row=document.createElement('div');row.className='clientbook-row';
+  const info=document.createElement('div');const name=document.createElement('strong');name.textContent=c.name;
+  const contact=document.createElement('p');contact.className='hint';contact.style.whiteSpace='pre-wrap';contact.textContent=c.contact;
+  info.append(name,contact);
+  const actions=document.createElement('div');actions.className='actions';actions.style.margin='0';
+  const choose=document.createElement('button');choose.type='button';choose.className='secondary';choose.textContent='Wybierz do wyceny';
+  choose.addEventListener('click',()=>{byId('client-name').value=c.name;byId('client-contact').value=c.contact;clientbookStatus('Wybrano klienta: '+c.name);showAppView('estimate');});
+  const edit=document.createElement('button');edit.type='button';edit.className='neutral';edit.textContent='Edytuj';
+  edit.addEventListener('click',()=>{byId('clientbook-name').value=c.name;byId('clientbook-contact').value=c.contact;byId('clientbook-name').focus();clientbookStatus('Zmień dane i kliknij „Zapisz klienta”, aby zaktualizować wpis o tej nazwie.');});
+  const remove=document.createElement('button');remove.type='button';remove.className='neutral';remove.textContent='Usuń';
+  remove.addEventListener('click',()=>{if(!confirm('Usunąć klienta „'+c.name+'” z bazy?'))return;const old=clientbook.slice();clientbook=clientbook.filter(x=>x.id!==c.id);if(!storeClients())clientbook=old;else clientbookStatus('Usunięto klienta.');renderClientbook();});
+  actions.append(choose,edit,remove);row.append(info,actions);list.append(row);
+ });
+}
+byId('clientbook-save').addEventListener('click',()=>{if(saveClient(byId('clientbook-name').value,byId('clientbook-contact').value)){byId('clientbook-name').value='';byId('clientbook-contact').value='';}});
+byId('client-quick-save').addEventListener('click',()=>{const name=byId('client-name').value;const contact=byId('client-contact').value;if(saveClient(name,contact))alert('Klient zapisany w bazie.');else showAppView('clients');});
+byId('client-open-list').addEventListener('click',()=>showAppView('clients'));
+byId('clientbook-search').addEventListener('input',renderClientbook);
+byId('clientbook-export').addEventListener('click',()=>{
+ const backup={app:'PewnaWycena',kind:'clients',version:1,exportedAt:new Date().toISOString(),clients:clientbook};
+ const url=URL.createObjectURL(new Blob([JSON.stringify(backup,null,2)],{type:'application/json'}));
+ const a=document.createElement('a');a.href=url;a.download='PewnaWycena-klienci.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);clientbookStatus('Pobrano kopię bazy klientów.');
+});
+byId('clientbook-import').addEventListener('click',()=>byId('clientbook-file').click());
+byId('clientbook-file').addEventListener('change',async e=>{
+ const file=e.target.files[0];if(!file)return;
+ try{
+  if(file.size>5_000_000)throw Error('Plik jest za duży (maks. 5 MB).');
+  const data=JSON.parse(await file.text());
+  if(data.app!=='PewnaWycena'||data.kind!=='clients'||!Array.isArray(data.clients)||data.clients.length>5000||!data.clients.every(isValidClient))throw Error('Nieprawidłowa kopia klientów.');
+  if(!confirm('Dodać klientów z kopii do obecnej bazy?'))return;
+  const old=clientbook.slice();const ids=new Set(clientbook.map(c=>c.id));let added=0;
+  for(const c of data.clients){if(!ids.has(c.id)){clientbook.push({id:c.id,name:c.name,contact:c.contact});ids.add(c.id);added++;}}
+  if(!storeClients())clientbook=old;else clientbookStatus('Wczytano '+added+' nowych klientów.');renderClientbook();
+ }catch(err){clientbookStatus('Błąd importu: '+err.message);}finally{e.target.value='';}
+});
+readClients();
+
+// PewnaWycena 1.7 — statusy ofert i automatyczne proponowanie kolejnego numeru.
+function statusLabel(value){return ({draft:'Robocza',sent:'Wysłana',accepted:'Zaakceptowana',rejected:'Odrzucona'})[value]||'Robocza';}
+function proposeNextNumber(){
+  const year=new Date().getFullYear();
+  const prefix='PW-'+year+'-';
+  const all=[...savedEstimates.map(r=>String(r.fields['estimate-number']||'')),byId('estimate-number').value];
+  let max=0;
+  all.forEach(number=>{if(number.startsWith(prefix)){const suffix=number.slice(prefix.length);if(/^\d+$/.test(suffix))max=Math.max(max,Number(suffix));}});
+  return prefix+String(max+1).padStart(3,'0');
+}
+byId('next-number').addEventListener('click',()=>{byId('estimate-number').value=proposeNextNumber();});
+// Przy pierwszym otwarciu proponujemy numer zgodny z bieżącym rokiem.
+if(byId('estimate-number').value==='PW-001')byId('estimate-number').value=proposeNextNumber();
+
+// PewnaWycena 1.8 — automatyczny zapis roboczy (oddzielny od listy zapisanych wycen).
+const DRAFT_KEY='pewnawycena_draft_v1';
+let draftTimer=null;
+let draftPaused=false;
+let draftDirty=false;
+function draftNotice(message){byId('draft-save-state').textContent=message;}
+function saveDraftNow(){
+  if(draftPaused||!draftDirty)return;
+  clearTimeout(draftTimer);
+  try{
+    const record=currentEstimate();
+    localStorage.setItem(DRAFT_KEY,JSON.stringify(record));
+    draftDirty=false;
+    draftNotice('Autozapis: zapisano o '+new Date().toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'}));
+  }catch(err){draftNotice('Autozapis niedostępny — zapisz wycenę ręcznie lub pobierz kopię zapasową.');}
+}
+function queueDraftSave(){
+  if(draftPaused)return;
+  draftDirty=true;
+  draftNotice('Autozapis: zapisywanie…');
+  clearTimeout(draftTimer);
+  draftTimer=setTimeout(saveDraftNow,650);
+}
+// Przechwytujemy również zmiany w dynamicznych wierszach kosztorysu.
+const estimateView=byId('view-estimate');
+estimateView.addEventListener('input',queueDraftSave);
+estimateView.addEventListener('change',queueDraftSave);
+estimateView.addEventListener('click',event=>{
+  if(event.target.closest('#draft-clear'))return;
+  if(event.target.closest('button'))queueMicrotask(queueDraftSave);
+});
+// Wybór klienta z bazy i wczytanie wcześniejszej wyceny nie wywołują input.
+byId('view-clients').addEventListener('click',()=>setTimeout(queueDraftSave,0));
+byId('view-saved').addEventListener('click',()=>setTimeout(queueDraftSave,0));
+window.addEventListener('pagehide',saveDraftNow);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')saveDraftNow();});
+byId('draft-clear').addEventListener('click',()=>{
+  if(!confirm('Usunąć automatyczną wersję roboczą? Bieżący formularz pozostanie bez zmian.'))return;
+  clearTimeout(draftTimer);draftDirty=false;
+  try{localStorage.removeItem(DRAFT_KEY);draftNotice('Autozapis: usunięto wersję roboczą.');}
+  catch(err){draftNotice('Nie udało się usunąć wersji roboczej.');}
+});
+(function offerDraftRecovery(){
+  let draft;
+  try{draft=JSON.parse(localStorage.getItem(DRAFT_KEY)||'null');}
+  catch(err){draftNotice('Nie udało się odczytać wersji roboczej.');return;}
+  if(!validEstimate(draft))return;
+  if(confirm('Znaleziono automatycznie zapisaną wycenę. Czy przywrócić ostatnią wersję roboczą?')){
+    draftPaused=true;
+    try{restoreEstimate(draft);draftNotice('Autozapis: przywrócono wersję roboczą.');}
+    finally{draftPaused=false;draftDirty=false;}
+  }else{
+    draftNotice('Autozapis: dostępna starsza wersja robocza. Nowe zmiany ją zastąpią.');
+  }
+})();
+
+byId('quick-save').addEventListener('click',()=>byId('save-estimate').click());
+</script>
+</body>
+</html>
