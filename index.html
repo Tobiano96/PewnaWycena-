@@ -2,8 +2,16 @@
 <html lang="pl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PewnaWycena 1.9 — wygodna na telefonie</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#143B31">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="PewnaWycena">
+<meta name="description" content="PewnaWycena — wygodne kosztorysy dla usługodawców.">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<title>PewnaWycena 2.3.1 — poprawiony asystent zakresu</title>
 <style>
 :root{--green:#176b52;--dark:#143b31;--bg:#f3f7f4;--border:#dce7df;--muted:#607269}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);font:15px/1.5 system-ui,Arial,sans-serif;color:#18251e}
@@ -156,6 +164,7 @@ header span:not(.brand-mark){color:#b8f3d7}
 <div class="layout">
 <section class="panel" aria-labelledby="input-heading">
 <h2 id="input-heading">1. Opis zlecenia</h2>
+
 <label for="description">Opis prac</label>
 <textarea id="description">Remont łazienki. Skuć stare płytki, przygotować podłoże, wykonać hydroizolację, ułożyć nowe płytki i zamontować armaturę.</textarea>
 <label for="category">Branża / rodzaj usług</label>
@@ -163,6 +172,18 @@ header span:not(.brand-mark){color:#b8f3d7}
 <label for="custom-category" id="custom-category-label" hidden>Własna nazwa usługi / branży</label><input id="custom-category" placeholder="np. Fotografia, transport, szkolenia" hidden>
 <div id="surface-fields"><label for="area">Powierzchnia podłogi / obszar (m²)</label><input id="area" type="number" min="0" step="0.1" value="6"><label for="walls">Powierzchnia ścian (m²)</label><input id="walls" type="number" min="0" step="0.1" value="20"></div>
 <p class="hint" id="category-hint">Wybierz branżę, aby wstawić przykładowy zakres i pozycje. Wszystkie stawki możesz zmienić.</p>
+<section class="assistant-scope" aria-labelledby="scope-heading" style="border:1px solid #c7ded1;background:#f2faf5;padding:16px;border-radius:12px;margin-bottom:16px">
+<h3 id="scope-heading" style="margin-top:0">Asystent zakresu prac <small style="font-size:12px;color:#176B52">v2.3.2</small></h3>
+<p class="hint">Po wybraniu branży poniżej pojawią się czynności do zaznaczenia. Asystent ułoży z nich opis do wyceny. To pomoc oparta na gotowych regułach — nie jest jeszcze sztuczną inteligencją.</p>
+<p id="scope-industry" style="font-weight:700;margin:8px 0">Dostępne czynności</p>
+<div id="scope-choices" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;margin:12px 0"></div>
+<div class="actions">
+<button id="scope-apply" type="button" class="secondary">Wstaw opis do wyceny</button>
+<button id="scope-clear" type="button" class="neutral">Wyczyść zaznaczenie</button>
+</div>
+<p class="hint" id="scope-status" role="status" aria-live="polite"></p>
+</section>
+
 <button id="generate" class="primary" type="button">Utwórz kosztorys</button>
 <p class="hint">Przykładowe pozycje możesz dowolnie edytować, usuwać i dodawać. Wycena wymaga sprawdzenia przez wykonawcę.</p>
 <div class="notice"><b>Wersja testowa:</b> stawki i pozycje dla każdej branży są wyłącznie przykładami, nie aktualnym cennikiem. To kalkulator szablonowy, jeszcze bez połączenia z AI. Zweryfikuj wycenę przed wysłaniem klientowi.</div>
@@ -179,6 +200,17 @@ header span:not(.brand-mark){color:#b8f3d7}
 </div>
 </div>
 <div id="view-saved" class="app-view" hidden>
+<section class="panel" id="all-data-backup">
+<h2>Bezpieczeństwo danych — pełna kopia</h2>
+<p class="hint">Jednym plikiem JSON zabezpieczysz zapisane wyceny, klientów, własny cennik i ostatnią wersję roboczą. Plik przechowuj prywatnie — może zawierać dane osobowe.</p>
+<div class="actions">
+<button id="backup-all" class="secondary" type="button">Pobierz pełną kopię danych</button>
+<button id="import-all" class="neutral" type="button">Przywróć pełną kopię</button>
+<input id="import-all-file" type="file" accept=".json,application/json" hidden>
+</div>
+<p id="backup-all-status" class="hint" role="status" aria-live="polite"></p>
+</section>
+
 <section class="panel" id="saved-estimates" style="margin-top:18px">
 <h2>Zapisane wyceny</h2><p class="hint">Wybierz „Otwórz”, aby przejść do edycji zapisanej wyceny.</p>
 <p class="hint">Zapisz kosztorys i wróć do niego później na tym samym urządzeniu i w tej samej przeglądarce. Dodatkowo możesz pobrać kopię zapasową JSON.</p>
@@ -773,6 +805,154 @@ byId('draft-clear').addEventListener('click',()=>{
 })();
 
 byId('quick-save').addEventListener('click',()=>byId('save-estimate').click());
+
+// PewnaWycena 2.1: jeden przenośny backup całej lokalnej bazy.
+const FULL_BACKUP_KIND='full-backup';
+const FULL_BACKUP_LIMIT=12*1024*1024;
+function backupAllStatus(text){byId('backup-all-status').textContent=text;}
+function readBackupState(){
+  return {
+    estimates:savedEstimates,
+    clients:clientbook,
+    prices:pricebook,
+    draft:(()=>{try{const d=JSON.parse(localStorage.getItem(DRAFT_KEY)||'null');return validEstimate(d)?d:null;}catch(e){return null;}})()
+  };
+}
+function downloadFullBackup(){
+  try{
+    saveDraftNow();
+    const backup={app:'PewnaWycena',kind:FULL_BACKUP_KIND,version:1,
+      exportedAt:new Date().toISOString(),data:readBackupState()};
+    const json=JSON.stringify(backup,null,2);
+    const url=URL.createObjectURL(new Blob([json],{type:'application/json'}));
+    const a=document.createElement('a');a.href=url;
+    a.download='PewnaWycena-pelna-kopia-'+new Date().toISOString().slice(0,10)+'.json';
+    document.body.append(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),3000);
+    backupAllStatus('Pobrano pełną kopię. Zachowaj ją w bezpiecznym miejscu.');
+  }catch(e){backupAllStatus('Nie udało się przygotować kopii: '+e.message);}
+}
+function validateFullBackup(data){
+  if(!data||data.app!=='PewnaWycena'||data.kind!==FULL_BACKUP_KIND||data.version!==1||!data.data)
+    throw Error('To nie jest obsługiwana pełna kopia PewnaWycena.');
+  const d=data.data;
+  if(!Array.isArray(d.estimates)||d.estimates.length>5000||!d.estimates.every(validEstimate))
+    throw Error('Nieprawidłowe zapisane wyceny.');
+  if(!Array.isArray(d.clients)||d.clients.length>5000||!d.clients.every(isValidClient))
+    throw Error('Nieprawidłowa baza klientów.');
+  if(!Array.isArray(d.prices)||d.prices.length>2000||!d.prices.every(validPrice))
+    throw Error('Nieprawidłowy cennik.');
+  if(d.draft!==null && d.draft!==undefined && !validEstimate(d.draft))
+    throw Error('Nieprawidłowa wersja robocza.');
+  return d;
+}
+function importFullBackup(data){
+  // Import zastępuje całą bazę. Najpierw weryfikujemy plik, potem próbujemy
+  // zapisać wszystkie klucze; przy błędzie odtwarzamy wcześniejszy stan.
+  const keys=[STORAGE_KEY,CLIENTS_STORAGE_KEY,PRICE_KEY,DRAFT_KEY];
+  const previous=keys.map(key=>localStorage.getItem(key));
+  const replacement=[
+    JSON.stringify(data.estimates),JSON.stringify(data.clients),
+    JSON.stringify(data.prices),data.draft?JSON.stringify(data.draft):null
+  ];
+  try{
+    keys.forEach((key,i)=>replacement[i]===null?localStorage.removeItem(key):localStorage.setItem(key,replacement[i]));
+  }catch(err){
+    try{keys.forEach((key,i)=>previous[i]===null?localStorage.removeItem(key):localStorage.setItem(key,previous[i]));}
+    catch(rollbackError){throw Error('Nie udało się przywrócić poprzednich danych. Zachowaj kopię JSON i nie zamykaj aplikacji.');}
+    throw Error('Brak miejsca na dane lub blokada pamięci przeglądarki. Import anulowany.');
+  }
+  savedEstimates=data.estimates;
+  clientbook=data.clients;
+  pricebook=data.prices;
+  renderSavedEstimates();renderClientbook();renderPrices();
+  draftDirty=false;clearTimeout(draftTimer);
+  backupAllStatus('Przywrócono dane: '+savedEstimates.length+' wycen, '+clientbook.length+' klientów, '+pricebook.length+' pozycji cennika.');
+  draftNotice(data.draft?'Przywrócono wersję roboczą. Odśwież aplikację, aby ją otworzyć.':'W kopii nie było wersji roboczej.');
+}
+byId('backup-all').addEventListener('click',downloadFullBackup);
+byId('import-all').addEventListener('click',()=>byId('import-all-file').click());
+byId('import-all-file').addEventListener('change',async event=>{
+  const file=event.target.files[0];
+  if(!file)return;
+  try{
+    if(file.size>FULL_BACKUP_LIMIT)throw Error('Plik jest za duży (maksymalnie 12 MB).');
+    const parsed=JSON.parse(await file.text());
+    const data=validateFullBackup(parsed);
+    if(!confirm('Przywrócić pełną kopię? UWAGA: zastąpi ona WSZYSTKIE aktualne wyceny, klientów, cennik i autozapis. Najpierw pobierz kopię obecnych danych.'))return;
+    importFullBackup(data);
+  }catch(e){backupAllStatus('Nie udało się wczytać kopii: '+e.message);}
+  finally{event.target.value='';}
+});
+
+
+
+</script>
+<script>
+(function(){
+'use strict';
+try{
+// Asystent zakresu 2.3: przewidywalne reguły, bez zewnętrznych API.
+const scopeTemplates={
+ bath:['Demontaż starej okładziny','Przygotowanie podłoża','Hydroizolacja','Układanie płytek','Fugowanie i silikonowanie','Montaż armatury','Wywóz odpadów'],
+ paint:['Zabezpieczenie pomieszczeń','Naprawa ubytków','Gruntowanie','Malowanie ścian','Malowanie sufitów','Sprzątanie po pracach'],
+ floor:['Demontaż starej podłogi','Wyrównanie podłoża','Montaż paneli lub desek','Montaż listew','Wykończenie progów'],
+ plumbing:['Diagnoza instalacji','Usunięcie przecieku','Wymiana baterii','Montaż umywalki','Montaż WC','Próba szczelności'],
+ electric:['Diagnostyka instalacji','Montaż gniazdek','Montaż oświetlenia','Wymiana zabezpieczeń','Pomiary kontrolne'],
+ cleaning:['Odkurzanie','Mycie podłóg','Mycie okien','Czyszczenie łazienek','Czyszczenie kuchni','Wywóz odpadów'],
+ garden:['Koszenie trawnika','Przycinanie żywopłotu','Pielęgnacja rabat','Sadzenie roślin','Usuwanie chwastów','Wywóz zielonych odpadów'],
+ auto:['Diagnostyka pojazdu','Wymiana oleju','Wymiana filtrów','Serwis hamulców','Wymiana części','Jazda próbna'],
+ it:['Diagnoza problemu','Instalacja oprogramowania','Konfiguracja sieci','Kopia danych','Usuwanie usterek','Testy po naprawie'],
+ general:['Konsultacja i pomiary','Przygotowanie stanowiska','Wykonanie usługi','Materiały i dostawa','Kontrola jakości','Porządkowanie miejsca pracy']
+};
+function renderScopeChoices(){
+ const category=document.getElementById('category').value;
+ const root=document.getElementById('scope-choices');root.replaceChildren();
+ document.getElementById('scope-industry').textContent='Dostępne czynności: '+document.getElementById('category').options[document.getElementById('category').selectedIndex].text;
+ (scopeTemplates[category]||scopeTemplates.general).forEach((label,i)=>{
+   const wrapper=document.createElement('label');
+   wrapper.style.cssText='display:flex;align-items:center;gap:9px;background:white;border:1px solid #d5e6db;border-radius:9px;padding:10px;cursor:pointer';
+   const check=document.createElement('input');check.type='checkbox';check.value=label;check.className='scope-choice';
+   check.style.cssText='width:18px;height:18px;flex:none';
+   const span=document.createElement('span');span.textContent=label;
+   wrapper.append(check,span);root.append(wrapper);
+ });
+ document.getElementById('scope-status').textContent='Wybierz czynności i kliknij „Wstaw opis do wyceny”.';
+}
+document.getElementById('category').addEventListener('change',renderScopeChoices);
+document.getElementById('scope-clear').addEventListener('click',()=>{
+ document.querySelectorAll('.scope-choice').forEach(c=>c.checked=false);
+ document.getElementById('scope-status').textContent='Wyczyszczono zaznaczenie.';
+});
+document.getElementById('scope-apply').addEventListener('click',()=>{
+ const chosen=Array.from(document.querySelectorAll('.scope-choice:checked'),c=>c.value);
+ if(!chosen.length){document.getElementById('scope-status').textContent='Najpierw zaznacz przynajmniej jedną czynność.';return;}
+ const category=document.getElementById('category');
+ const name=category.value==='general'?(document.getElementById('custom-category').value.trim()||'Usługa'):category.options[category.selectedIndex].text;
+ const description='Zakres usługi: '+name+'.\n'+chosen.map((v,i)=>(i+1)+'. '+v+'.').join('\n')+'\nZakres i ilości do potwierdzenia z klientem.';
+ const input=document.getElementById('description');
+ if(input.value.trim() && !confirm('Zastąpić obecny opis prac nowym opisem z asystenta?'))return;
+ input.value=description;
+ input.dispatchEvent(new Event('input',{bubbles:true}));
+ document.getElementById('scope-status').textContent='Wstawiono opis. Sprawdź zakres i stawki przed przygotowaniem wyceny.';
+});
+renderScopeChoices();
+
+}catch(err){
+ const status=document.getElementById('scope-status');
+ if(status)status.textContent='Błąd asystenta: '+err.message;
+ console.error('PewnaWycena asystent:',err);
+}
+})();
+</script>
+<script>
+if ('serviceWorker' in navigator && location.protocol === 'https:') {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(error => {
+      console.warn('Tryb offline jest niedostępny:', error);
+    });
+  });
+}
 </script>
 </body>
 </html>
