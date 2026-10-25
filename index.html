@@ -557,7 +557,22 @@ function renderSavedEstimates(){
       if(!persistEstimates())savedEstimates=before;
       renderSavedEstimates();
     });
-    buttons.append(open,remove);row.append(label,buttons);list.append(row);
+    const duplicate=document.createElement('button');
+    duplicate.type='button';duplicate.className='secondary';duplicate.textContent='Kopiuj';
+    duplicate.addEventListener('click',()=>{
+      const copy={
+        id:String(Date.now())+'-'+Math.random().toString(36).slice(2,9),
+        savedAt:new Date().toISOString(),
+        fields:{...record.fields,'estimate-number':'','estimate-status':'draft',
+          'estimate-date':new Date().toLocaleDateString('en-CA')},
+        items:record.items.map(item=>({...item}))
+      };
+      restoreEstimate(copy);
+      byId('estimate-number').value=nextEstimateNumber();
+      queueDraftSave();
+      statusMessage('Kopia otwarta jako nowa wycena. Sprawdź dane i kliknij „Zapisz wycenę”.');
+    });
+    buttons.append(open,duplicate,remove);row.append(label,buttons);list.append(row);
   });
 }
 byId('save-estimate').addEventListener('click',()=>{
