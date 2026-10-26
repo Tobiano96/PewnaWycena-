@@ -142,6 +142,19 @@ header span:not(.brand-mark){color:#b8f3d7}
 .status-pill--rejected{background:#fee2e2;color:#991b1b;border-color:#fca5a5}
 .status-pill--draft{background:#dbeafe;color:#1e40af;border-color:#93c5fd}
 .status-pill--sent{background:#ffedd5;color:#9a3412;border-color:#fdba74}
+
+/* Panel statystyk 2.7 */
+.dash-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin:20px 0}
+.dash-card{background:#f4faf6;border:1px solid #d6e7dc;border-radius:13px;padding:17px;display:flex;flex-direction:column;gap:9px;min-width:0}
+.dash-card span{color:#365848;font-size:13px;font-weight:700}
+.dash-card strong{color:#143b31;font-size:clamp(19px,3.4vw,28px);overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.dash-card small{color:#5e756a;font-size:12px}
+.dash-bars{display:grid;gap:16px;margin:14px 0 18px}
+.dash-bar-heading{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px}
+.dash-track{height:13px;border-radius:999px;background:#e8efe9;overflow:hidden;margin-top:7px}
+.dash-fill{height:100%;border-radius:999px}
+.dash-legend{font-size:12px;color:#51695e;margin-top:4px}
+@media(max-width:540px){.dash-grid{grid-template-columns:1fr}.dash-card{padding:14px}}
 </style>
 </head>
 <body>
@@ -151,6 +164,7 @@ header span:not(.brand-mark){color:#b8f3d7}
 <p>Wprowadź opis prac, wygeneruj pozycje i dostosuj ceny. Wszystkie obliczenia odbywają się w przeglądarce.</p>
 <nav class="app-nav" aria-label="Nawigacja po aplikacji">
 <button type="button" class="nav-tab active" data-view="estimate" aria-pressed="true">Nowa wycena</button>
+<button type="button" class="nav-tab" data-view="dashboard">Statystyki</button>
 <button type="button" class="nav-tab" data-view="saved" aria-pressed="false">Zapisane wyceny</button>
 <button type="button" class="nav-tab" data-view="clients" aria-pressed="false">Klienci</button>
 <button type="button" class="nav-tab" data-view="prices" aria-pressed="false">Mój cennik</button>
@@ -204,6 +218,21 @@ header span:not(.brand-mark){color:#b8f3d7}
 <p class="hint">Narzut liczony od sumy robocizny, materiałów i kosztów dodatkowych. Podatki nie są doliczane automatycznie.</p><p class="pdf-hint">Aby otrzymać PDF, kliknij „Zapisz jako PDF”, a w oknie drukowania wybierz „Zapisz jako PDF”.</p>
 </section>
 </div>
+</div>
+<div id="view-dashboard" class="app-view" hidden>
+<section class="panel" aria-labelledby="dashboard-heading">
+  <h2 id="dashboard-heading">Statystyki firmy</h2>
+  <p class="hint">Wyniki obliczane na podstawie zapisanych wycen na tym urządzeniu. To wartości ofert, a nie otrzymane płatności.</p>
+  <div class="dash-grid">
+    <div class="dash-card"><span>Wartość wszystkich ofert</span><strong id="dash-total">0,00 zł</strong><small id="dash-count">0 zapisanych wycen</small></div>
+    <div class="dash-card"><span>Zaakceptowane oferty</span><strong id="dash-accepted">0,00 zł</strong><small id="dash-accepted-count">0 ofert</small></div>
+    <div class="dash-card"><span>Skuteczność decyzji</span><strong id="dash-rate">—</strong><small>Zaakceptowane / (zaakceptowane + odrzucone)</small></div>
+    <div class="dash-card"><span>Wysłane — oczekujące</span><strong id="dash-pending">0,00 zł</strong><small id="dash-pending-count">0 ofert</small></div>
+  </div>
+  <h3>Oferty według statusu</h3>
+  <div id="dash-bars" class="dash-bars" aria-label="Wartość ofert według statusu"></div>
+  <p class="hint" id="dash-footnote">Kwoty uwzględniają pozycje, koszty dodatkowe i narzut zapisane w każdej wycenie. Każdy zapis liczony jest oddzielnie.</p>
+</section>
 </div>
 <div id="view-saved" class="app-view" hidden>
 <section class="panel" id="all-data-backup">
@@ -690,7 +719,7 @@ loadPrices();
 
 // Nawigacja zakładkowa — nie zmienia zawartości formularzy ani zapisanych danych.
 function showAppView(view) {
-  const valid=['estimate','saved','clients','prices'];
+  const valid=['estimate','dashboard','saved','clients','prices'];
   if(!valid.includes(view))return;
   valid.forEach(name=>{
     const panel=byId('view-'+name);
@@ -931,6 +960,75 @@ byId('import-all-file').addEventListener('change',async event=>{
 
 
 </script>
+<script>
+(function(){
+'use strict';
+const $=id=>document.getElementById(id);
+const statuses=[
+ {key:'accepted',label:'Zaakceptowane',color:'#16a34a'},
+ {key:'sent',label:'Wysłane',color:'#ea8b18'},
+ {key:'draft',label:'Robocze',color:'#3b82f6'},
+ {key:'rejected',label:'Odrzucone',color:'#dc2626'}
+];
+const pln=new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN'});
+const num=v=>{const n=Number(v);return Number.isFinite(n)?Math.max(0,n):0;};
+function amount(record){
+ const rows=Array.isArray(record.items)?record.items:[];
+ let subtotal=0;
+ for(const row of rows){
+   const value=num(row.quantity)*num(row.rate);
+   if(Number.isFinite(value))subtotal+=value;
+ }
+ const fields=record.fields||{};
+ const base=subtotal+num(fields.extra);
+ const total=base*(1+num(fields.margin)/100);
+ return Number.isFinite(total)?Math.min(total,1e14):0;
+}
+function refresh(){
+ const saved=Array.isArray(window.savedEstimates)?window.savedEstimates:
+   (typeof savedEstimates!=='undefined'?savedEstimates:[]);
+ const sums=Object.fromEntries(statuses.map(x=>[x.key,{count:0,value:0}]));
+ for(const record of saved){
+   if(!record||!record.fields)continue;
+   const status=Object.hasOwn(sums,record.fields['estimate-status'])?record.fields['estimate-status']:'draft';
+   sums[status].count++;
+   sums[status].value+=amount(record);
+ }
+ const all=statuses.reduce((acc,s)=>acc+sums[s.key].value,0);
+ const count=statuses.reduce((acc,s)=>acc+sums[s.key].count,0);
+ const accepted=sums.accepted.count,rejected=sums.rejected.count;
+ const decided=accepted+rejected;
+ $('dash-total').textContent=pln.format(all);
+ $('dash-count').textContent=count+' zapisanych wycen';
+ $('dash-accepted').textContent=pln.format(sums.accepted.value);
+ $('dash-accepted-count').textContent=accepted+' zaakceptowanych';
+ $('dash-rate').textContent=decided?new Intl.NumberFormat('pl-PL',{style:'percent',maximumFractionDigits:1}).format(accepted/decided):'—';
+ $('dash-pending').textContent=pln.format(sums.sent.value);
+ $('dash-pending-count').textContent=sums.sent.count+' wysłanych';
+ const root=$('dash-bars');root.replaceChildren();
+ const max=Math.max(0,...statuses.map(x=>sums[x.key].value));
+ for(const entry of statuses){
+   const group=document.createElement('div');
+   const head=document.createElement('div');head.className='dash-bar-heading';
+   const name=document.createElement('strong');name.textContent=entry.label;
+   const value=document.createElement('span');value.textContent=pln.format(sums[entry.key].value);
+   head.append(name,value);
+   const track=document.createElement('div');track.className='dash-track';
+   const fill=document.createElement('div');fill.className='dash-fill';
+   fill.style.backgroundColor=entry.color;
+   fill.style.width=(max?Math.max(0,Math.min(100,sums[entry.key].value/max*100)):0)+'%';
+   track.append(fill);
+   const legend=document.createElement('div');legend.className='dash-legend';
+   legend.textContent=sums[entry.key].count+' wycen';
+   group.append(head,track,legend);root.append(group);
+ }
+}
+document.querySelector('[data-view="dashboard"]').addEventListener('click',refresh);
+window.addEventListener('storage',refresh);
+refresh();
+})();
+</script>
+
 <script>
 (function(){
 'use strict';
