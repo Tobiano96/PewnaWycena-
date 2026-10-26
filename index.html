@@ -536,10 +536,34 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .health-results ul{padding-left:20px;margin:9px 0 0}
 .health-results li{padding:3px 0;color:#d5e8f8;font-size:13px}
 .health-results .health-warning{color:#ffc5c5;font-weight:700}
+
+/* 4.6 — samouczek pierwszego uruchomienia */
+.tutorial-overlay[hidden]{display:none!important}
+.tutorial-overlay{position:fixed;inset:0;z-index:10000;background:#031024c9;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px))}
+.tutorial-card{width:min(460px,100%);max-height:calc(100dvh - 42px);overflow-y:auto;background:linear-gradient(155deg,#173e69,#0a2343 70%);border:1px solid #85cfff88;border-radius:25px;box-shadow:0 25px 90px #000c28;padding:24px;color:#edf8ff}
+.tutorial-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.tutorial-kicker{font-size:11px;letter-spacing:.12em;font-weight:850;color:#8fdaff}
+#tutorial-close{background:#ffffff12;border:1px solid #ffffff33;color:#e8f7ff;width:40px;height:40px;border-radius:12px;min-height:40px;font-size:19px}
+.tutorial-progress{height:6px;background:#ffffff22;border-radius:20px;margin:20px 0 12px;overflow:hidden}
+#tutorial-progress-bar{display:block;height:100%;width:0;background:linear-gradient(90deg,#58b5ff,#8bf1f1);border-radius:20px;transition:width .22s ease}
+.tutorial-count{font-size:12px;color:#c4def3}
+.tutorial-emoji{font-size:42px;margin:15px 0 9px}
+.tutorial-card h2{font-size:clamp(22px,5vw,29px);line-height:1.2;color:#fff;margin:0 0 12px}
+.tutorial-card p{font-size:15px;line-height:1.7;color:#d6e9f8;margin:0 0 23px;min-height:74px}
+.tutorial-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tutorial-actions button{min-height:46px;border-radius:12px;padding:10px 14px;font-weight:800}
+.tutorial-skip{background:transparent;color:#c8dced;border:1px solid #ffffff3b;margin-right:auto}
+.tutorial-prev{background:#173d66;color:#eff8ff;border:1px solid #8fcaff6e}
+.tutorial-next{background:#90d9ff;color:#08223c;border:1px solid #90d9ff;flex:1}
+.tutorial-actions button:disabled{opacity:.35}
+.tutorial-menu-button{border:1px solid #86d2ff77!important;color:#b8e8ff!important}
+@media(prefers-reduced-motion:reduce){#tutorial-progress-bar{transition:none}}
+@media(max-width:380px){.tutorial-card{padding:18px}.tutorial-actions button{padding:9px 11px}}
+@media print{.tutorial-overlay{display:none!important}}
 </style>
 </head>
 <body>
-<header><span class="brand-mark" aria-hidden="true">⌂</span><span class="brand-name">Pewna<span>Wycena</span><small class="brand-slogan">Twój biznes pod kontrolą</small></span><span class="header-version">4.4 <span aria-hidden="true">✦</span></span></header>
+<header><span class="brand-mark" aria-hidden="true">⌂</span><span class="brand-name">Pewna<span>Wycena</span><small class="brand-slogan">Twój biznes pod kontrolą</small></span><span class="header-version">4.6 <span aria-hidden="true">✦</span></span></header>
 <nav class="bottom-nav" aria-label="Szybka nawigacja">
 <button type="button" data-view="home" aria-label="Pulpit" aria-pressed="true"><span class="bottom-icon" aria-hidden="true">⌂</span><span>Pulpit</span></button>
 <button type="button" data-view="estimate" aria-label="Nowa wycena" aria-pressed="false"><span class="bottom-icon" aria-hidden="true">▤</span><span>Wycena</span></button>
@@ -566,6 +590,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 <button type="button" class="nav-tab" data-view="reminders" aria-pressed="false">🔔 Przypomnienia</button>
 <button type="button" class="nav-tab" data-view="calendar" aria-pressed="false">📅 Terminarz</button>
 <button type="button" class="nav-tab" data-view="company" aria-pressed="false">🏢 Moja firma</button>
+<button type="button" id="tutorial-replay" class="nav-tab tutorial-menu-button">🎓 Samouczek aplikacji</button>
 </nav>
 </div>
 <div id="view-home" class="app-view">
@@ -772,6 +797,17 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 </div>
 <p class="footer">PewnaWycena · lokalny prototyp · wyceny i cennik przechowywane w tej przeglądarce. Pobieraj kopie zapasowe.</p>
 </main>
+<div id="tutorial-overlay" class="tutorial-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="tutorial-title" aria-describedby="tutorial-desc">
+ <div class="tutorial-card">
+  <div class="tutorial-top"><span class="tutorial-kicker">🎓 POZNAJ PEWNAWYCENA</span><button id="tutorial-close" type="button" aria-label="Zamknij samouczek">✕</button></div>
+  <div class="tutorial-progress" aria-hidden="true"><span id="tutorial-progress-bar"></span></div>
+  <div id="tutorial-count" class="tutorial-count"></div>
+  <div id="tutorial-emoji" class="tutorial-emoji" aria-hidden="true">👋</div>
+  <h2 id="tutorial-title">Witaj w PewnaWycena!</h2>
+  <p id="tutorial-desc"></p>
+  <div class="tutorial-actions"><button id="tutorial-skip" type="button" class="tutorial-skip">Pomiń</button><button id="tutorial-prev" type="button" class="tutorial-prev">Wstecz</button><button id="tutorial-next" type="button" class="tutorial-next">Dalej →</button></div>
+ </div>
+</div>
 <div id="view-company" class="app-view" hidden>
 <section class="panel">
 <h2>🏢 Moja firma — ustaw raz, korzystaj przy każdej wycenie</h2>
@@ -2401,8 +2437,76 @@ window.renderHome=function renderHome(){
  if(!sorted.length)empty(jobRoot,'Brak aktywnych zleceń.');
  for(const j of sorted)addRow(jobRoot,j.number+' — '+j.client,(j.status==='progress'?'W realizacji':'Do rozpoczęcia')+(j.deadline?' · termin '+j.deadline:''),'jobs','job');
 };
+
+// 4.6 — samouczek: tylko lokalna flaga ukończenia, bez zmian w danych firmy.
+const TUTORIAL_KEY='pewnawycena_tutorial_seen_v1';
+const tutorialSteps=[
+ {view:'home',emoji:'👋',title:'Witaj w PewnaWycena!',desc:'To Twoje centrum zarządzania firmą. W kilka chwil pokażę Ci najważniejsze miejsca. Ten samouczek uruchomi się automatycznie tylko raz.'},
+ {view:'home',emoji:'🏠',title:'Pulpit firmy',desc:'Na pulpicie zobaczysz aktywne zlecenia, pieniądze do otrzymania i zbliżające się terminy. To najlepsze miejsce na rozpoczęcie dnia.'},
+ {view:'estimate',emoji:'🧮',title:'Tworzenie wyceny',desc:'Otwórz zakładkę Wycena, uzupełnij klienta i dodaj pozycje kosztorysu. Asystent zakresu prac pomoże Ci opisać usługę.'},
+ {view:'saved',emoji:'📂',title:'Zapisane wyceny',desc:'Tutaj znajdziesz wcześniejsze kosztorysy, możesz je edytować, kopiować i zmieniać ich status. Zaakceptowana wycena może stać się zleceniem.'},
+ {view:'jobs',emoji:'🛠️',title:'Zlecenia i płatności',desc:'Śledź realizację prac, dodawaj notatki i terminy. W szczegółach zlecenia zapiszesz koszty, wpłaty i przygotujesz protokół odbioru.'},
+ {view:'calendar',emoji:'📅',title:'Terminarz i przypomnienia',desc:'Terminarz pokazuje planowane prace. W sekcji Przypomnienia zobaczysz zadania i ważne daty. To przypomnienia wewnątrz aplikacji, nie powiadomienia push.'},
+ {view:'company',emoji:'🏢',title:'Dane Twojej firmy',desc:'W sekcji Moja firma ustawisz nazwę, logo i wygląd dokumentów. W menu Więcej znajdziesz również klientów, cennik i statystyki.'},
+ {view:'home',emoji:'🛡️',title:'Zadbaj o kopię danych',desc:'PewnaWycena przechowuje dane lokalnie na urządzeniu. Regularnie pobieraj pełną kopię JSON i zachowuj ją w bezpiecznym miejscu poza aplikacją.'},
+ {view:'home',emoji:'🚀',title:'Gotowe do działania!',desc:'Możesz zacząć od przycisku Wycena. Jeśli zechcesz powtórzyć oprowadzanie, otwórz Więcej → Samouczek aplikacji.'}
+];
+const tutorialOverlay=byId('tutorial-overlay');
+let tutorialIndex=0,tutorialReturn='home',tutorialFocus=null;
+function tutorialCurrentView(){
+ const active=document.querySelector('.app-nav .nav-tab.active[data-view]');
+ return active?active.dataset.view:'home';
+}
+function tutorialDraw(){
+ const step=tutorialSteps[tutorialIndex];
+ showAppView(step.view);
+ byId('tutorial-title').textContent=step.title;
+ byId('tutorial-desc').textContent=step.desc;
+ byId('tutorial-emoji').textContent=step.emoji;
+ byId('tutorial-count').textContent='Krok '+(tutorialIndex+1)+' z '+tutorialSteps.length;
+ byId('tutorial-progress-bar').style.width=((tutorialIndex+1)/tutorialSteps.length*100)+'%';
+ byId('tutorial-prev').disabled=tutorialIndex===0;
+ byId('tutorial-next').textContent=tutorialIndex===tutorialSteps.length-1?'Zakończ ✓':'Dalej →';
+}
+function tutorialOpen(){
+ if(!tutorialOverlay.hidden)return;
+ tutorialReturn=tutorialCurrentView();
+ tutorialFocus=document.activeElement;
+ tutorialIndex=0;
+ tutorialOverlay.hidden=false;
+ document.body.style.overflow='hidden';
+ tutorialDraw();
+ byId('tutorial-next').focus();
+}
+function tutorialEnd(){
+ tutorialOverlay.hidden=true;
+ document.body.style.overflow='';
+ try{localStorage.setItem(TUTORIAL_KEY,'1')}catch(e){}
+ showAppView(tutorialReturn);
+ if(tutorialFocus&&document.contains(tutorialFocus))tutorialFocus.focus();
+ else byId('main-menu-toggle').focus();
+}
+byId('tutorial-replay').addEventListener('click',tutorialOpen);
+byId('tutorial-close').addEventListener('click',tutorialEnd);
+byId('tutorial-skip').addEventListener('click',tutorialEnd);
+byId('tutorial-prev').addEventListener('click',()=>{if(tutorialIndex>0){tutorialIndex--;tutorialDraw()}});
+byId('tutorial-next').addEventListener('click',()=>{
+ if(tutorialIndex===tutorialSteps.length-1)tutorialEnd();
+ else{tutorialIndex++;tutorialDraw()}
+});
+tutorialOverlay.addEventListener('keydown',e=>{
+ if(e.key==='Escape'){e.preventDefault();tutorialEnd();return}
+ if(e.key==='Tab'){
+  const controls=[...tutorialOverlay.querySelectorAll('button:not([disabled])')];
+  const first=controls[0],last=controls[controls.length-1];
+  if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}
+  else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}
+ }
+});
+
 // Start na pulpicie dopiero po inicjalizacji wszystkich modułów.
 showAppView('home');
+try{if(localStorage.getItem(TUTORIAL_KEY)!=='1')tutorialOpen()}catch(e){/* prywatny tryb może blokować localStorage */}
 })();
 </script>
 </body>
