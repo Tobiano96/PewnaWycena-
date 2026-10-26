@@ -302,6 +302,29 @@ body.brand-preview-open{overflow:hidden}
 .rem-item-actions{display:flex;gap:5px;flex-wrap:wrap}
 .rem-form{display:grid;gap:12px;margin:12px 0}.rem-form label{display:block;margin-bottom:5px}
 @media print{#view-reminders{display:none!important}}
+
+/* 3.7 — protokół odbioru i osobny widok A4 */
+.acceptance-print{display:none}
+.acceptance-header{display:flex;justify-content:space-between;gap:22px;border-bottom:3px solid #176b52;padding-bottom:15px;margin-bottom:22px}
+.acceptance-header strong{font-size:21px;color:#176b52}.acceptance-header small{display:block;color:#63716a}
+.acceptance-header h1{font-size:21px;margin:0 0 8px}.acceptance-header p{margin:3px 0;font-size:12px}
+.acceptance-parties{display:grid;grid-template-columns:1fr 1fr;gap:25px;margin:20px 0}
+.acceptance-print h3{color:#176b52;font-size:12px;text-transform:uppercase;margin:22px 0 7px}
+.acceptance-print p{white-space:pre-line;overflow-wrap:anywhere;line-height:1.5}
+.acceptance-parties p{margin:0}.acceptance-statement{margin-top:30px;font-size:12px}
+.acceptance-signatures{display:grid;grid-template-columns:1fr 1fr;gap:35px;margin:65px 0 20px;text-align:center;font-size:13px}
+.acceptance-signatures p{margin-top:6px}.acceptance-footnote{border-top:1px solid #dae7de;padding-top:12px;color:#6a7770;font-size:10px}
+.protocol-form{border:1px solid #c9dfd0;background:#f7fbf8;border-radius:12px;padding:14px;margin-top:12px;display:grid;gap:10px}
+.protocol-form label{display:block;font-size:13px;font-weight:700;margin-bottom:4px}
+.protocol-form textarea{min-height:72px;resize:vertical;width:100%}
+.protocol-form input,.protocol-form select{width:100%}
+@media print{
+ body.protocol-print .print-document{display:none!important}
+ body.protocol-print .acceptance-print{display:block!important;width:100%;max-width:100%;margin:0;padding:0;color:#1d2c25;font:10.5pt/1.5 Arial,sans-serif}
+ body:not(.protocol-print) .acceptance-print{display:none!important}
+ body.protocol-print .acceptance-signatures{break-inside:avoid}
+ body.protocol-print .acceptance-header,body.protocol-print .acceptance-parties{break-inside:avoid}
+}
 </style>
 </head>
 <body>
@@ -542,6 +565,17 @@ body.brand-preview-open{overflow:hidden}
   <table class="print-table"><thead><tr><th>Lp.</th><th>Pozycja</th><th>Typ</th><th class="right">Ilość</th><th>J.m.</th><th class="right">Stawka</th><th class="right">Wartość</th></tr></thead><tbody id="print-rows"></tbody></table>
   <div class="print-totals"><div><span>Robocizna</span><b id="print-labor"></b></div><div><span>Materiały</span><b id="print-material"></b></div><div><span>Koszty dodatkowe</span><b id="print-extra"></b></div><div><span>Narzut</span><b id="print-margin"></b></div><div class="final"><span>Łączna wycena</span><span id="print-total"></span></div></div>
   <div id="print-notes" class="print-note"></div><div id="print-custom-footer" class="print-custom-footer" hidden></div><div class="print-footer">Wycena orientacyjna. Zakres, ceny i ilości należy potwierdzić przed realizacją. Podatki nie są doliczane automatycznie.</div>
+</section>
+<section id="acceptance-print" class="acceptance-print" aria-label="Protokół odbioru prac do wydruku">
+<div class="acceptance-header"><div><strong>✓ PewnaWycena</strong><small>Dokument odbioru wykonanych prac</small></div><div><h1>PROTOKÓŁ ODBIORU PRAC</h1><p id="ap-number"></p><p id="ap-date"></p></div></div>
+<div class="acceptance-parties"><div><h3>Wykonawca</h3><p id="ap-company"></p></div><div><h3>Zamawiający</h3><p id="ap-client"></p></div></div>
+<h3>Przedmiot i zakres odbioru</h3><p id="ap-scope"></p>
+<h3>Wynik odbioru</h3><p id="ap-result"></p>
+<h3>Uwagi i ustalenia stron</h3><p id="ap-notes"></p>
+<div id="ap-fixes-wrap"><h3>Termin usunięcia zgłoszonych usterek / uwag</h3><p id="ap-fixes"></p></div>
+<p class="acceptance-statement">Strony potwierdzają powyższy stan odbioru. Dokument opisuje ustalenia stron na dzień wskazany w protokole.</p>
+<div class="acceptance-signatures"><div><span>...................................................</span><p>Podpis wykonawcy</p></div><div><span>...................................................</span><p>Podpis zamawiającego</p></div></div>
+<p class="acceptance-footnote">Protokół należy zweryfikować i podpisać zgodnie z faktycznym przebiegiem odbioru. Wydruk nie stanowi podpisu elektronicznego.</p>
 </section>
 <div id="brand-preview-modal" class="brand-preview-modal" hidden role="dialog" aria-modal="true" aria-labelledby="brand-preview-title">
 <div class="brand-preview-shell"><div class="brand-preview-bar"><strong id="brand-preview-title">Podgląd kosztorysu</strong><button id="brand-preview-close" type="button" class="neutral">✕ Zamknij</button></div><div class="brand-preview-page" id="brand-preview-page"></div><p class="hint">To podgląd dokumentu przed zapisaniem PDF. Wydruk może mieć inne podziały stron.</p></div>
@@ -1348,6 +1382,84 @@ function buildJobFinance(job){
 function renderFinanceOverview(){const el=byId('finance-overview');if(!el)return;let gross=0,cost=0,paid=0,result=0;for(const j of jobs){const c=financeCalc(financeOf(j));gross+=c.gross;cost+=c.expenseGross;paid+=c.payments;result+=c.result;}el.replaceChildren();const title=document.createElement('strong');title.textContent='💰 Podsumowanie finansów zleceń';el.append(title);[['Zlecenia brutto',gross],['Wydatki brutto',cost],['Wpłaty klientów',paid],['Pozostało do zapłaty',gross-paid],['Wynik przed podatkiem dochodowym',result]].forEach(([name,value])=>{const row=document.createElement('div');row.className='fin-line';const label=document.createElement('span');label.textContent=name;const amount=document.createElement('strong');amount.textContent=(value<0?'−':'')+moneyGr(Math.abs(value));row.append(label,amount);el.append(row)});}
 const vatModeInput=byId('company-vat-mode');vatModeInput.value=localStorage.getItem('pewnawycena_vat_mode_v1')==='exempt'?'exempt':'active';vatModeInput.addEventListener('change',()=>{try{localStorage.setItem('pewnawycena_vat_mode_v1',vatModeInput.value)}catch(e){alert('Nie udało się zapisać ustawień VAT.')}});
 
+
+// PewnaWycena 3.7 — protokoły powiązane z istniejącymi zleceniami.
+function validAcceptanceProtocol(p){
+ return !!(p&&typeof p==='object'
+ &&typeof p.date==='string'&&(!p.date||/^\d{4}-\d{2}-\d{2}$/.test(p.date))
+ &&['clear','remarks'].includes(p.result)
+ &&typeof p.scope==='string'&&p.scope.length<=4000
+ &&typeof p.notes==='string'&&p.notes.length<=4000
+ &&typeof p.fixDeadline==='string'&&(!p.fixDeadline||/^\d{4}-\d{2}-\d{2}$/.test(p.fixDeadline)));
+}
+function acceptanceOf(job){
+ return job.protocol||{date:'',result:'clear',scope:'',notes:'',fixDeadline:''};
+}
+function buildAcceptanceEditor(job){
+ const details=document.createElement('details');details.className='protocol-form';
+ const summary=document.createElement('summary');summary.textContent='📋 Protokół odbioru prac';details.append(summary);
+ const hint=document.createElement('p');hint.className='hint';hint.textContent='Dane protokołu są zapisywane razem ze zleceniem. Przed wydrukiem sprawdź treść i uzyskaj podpisy obu stron.';details.append(hint);
+ const protocol=acceptanceOf(job);
+ const fields={};
+ function field(label,type,value,maxLength){
+  const wrap=document.createElement('div');const lab=document.createElement('label');lab.textContent=label;
+  const input=document.createElement(type==='textarea'?'textarea':'input');
+  if(type!=='textarea')input.type=type;
+  if(maxLength)input.maxLength=maxLength;
+  input.value=value||'';wrap.append(lab,input);details.append(wrap);return input;
+ }
+ fields.date=field('Data odbioru','date',protocol.date);
+ const resultWrap=document.createElement('div'),resultLabel=document.createElement('label');resultLabel.textContent='Wynik odbioru';
+ fields.result=document.createElement('select');
+ for(const [v,t] of [['clear','Odebrano bez zastrzeżeń'],['remarks','Odebrano z uwagami / zastrzeżeniami']]){
+  const opt=document.createElement('option');opt.value=v;opt.textContent=t;fields.result.append(opt);
+ }
+ fields.result.value=protocol.result;resultWrap.append(resultLabel,fields.result);details.append(resultWrap);
+ fields.scope=field('Zakres wykonanych prac','textarea',protocol.scope,4000);
+ fields.notes=field('Uwagi i ustalenia stron','textarea',protocol.notes,4000);
+ fields.fixDeadline=field('Termin usunięcia uwag (opcjonalnie)','date',protocol.fixDeadline);
+ const message=document.createElement('p');message.className='hint';message.setAttribute('role','status');
+ const actions=document.createElement('div');actions.className='actions';
+ const save=document.createElement('button');save.type='button';save.className='secondary';save.textContent='💾 Zapisz protokół';
+ const print=document.createElement('button');print.type='button';print.className='primary';print.textContent='📄 Drukuj / Zapisz PDF';
+ function values(){return {date:fields.date.value,result:fields.result.value,scope:fields.scope.value.trim(),notes:fields.notes.value.trim(),fixDeadline:fields.fixDeadline.value}}
+ function saveProtocol(){
+  const value=values();
+  if(!value.date){message.textContent='Wybierz datę odbioru.';return false}
+  if(!value.scope){message.textContent='Wpisz zakres wykonanych prac.';return false}
+  if(!validAcceptanceProtocol(value)){message.textContent='Sprawdź poprawność pól protokołu.';return false}
+  const previous=job.protocol;job.protocol=value;
+  if(!persistJobs()){if(previous===undefined)delete job.protocol;else job.protocol=previous;message.textContent='Nie udało się zapisać. Sprawdź wolne miejsce.';return false}
+  message.textContent='Protokół zapisany wraz ze zleceniem.';return true;
+ }
+ save.addEventListener('click',saveProtocol);
+ print.addEventListener('click',()=>{
+  if(!saveProtocol())return;
+  prepareAcceptancePrint(job);
+  document.body.classList.add('protocol-print');
+  window.print();
+ });
+ actions.append(save,print);details.append(actions,message);
+ return details;
+}
+function prepareAcceptancePrint(job){
+ const p=acceptanceOf(job);
+ const record=savedEstimates.find(r=>r.id===job.estimateId);
+ const fields=record&&record.fields||{};
+ const companyName=byId('company-profile-name').value.trim();
+ const companyContact=byId('company-profile-contact').value.trim();
+ byId('ap-company').textContent=[companyName||fields['company-name']||'Nie podano wykonawcy',companyContact||fields['company-contact']||''].filter(Boolean).join('\n');
+ byId('ap-client').textContent=[job.client||fields['client-name']||'Nie podano klienta',fields['client-contact']||''].filter(Boolean).join('\n');
+ byId('ap-number').textContent='Zlecenie: '+job.number;
+ byId('ap-date').textContent='Data odbioru: '+p.date.split('-').reverse().join('.');
+ byId('ap-scope').textContent=p.scope;
+ byId('ap-result').textContent=p.result==='clear'?'Prace odebrano bez zastrzeżeń.':'Prace odebrano z uwagami / zastrzeżeniami.';
+ byId('ap-notes').textContent=p.notes||'Brak dodatkowych uwag.';
+ byId('ap-fixes-wrap').hidden=!p.fixDeadline;
+ byId('ap-fixes').textContent=p.fixDeadline?p.fixDeadline.split('-').reverse().join('.'):'—';
+}
+window.addEventListener('afterprint',()=>document.body.classList.remove('protocol-print'));
+
 // PewnaWycena 3.2 — lokalne Centrum zleceń.
 const JOBS_KEY='pewnawycena_jobs_v1';
 const JOB_STATUSES={todo:'Do rozpoczęcia',progress:'W trakcie',done:'Zakończone'};
@@ -1362,7 +1474,8 @@ function validJob(j){
   &&(!j.deadline||/^\d{4}-\d{2}-\d{2}$/.test(j.deadline))
   &&typeof j.notes==='string'&&j.notes.length<=3000
   &&typeof j.createdAt==='string'&&j.createdAt.length<80
-  &&(j.finance===undefined||validFinance(j.finance)));
+  &&(j.finance===undefined||validFinance(j.finance))
+  &&(j.protocol===undefined||validAcceptanceProtocol(j.protocol)));
 }
 let jobs=[];
 try{
@@ -1431,6 +1544,7 @@ function renderJobs(){
   const notesLabel=document.createElement('label');notesLabel.textContent='Notatki do zlecenia';
   const notes=document.createElement('textarea');notes.rows=2;notes.maxLength=3000;notes.value=job.notes;notes.placeholder='Ustalenia, postęp, materiały…';
   notes.addEventListener('change',()=>{const old=job.notes;job.notes=notes.value;if(!persistJobs()){job.notes=old;notes.value=old}});
+  card.append(buildAcceptanceEditor(job));
   card.append(buildJobFinance(job));
   const actions=document.createElement('div');actions.className='actions';
   const original=document.createElement('button');original.type='button';original.className='secondary';original.textContent='Otwórz wycenę';
