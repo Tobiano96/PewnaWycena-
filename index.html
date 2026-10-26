@@ -206,6 +206,35 @@ body.template-creative .print-document .print-title{font-style:italic}
  body.template-technical .print-document .print-header{border-bottom:5px solid var(--pdf-accent)!important}
  body.template-creative .print-document .print-header{border-bottom:3px dashed var(--pdf-accent)!important}
 }
+
+/* PewnaWycena 3.0 — Pakiet firmowy */
+.company-branding{margin:16px 0;padding:16px;border:2px solid #a5d5b7;border-radius:14px;background:#f3faf5}
+.company-branding h3{margin:0 0 8px}.brand-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:14px 0}
+.brand-logo-line,.brand-color-line{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:10px}
+#brand-logo-preview{max-height:70px;max-width:160px;object-fit:contain;background:white;padding:5px;border:1px solid #d3e3d7;border-radius:6px}
+#brand-color{width:65px;height:42px;padding:2px;border-radius:7px;cursor:pointer}
+.print-company-logo{max-height:68px;max-width:185px;object-fit:contain;display:block;margin:0 0 9px}
+.print-company-logo[hidden]{display:none!important}
+.print-custom-footer{margin-top:16px;padding-top:9px;border-top:1px solid #a9b8af;font-size:11px;white-space:pre-line;overflow-wrap:anywhere;color:#344b3e}
+.print-custom-footer[hidden]{display:none!important}
+.print-document{--pdf-accent:#176b52;--pdf-soft:#edf6f0;--pdf-ink:#264737}
+.print-document.brand-color-active{--pdf-accent:var(--company-accent)!important;--pdf-ink:var(--company-accent)!important}
+.print-document.brand-color-active .print-header{border-bottom-color:var(--company-accent)!important}
+.print-document.brand-color-active .print-brand,.print-document.brand-color-active .print-columns h3,.print-document.brand-color-active>h3,.print-document.brand-color-active .print-totals .final{color:var(--company-accent)!important}
+.print-document.brand-color-active .print-brand-mark{background:var(--company-accent)!important}
+.print-document.brand-color-active .print-totals .final{border-top-color:var(--company-accent)!important}
+.brand-preview-modal{position:fixed;inset:0;z-index:1000;background:rgba(9,24,17,.8);padding:12px;overflow:auto}
+.brand-preview-modal[hidden]{display:none!important}
+.brand-preview-shell{max-width:900px;margin:10px auto;background:#e6ebe8;border-radius:12px;padding:12px}
+.brand-preview-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.brand-preview-page{background:white;color:#18251e;border-radius:3px;padding:clamp(12px,4vw,36px);box-shadow:0 3px 16px #0002;overflow:auto}
+.brand-preview-page .print-document{display:block!important;width:100%;font-size:12px}
+.brand-preview-page .print-header{display:flex!important}
+.brand-preview-page .print-table{width:100%;font-size:10px}
+.brand-preview-page .print-table th,.brand-preview-page .print-table td{padding:5px 3px}
+body.brand-preview-open{overflow:hidden}
+@media(max-width:600px){.brand-grid{grid-template-columns:1fr}.brand-preview-page .print-brand{font-size:17px}.brand-preview-page .print-title{font-size:18px}.brand-preview-page .print-columns{gap:12px}}
+@media print{.brand-preview-modal{display:none!important}.print-company-logo{max-height:20mm;max-width:52mm;break-inside:avoid}.print-custom-footer{font-size:9pt}}
 </style>
 </head>
 <body>
@@ -230,6 +259,17 @@ body.template-creative .print-document .print-title{font-style:italic}
 <div><label for="estimate-number">Numer kosztorysu</label><div class="actions" style="align-items:center"><input id="estimate-number" value="PW-001" style="flex:1;min-width:130px"><button id="next-number" type="button" class="secondary">Nowy numer</button></div></div>
 <div><label for="estimate-date">Data kosztorysu</label><input id="estimate-date" type="date"></div><div><label for="estimate-status">Status oferty</label><select id="estimate-status"><option value="draft">Robocza</option><option value="sent">Wysłana</option><option value="accepted">Zaakceptowana</option><option value="rejected">Odrzucona</option></select></div>
 </div>
+<section class="company-branding" aria-labelledby="branding-heading">
+<h3 id="branding-heading">🏢 Pakiet firmowy — wygląd oferty</h3>
+<p class="hint">Logo, kolor i stopka będą widoczne w wydruku i PDF. Ustawienia zapisują się tylko na tym urządzeniu.</p>
+<div class="brand-grid">
+<div><label for="brand-logo">Logo firmy (PNG, JPG, WEBP)</label><input id="brand-logo" type="file" accept="image/png,image/jpeg,image/webp"><p class="hint">Maksymalnie 1 MB. Logo pozostaje na tym urządzeniu.</p><div class="brand-logo-line"><img id="brand-logo-preview" alt="Podgląd logo firmy" hidden><button type="button" id="brand-logo-remove" class="neutral">Usuń logo</button></div></div>
+<div><label for="brand-color">Kolor firmowy</label><div class="brand-color-line"><input id="brand-color" type="color" value="#176b52"><button type="button" id="brand-color-reset" class="neutral">Przywróć zielony</button></div><p class="hint">Kolor zastępuje główne akcenty wybranego szablonu PDF.</p></div>
+</div>
+<label for="brand-footer">Własna stopka dokumentu</label><textarea id="brand-footer" rows="3" maxlength="600" placeholder="np. NIP: 123-456-78-90 · tel. 500 000 000 · Oferta ważna 14 dni"></textarea>
+<div class="actions"><button type="button" id="brand-preview-open" class="secondary">👁 Podgląd oferty</button></div>
+<p class="hint" id="brand-status" role="status" aria-live="polite"></p>
+</section>
 <label for="estimate-notes">Uwagi / warunki wyceny</label><textarea id="estimate-notes" placeholder="np. Wycena ważna 14 dni. Termin realizacji do uzgodnienia."></textarea>
 </section>
 <div class="layout">
@@ -361,13 +401,16 @@ body.template-creative .print-document .print-title{font-style:italic}
 <p class="footer">PewnaWycena · lokalny prototyp · wyceny i cennik przechowywane w tej przeglądarce. Pobieraj kopie zapasowe.</p>
 </main>
 <section id="print-document" class="print-document" aria-label="Kosztorys do PDF">
-  <div class="print-header"><div><div class="print-brand"><span class="print-brand-mark">✓</span> PewnaWycena</div><div class="print-meta">Profesjonalna wycena usług</div></div><div><h1 class="print-title">KOSZTORYS</h1><div class="print-meta">Numer: <span id="print-number"></span></div><div class="print-meta">Data: <span id="print-date"></span></div></div></div>
+  <div class="print-header"><div><img id="print-company-logo" class="print-company-logo" alt="Logo wykonawcy" hidden><div class="print-brand"><span class="print-brand-mark">✓</span> PewnaWycena</div><div class="print-meta">Profesjonalna wycena usług</div></div><div><h1 class="print-title">KOSZTORYS</h1><div class="print-meta">Numer: <span id="print-number"></span></div><div class="print-meta">Data: <span id="print-date"></span></div></div></div>
   <div class="print-columns"><div><h3>Wykonawca</h3><p id="print-company"></p></div><div><h3>Klient / inwestycja</h3><p id="print-client"></p></div></div>
   <h3>Zakres prac</h3><p id="print-description" style="white-space:pre-line"></p>
   <table class="print-table"><thead><tr><th>Lp.</th><th>Pozycja</th><th>Typ</th><th class="right">Ilość</th><th>J.m.</th><th class="right">Stawka</th><th class="right">Wartość</th></tr></thead><tbody id="print-rows"></tbody></table>
   <div class="print-totals"><div><span>Robocizna</span><b id="print-labor"></b></div><div><span>Materiały</span><b id="print-material"></b></div><div><span>Koszty dodatkowe</span><b id="print-extra"></b></div><div><span>Narzut</span><b id="print-margin"></b></div><div class="final"><span>Łączna wycena</span><span id="print-total"></span></div></div>
-  <div id="print-notes" class="print-note"></div><div class="print-footer">Wycena orientacyjna. Zakres, ceny i ilości należy potwierdzić przed realizacją. Podatki nie są doliczane automatycznie.</div>
+  <div id="print-notes" class="print-note"></div><div id="print-custom-footer" class="print-custom-footer" hidden></div><div class="print-footer">Wycena orientacyjna. Zakres, ceny i ilości należy potwierdzić przed realizacją. Podatki nie są doliczane automatycznie.</div>
 </section>
+<div id="brand-preview-modal" class="brand-preview-modal" hidden role="dialog" aria-modal="true" aria-labelledby="brand-preview-title">
+<div class="brand-preview-shell"><div class="brand-preview-bar"><strong id="brand-preview-title">Podgląd kosztorysu</strong><button id="brand-preview-close" type="button" class="neutral">✕ Zamknij</button></div><div class="brand-preview-page" id="brand-preview-page"></div><p class="hint">To podgląd dokumentu przed zapisaniem PDF. Wydruk może mieć inne podziały stron.</p></div>
+</div>
 <script>
 'use strict';
 const byId = id => document.getElementById(id);
@@ -1231,6 +1274,60 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
  let initial='classic';
  try{initial=localStorage.getItem(key)||'classic'}catch(e){}
  apply(initial);
+})();
+</script>
+<script>
+(function(){
+'use strict';
+const key='pewnawycena_company_brand_v1';
+const $=id=>document.getElementById(id);
+const initial={logo:'',color:'#176b52',footer:''};
+let data={...initial};
+try{
+ const stored=JSON.parse(localStorage.getItem(key)||'null');
+ if(stored&&typeof stored==='object'){
+  if(typeof stored.logo==='string'&&/^data:image\/(png|jpeg|webp);base64,/.test(stored.logo)&&stored.logo.length<1600000)data.logo=stored.logo;
+  if(typeof stored.color==='string'&&/^#[0-9a-fA-F]{6}$/.test(stored.color))data.color=stored.color;
+  if(typeof stored.footer==='string')data.footer=stored.footer.slice(0,600);
+ }
+}catch(e){}
+const status=$('brand-status');
+function save(){try{localStorage.setItem(key,JSON.stringify(data));status.textContent='Ustawienia firmowe zapisane na tym urządzeniu.';return true}catch(e){status.textContent='Brak miejsca na zapis ustawień. Zmniejsz logo lub usuń niepotrzebne dane.';return false}}
+function render(){
+ $('brand-color').value=data.color;
+ $('brand-footer').value=data.footer;
+ $('brand-logo-preview').hidden=!data.logo;
+ if(data.logo)$('brand-logo-preview').src=data.logo;
+ else $('brand-logo-preview').removeAttribute('src');
+ const logo=$('print-company-logo');logo.hidden=!data.logo;
+ if(data.logo)logo.src=data.logo;else logo.removeAttribute('src');
+ const footer=$('print-custom-footer');footer.textContent=data.footer;footer.hidden=!data.footer.trim();
+ const doc=$('print-document');doc.classList.toggle('brand-color-active',data.color.toLowerCase()!=='#176b52');doc.style.setProperty('--company-accent',data.color);
+}
+$('brand-color').addEventListener('input',()=>{data.color=$('brand-color').value;render();save()});
+$('brand-color-reset').addEventListener('click',()=>{data.color='#176b52';render();save()});
+$('brand-footer').addEventListener('input',()=>{data.footer=$('brand-footer').value.slice(0,600);render();save()});
+$('brand-logo').addEventListener('change',event=>{
+ const file=event.target.files&&event.target.files[0];if(!file)return;
+ if(!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>1024*1024){status.textContent='Wybierz PNG, JPG lub WEBP o rozmiarze do 1 MB.';event.target.value='';return}
+ const reader=new FileReader();reader.onload=()=>{
+  const result=String(reader.result||'');if(!/^data:image\/(png|jpeg|webp);base64,/.test(result))return;
+  const previous=data.logo;data.logo=result;render();if(!save()){data.logo=previous;render()}
+ };reader.onerror=()=>{status.textContent='Nie udało się odczytać pliku.'};reader.readAsDataURL(file);
+});
+$('brand-logo-remove').addEventListener('click',()=>{data.logo='';$('brand-logo').value='';render();save()});
+const modal=$('brand-preview-modal'),page=$('brand-preview-page');
+function close(){modal.hidden=true;document.body.classList.remove('brand-preview-open');page.replaceChildren()}
+$('brand-preview-open').addEventListener('click',()=>{
+ preparePrintDocument();render();
+ const copy=$('print-document').cloneNode(true);copy.removeAttribute('id');
+ page.replaceChildren(copy);modal.hidden=false;document.body.classList.add('brand-preview-open');
+ $('brand-preview-close').focus();
+});
+$('brand-preview-close').addEventListener('click',close);
+modal.addEventListener('click',event=>{if(event.target===modal)close()});
+document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!modal.hidden)close()});
+render();
 })();
 </script>
 </body>
