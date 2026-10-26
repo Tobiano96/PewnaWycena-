@@ -11,7 +11,7 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
-<title>PewnaWycena 4.3 — Premium Glass</title>
+<title>PewnaWycena 4.4 — Premium Glass</title>
 <style>
 :root{--green:#176b52;--dark:#143b31;--bg:#f3f7f4;--border:#dce7df;--muted:#607269}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);font:15px/1.5 system-ui,Arial,sans-serif;color:#18251e}
@@ -344,7 +344,7 @@ body.is-home #main-heading,body.is-home #main-heading+p{display:none}
 @media print{#view-home{display:none!important}}
 
 
-/* PewnaWycena 4.3 — Midnight Navy Premium Glass, kontrast WCAG */
+/* PewnaWycena 4.4 — Midnight Navy Premium Glass, kontrast WCAG */
 :root{--text:#ecf5ff;--muted:#b7cce4;--navy:#07182f;--navy2:#102947;--blue:#6fb8ff;--aqua:#64e0d4}
 html{background:#061326;scroll-behavior:smooth}
 body{background:radial-gradient(ellipse 80% 460px at 85% 0,#163c68 0%,transparent 85%),radial-gradient(ellipse 80% 620px at 5% 650px,#0b3156 0%,transparent 85%),linear-gradient(155deg,#081c35,#061326 80%);background-attachment:fixed;color:#eaf4ff;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",Inter,system-ui,sans-serif;letter-spacing:-.01em}
@@ -389,7 +389,7 @@ input,select,textarea{background:#0a2749!important;border:1px solid #8bc6ff77!im
 @media print{body{background:#fff!important;color:#111!important}body>header,.bottom-nav,.menu-wrap{display:none!important}}
 
 
-/* PewnaWycena 4.3 — polish: mobile usability, legibility and accessibility */
+/* PewnaWycena 4.4 — polish: mobile usability, legibility and accessibility */
 :root{--green:#63c7ff;--dark:#07182f;--bg:#07182f;--border:#365c80;--muted:#bed2e8}
 .visually-hidden{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 body{line-height:1.55;-webkit-font-smoothing:antialiased}
@@ -476,7 +476,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 }
 
 
-/* PewnaWycena 4.3 — premium dashboard and motion */
+/* PewnaWycena 4.4 — premium dashboard and motion */
 .home-hero{display:flex;justify-content:space-between;align-items:center;gap:12px;isolation:isolate;min-height:225px!important}
 .home-hero-copy{position:relative;z-index:2;max-width:620px}
 .home-hero .home-eyebrow{font-size:10px;font-weight:850;letter-spacing:.18em;margin:0 0 14px;color:#8ddcff!important}
@@ -524,10 +524,22 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 @media(max-width:365px){.home-hero-art{opacity:.35}.home-stat-head{flex-wrap:wrap}.home-stat{min-height:150px!important}}
 @media(prefers-reduced-motion:reduce){.home-stat,.hero-orbit,.hero-spark{animation:none!important}.home-item:hover{transform:none}}
 
+
+/* 4.4: panel diagnostyczny, dostępność i bezpieczne formularze */
+.health-panel{margin-top:18px;padding:17px;border:1px solid #8ecbff66;border-radius:18px;background:linear-gradient(145deg,#15395f,#0c2748);color:#eef7ff}
+.health-panel h3{margin:0 0 8px;color:#f2f9ff}
+.health-panel .hint{color:#c5ddf2}
+.health-actions{display:flex;gap:10px;flex-wrap:wrap;margin:13px 0}
+.health-actions button{flex:1 1 180px;min-height:46px}
+.health-results{padding:13px;border-radius:12px;background:#09223f;border:1px solid #8ecbff44;overflow-wrap:anywhere}
+.health-results strong{display:block;color:#b5e7ff}
+.health-results ul{padding-left:20px;margin:9px 0 0}
+.health-results li{padding:3px 0;color:#d5e8f8;font-size:13px}
+.health-results .health-warning{color:#ffc5c5;font-weight:700}
 </style>
 </head>
 <body>
-<header><span class="brand-mark" aria-hidden="true">⌂</span><span class="brand-name">Pewna<span>Wycena</span><small class="brand-slogan">Twój biznes pod kontrolą</small></span><span class="header-version">4.3 <span aria-hidden="true">✦</span></span></header>
+<header><span class="brand-mark" aria-hidden="true">⌂</span><span class="brand-name">Pewna<span>Wycena</span><small class="brand-slogan">Twój biznes pod kontrolą</small></span><span class="header-version">4.4 <span aria-hidden="true">✦</span></span></header>
 <nav class="bottom-nav" aria-label="Szybka nawigacja">
 <button type="button" data-view="home" aria-label="Pulpit" aria-pressed="true"><span class="bottom-icon" aria-hidden="true">⌂</span><span>Pulpit</span></button>
 <button type="button" data-view="estimate" aria-label="Nowa wycena" aria-pressed="false"><span class="bottom-icon" aria-hidden="true">▤</span><span>Wycena</span></button>
@@ -651,6 +663,16 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 <input id="import-all-file" type="file" accept=".json,application/json" hidden>
 </div>
 <p id="backup-all-status" class="hint" role="status" aria-live="polite"></p>
+<div class="health-panel" aria-labelledby="health-title">
+<h3 id="health-title">🛡️ Kontrola bezpieczeństwa danych</h3>
+<p class="hint">Sprawdź, czy zapis w przeglądarce działa, czy baza jest spójna i czy można przygotować poprawną kopię JSON.</p>
+<div class="health-actions">
+<button id="health-check" class="secondary" type="button">Sprawdź dane</button>
+<button id="health-backup" class="primary" type="button">Pobierz kopię bezpieczeństwa</button>
+</div>
+<div id="health-results" class="health-results" role="status" aria-live="polite">Kontrola nie była jeszcze uruchamiana.</div>
+<p class="hint">Dane są przechowywane lokalnie na tym urządzeniu. Kopię JSON trzymaj poza aplikacją, np. w Plikach iPhone’a.</p>
+</div>
 </section>
 
 <section class="panel" id="saved-estimates" style="margin-top:18px">
@@ -1488,7 +1510,7 @@ function downloadFullBackup(){
     a.download='PewnaWycena-pelna-kopia-'+new Date().toISOString().slice(0,10)+'.json';
     document.body.append(a);a.click();a.remove();
     setTimeout(()=>URL.revokeObjectURL(url),3000);
-    backupAllStatus('Pobrano pełną kopię. Zachowaj ją w bezpiecznym miejscu.');
+    backupAllStatus('Rozpoczęto pobieranie kopii JSON. Sprawdź w Plikach, czy plik został zapisany.');
   }catch(e){backupAllStatus('Nie udało się przygotować kopii: '+e.message);}
 }
 function validateFullBackup(data){
@@ -1545,6 +1567,71 @@ function importFullBackup(data){
   backupAllStatus('Przywrócono dane: '+savedEstimates.length+' wycen, '+clientbook.length+' klientów, '+pricebook.length+' pozycji cennika i '+jobs.length+' zleceń i '+reminders.length+' przypomnień.');
   draftNotice('Dane przywrócone. Odśwież aplikację, aby zobaczyć przywrócone ustawienia firmy i wersję roboczą.');
 }
+
+// PewnaWycena 4.4 — diagnostyka, która NIE usuwa ani nie nadpisuje danych.
+function inspectLocalData(){
+ const checks=[], add=(ok,text)=>checks.push({ok,text});
+ let canWrite=false;
+ const probe='pewnawycena_probe_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+ try{
+   localStorage.setItem(probe,'ok');
+   canWrite=localStorage.getItem(probe)==='ok';
+ }catch(e){canWrite=false}
+ finally{try{localStorage.removeItem(probe)}catch(e){}}
+ add(canWrite,'Zapis w pamięci urządzenia');
+ const groups=[
+  [STORAGE_KEY,validEstimate,5000,'Zapisane wyceny'],
+  [CLIENTS_STORAGE_KEY,isValidClient,5000,'Baza klientów'],
+  [PRICE_KEY,validPrice,2000,'Cennik'],
+  [JOBS_KEY,validJob,5000,'Zlecenia i protokoły'],
+  [REMINDERS_KEY,validReminder,3000,'Przypomnienia']
+ ];
+ for(const [key,validator,max,label] of groups){
+  try{
+   const raw=localStorage.getItem(key);
+   const arr=raw===null?[]:JSON.parse(raw);
+   add(Array.isArray(arr)&&arr.length<=max&&arr.every(validator),label+': '+(Array.isArray(arr)?arr.length:'niepoprawny format'));
+  }catch(e){add(false,label+': nie można odczytać danych')}
+ }
+ try{
+  const draftRaw=localStorage.getItem(DRAFT_KEY);
+  add(!draftRaw||validEstimate(JSON.parse(draftRaw)),'Wersja robocza kosztorysu');
+ }catch(e){add(false,'Wersja robocza kosztorysu: błąd odczytu')}
+ try{
+  const b={app:'PewnaWycena',kind:FULL_BACKUP_KIND,version:1,data:readBackupState()};
+  const json=JSON.stringify(b);
+  validateFullBackup(JSON.parse(json));
+  add(new Blob([json]).size<=FULL_BACKUP_LIMIT,'Możliwość przygotowania i weryfikacji kopii JSON ('+(new Blob([json]).size/1024).toFixed(0)+' KB)');
+ }catch(e){add(false,'Kopia JSON: '+e.message)}
+ try{
+  let bytes=0;
+  for(let i=0;i<localStorage.length;i++){
+   const k=localStorage.key(i);
+   bytes+=(k.length+(localStorage.getItem(k)||'').length)*2;
+  }
+  add(true,'Szacowana ilość danych lokalnych: '+(bytes/1024/1024).toFixed(2)+' MB (limit zależy od Safari)');
+ }catch(e){add(false,'Nie można oszacować zajętości pamięci')}
+ return checks;
+}
+function renderHealthCheck(){
+ const el=byId('health-results');el.replaceChildren();
+ const checks=inspectLocalData();
+ const problems=checks.filter(x=>!x.ok).length;
+ const heading=document.createElement('strong');
+ heading.textContent=problems?'⚠️ Wykryto '+problems+' problemów. Zachowaj kopię danych.':'✓ Kontrola zakończona: podstawowe testy OK';
+ el.append(heading);
+ const list=document.createElement('ul');
+ for(const check of checks){
+  const item=document.createElement('li');
+  item.textContent=(check.ok?'✓ ':'⚠ ')+check.text;
+  if(!check.ok)item.className='health-warning';
+  list.append(item);
+ }
+ el.append(list);
+}
+byId('health-check').addEventListener('click',renderHealthCheck);
+byId('health-backup').addEventListener('click',downloadFullBackup);
+
 byId('backup-all').addEventListener('click',downloadFullBackup);
 byId('import-all').addEventListener('click',()=>byId('import-all-file').click());
 byId('import-all-file').addEventListener('change',async event=>{
