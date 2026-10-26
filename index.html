@@ -155,6 +155,25 @@ header span:not(.brand-mark){color:#b8f3d7}
 .dash-fill{height:100%;border-radius:999px}
 .dash-legend{font-size:12px;color:#51695e;margin-top:4px}
 @media(max-width:540px){.dash-grid{grid-template-columns:1fr}.dash-card{padding:14px}}
+
+/* Szablony dokumentów 2.9 */
+body.template-modern .print-document{--pdf-accent:#1d4ed8;--pdf-soft:#eff6ff;--pdf-ink:#1e3a8a}
+body.template-minimal .print-document{--pdf-accent:#222;--pdf-soft:#f3f4f6;--pdf-ink:#222}
+body.template-classic .print-document{--pdf-accent:#176b52;--pdf-soft:#edf6f0;--pdf-ink:#264737}
+.print-document .print-header{border-bottom-color:var(--pdf-accent,#176b52)}
+.print-document .print-brand,.print-document .print-columns h3,.print-document>h3,.print-document .print-totals .final{color:var(--pdf-accent,#176b52)}
+.print-document .print-brand-mark{background:var(--pdf-accent,#176b52)}
+.print-document .print-table th{background:var(--pdf-soft,#edf6f0)!important;color:var(--pdf-ink,#264737)}
+.print-document .print-totals .final{border-top-color:var(--pdf-accent,#176b52)}
+body.template-minimal .print-document .print-brand-mark{border-radius:0}
+body.template-modern .print-document .print-brand-mark{border-radius:50%}
+@media print{
+.print-document .print-header{border-bottom-color:var(--pdf-accent,#176b52)!important}
+.print-document .print-brand,.print-document .print-columns h3,.print-document>h3,.print-document .print-totals .final{color:var(--pdf-accent,#176b52)!important}
+.print-document .print-brand-mark{background:var(--pdf-accent,#176b52)!important}
+.print-document .print-table th{background:var(--pdf-soft,#edf6f0)!important;color:var(--pdf-ink,#264737)!important}
+.print-document .print-totals .final{border-top-color:var(--pdf-accent,#176b52)!important}
+}
 </style>
 </head>
 <body>
@@ -212,7 +231,14 @@ header span:not(.brand-mark){color:#b8f3d7}
 <h2 id="result-heading">2. Twój kosztorys</h2>
 <div class="metrics"><div class="metric"><small>Robocizna</small><strong id="labor-metric">0 zł</strong></div><div class="metric"><small>Materiały</small><strong id="material-metric">0 zł</strong></div><div class="metric"><small>Cena końcowa</small><strong id="total-metric">0 zł</strong></div></div>
 <div class="table-scroll"><table><thead><tr><th>Pozycja</th><th>Typ</th><th>Ilość</th><th>Jedn.</th><th>Stawka (zł)</th><th>Razem</th><th></th></tr></thead><tbody id="items-body"></tbody></table></div>
-<div class="actions estimate-actions"><button id="quick-save" class="secondary" type="button">Zapisz wycenę</button><button id="add" class="secondary" type="button">+ Dodaj pozycję</button><button id="export" class="neutral" type="button">Eksport CSV</button><button id="pdf" class="pdf-btn" type="button">Zapisz jako PDF</button><button id="share-offer" class="secondary" type="button">Udostępnij ofertę</button><button id="copy-offer" class="neutral" type="button">Kopiuj wiadomość</button><button id="reset" class="neutral" type="button">Przywróć przykład</button></div>
+<div class="actions estimate-actions"><button id="quick-save" class="secondary" type="button">Zapisz wycenę</button><button id="add" class="secondary" type="button">+ Dodaj pozycję</button><button id="export" class="neutral" type="button">Eksport CSV</button><label for="offer-template">Wygląd dokumentu PDF</label>
+<select id="offer-template" aria-label="Szablon dokumentu PDF">
+<option value="classic">Klasyczny — zielony</option>
+<option value="modern">Nowoczesny — granatowy</option>
+<option value="minimal">Minimalistyczny — czarno-biały</option>
+</select>
+<p class="hint">Szablon zmienia wygląd wydruku/PDF. Nie zmienia wartości wyceny ani danych klientów.</p>
+<button id="pdf" class="pdf-btn" type="button">Zapisz jako PDF</button><button id="share-offer" class="secondary" type="button">Udostępnij ofertę</button><button id="copy-offer" class="neutral" type="button">Kopiuj wiadomość</button><button id="reset" class="neutral" type="button">Przywróć przykład</button></div>
 <div class="options"><div><label for="margin">Narzut (%)</label><input id="margin" type="number" min="0" step="1" value="20"></div><div><label for="extra">Koszty dodatkowe (zł)</label><input id="extra" type="number" min="0" step="0.01" value="150"></div></div>
 <div class="summary"><div class="sum-row"><span>Robocizna</span><b id="labor-sum">0 zł</b></div><div class="sum-row"><span>Materiały</span><b id="material-sum">0 zł</b></div><div class="sum-row"><span>Koszty dodatkowe</span><b id="extra-sum">0 zł</b></div><div class="sum-row"><span>Narzut</span><b id="margin-sum">0 zł</b></div><div class="sum-row final"><span>Do zapłaty</span><b id="total-sum">0 zł</b></div></div>
 <p id="share-status" class="hint" role="status" aria-live="polite"></p><p class="hint">Udostępnianie wysyła podsumowanie tekstowe. Aby wysłać PDF, najpierw wybierz „Zapisz jako PDF”, a potem udostępnij zapisany plik z aplikacji Pliki.</p>
@@ -1137,6 +1163,23 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
     });
   });
 }
+</script>
+<script>
+(function(){
+  const select=document.getElementById('offer-template');
+  const key='pewnawycena_pdf_template_v1';
+  function apply(value){
+    const safe=['classic','modern','minimal'].includes(value)?value:'classic';
+    document.body.classList.remove('template-classic','template-modern','template-minimal');
+    document.body.classList.add('template-'+safe);
+    select.value=safe;
+    try{localStorage.setItem(key,safe)}catch(e){}
+  }
+  let previous='classic';
+  try{previous=localStorage.getItem(key)||'classic'}catch(e){}
+  apply(previous);
+  select.addEventListener('change',()=>apply(select.value));
+})();
 </script>
 </body>
 </html>
