@@ -11,7 +11,7 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
-<title>PewnaWycena 4.0 — Premium Glass</title>
+<title>PewnaWycena 4.1 — Premium Glass</title>
 <style>
 :root{--green:#176b52;--dark:#143b31;--bg:#f3f7f4;--border:#dce7df;--muted:#607269}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);font:15px/1.5 system-ui,Arial,sans-serif;color:#18251e}
@@ -343,36 +343,55 @@ body.is-home #main-heading,body.is-home #main-heading+p{display:none}
 @media(max-width:360px){.home-stats{grid-template-columns:1fr}}
 @media print{#view-home{display:none!important}}
 
-/* PewnaWycena 4.0 — Premium Glass. Styl ekranowy nie zmienia drukowanych dokumentów. */
-@media screen {
-:root{--green:#19b879;--dark:#062b23;--bg:#041e19;--border:rgba(160,248,201,.18);--muted:#a4c7b7;--mint:#7cf3b6;--text:#f1fff7}
-html{background:#041e19;scroll-behavior:smooth}
-body{background:radial-gradient(ellipse 70% 360px at 80% -30px,#1b7354 0%,transparent 85%),radial-gradient(ellipse 75% 600px at 5% 600px,#0b4d3b 0%,transparent 85%),linear-gradient(145deg,#05251e,#041a17 75%);background-attachment:fixed;color:var(--text);min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",Inter,system-ui,sans-serif;letter-spacing:-.01em}
-body>header{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;background:rgba(4,34,27,.86);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border-bottom:1px solid rgba(145,255,192,.16);padding:13px max(20px,calc((100% - 1120px)/2));font-size:21px;box-shadow:0 6px 30px #00170f35}
-.brand-mark{width:43px;height:43px;background:linear-gradient(145deg,#3ae39c,#076d4b);color:white;border:1px solid #75f6b2a0;border-radius:15px;box-shadow:0 5px 18px #19e29d38;font-size:30px}
-.brand-name{display:flex;flex-direction:column;line-height:1.1}.brand-name>span{display:inline}.brand-name .brand-slogan{display:block!important;margin:5px 0 0!important;width:auto!important;color:#a7d5c0;font-size:11px;font-weight:500;letter-spacing:.01em}.header-version{margin-left:auto;font-size:12px;font-weight:800;color:#82efb8;background:#154b38;padding:7px 10px;border-radius:99px;white-space:nowrap}
-main{margin:22px auto 0;padding:0 18px 120px;max-width:1120px}h1,h2,h3{color:#f7fff9;letter-spacing:-.035em}h1{font-weight:850}p,.hint{color:#acc8ba}label{color:#d9f3e4}
-.panel,.job-card,.finance-settings,.finance-overview,.fin-panel,.protocol-form{background:linear-gradient(145deg,rgba(29,89,68,.70),rgba(8,45,36,.84))!important;border:1px solid rgba(155,255,200,.17)!important;border-radius:21px!important;box-shadow:0 12px 40px #00150f3d,inset 0 1px #d7ffe90e;color:#ecfff4}
-.panel{padding:21px}.home-hero{position:relative;overflow:hidden;min-height:208px;background:radial-gradient(circle at 90% 10%,#247657 0%,transparent 48%),linear-gradient(125deg,#0e4d38,#07291f)!important;border-color:#69f3b448!important;padding:26px!important}
-.home-hero:after{content:"✦";position:absolute;right:8%;top:0;color:#b1fdd025;font-size:130px;pointer-events:none}.home-hero>div{position:relative;z-index:1}.home-hero h2{font-size:clamp(27px,4vw,38px);margin:8px 0;font-weight:850}.home-eyebrow{color:#8cf5b7;font-size:11px;letter-spacing:2px}.home-hero p{color:#c5e4d3}.home-hero .home-actions{align-items:center}
-.home-stats{gap:12px;margin:15px 0 20px}.home-stat{position:relative;overflow:hidden;min-height:133px;border-radius:19px;background:linear-gradient(140deg,rgba(22,99,73,.80),rgba(5,44,36,.85));border:1px solid #7be5ac37;padding:19px 16px;box-shadow:0 9px 26px #00140e32;transition:transform .2s ease,border-color .2s ease}.home-stat:nth-child(2){background:linear-gradient(140deg,#215c45,#123729)}.home-stat:nth-child(3){background:linear-gradient(140deg,#553d39,#1d302b)}.home-stat:nth-child(4){background:linear-gradient(140deg,#185e4b,#0b332c)}.home-stat:before{content:"";position:absolute;right:-18px;top:-35px;width:100px;height:100px;border-radius:50%;background:#95ffbc10}.home-stat span{color:#c4e5d2;font-size:12px}.home-stat strong{color:#ecfff5;font-size:clamp(24px,5vw,33px);letter-spacing:-.04em}.home-stat small{color:#a9cbb9}.home-stat:hover{transform:translateY(-2px);border-color:#84efb77d}
-.home-sections{gap:16px}.home-sections .panel{background:linear-gradient(140deg,#103d30,#082c25)!important}.home-section-head h3{font-size:17px}.home-item,.rem-item,.cal-job,.clientbook-row{background:rgba(3,33,26,.48)!important;border:1px solid #7fe9b62a!important;border-radius:14px!important;color:#edfff5;padding:13px}.home-item-text small,.rem-item-info small,.cal-job-info small{color:#a9c8b9}.home-disclaimer{font-size:11px}
-.menu-wrap{z-index:15;margin:15px 0 20px}.menu-toggle{background:rgba(17,65,48,.78)!important;color:#e6fff1!important;border:1px solid #87efba38!important;border-radius:15px!important;backdrop-filter:blur(12px);box-shadow:0 6px 24px #00180e24}.menu-active-label{color:#8bf1b7}.menu-wrap .app-nav{background:rgba(9,48,36,.97)!important;border:1px solid #84e9b93c!important;box-shadow:0 20px 45px #00130d99;backdrop-filter:blur(24px)}.menu-wrap .app-nav .nav-tab{color:#d2efdd!important;background:#154a37!important;border:1px solid #ffffff10!important}.menu-wrap .app-nav .nav-tab.active{color:#072b1c!important;background:#81efb4!important}
-button{border-radius:12px;transition:transform .17s ease,filter .17s ease,box-shadow .17s ease}button:active{transform:scale(.97)}button:hover{filter:brightness(1.1)}.primary,.pdf-btn{background:linear-gradient(135deg,#91ffc0,#2ad994)!important;color:#043a27!important;font-weight:850;box-shadow:0 5px 22px #21e99732;border:1px solid #a8ffd099!important}.secondary{background:rgba(55,126,90,.32)!important;color:#c9ffe0!important;border:1px solid #8bf0b84b!important}.neutral{background:#22483c!important;color:#e2f9e9!important}.danger{background:#703d3d!important;color:#ffe2de!important}
-input,select,textarea{background:#092f27!important;border:1px solid #83dcb250!important;border-radius:12px!important;color:#f4fff7!important;box-shadow:inset 0 2px 7px #001a121b}input::placeholder,textarea::placeholder{color:#8ab3a0}option{background:#0c382c;color:white}input:focus,select:focus,textarea:focus{border-color:#7ef4b6!important;box-shadow:0 0 0 3px #73ffc32c}
-.metric,.fin-summary,.rem-counter,.notice,.autosave-bar{background:#164638!important;border:1px solid #a0eac03a!important;color:#e7fff0!important;border-radius:15px!important}.metric small,.rem-counter span{color:#bdd9c9!important}.metric strong,.rem-counter strong{color:#90f9bb!important}.fin-line,.fin-entry{border-bottom-color:#b0f1ca25}.fin-panel summary{color:#9cf5bf}.sum-row.final{color:#8df6b7}.home-item button{white-space:nowrap}
-.table-scroll{border-radius:13px}table th{color:#a8d6bd;border-bottom-color:#77cba741}table td{border-bottom-color:#7bcaab2a}table th,table td{background:transparent}.status-badge{color:inherit}
-.bottom-nav{position:fixed;bottom:calc(10px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);z-index:30;width:min(580px,calc(100% - 24px));display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;padding:8px 7px;border-radius:23px;background:rgba(4,35,28,.92);border:1px solid #8ef1ba45;box-shadow:0 8px 40px #000b09a8, inset 0 1px #d6ffe91e;backdrop-filter:blur(25px);-webkit-backdrop-filter:blur(25px)}.bottom-nav button{background:transparent;border:0;display:flex;flex-direction:column;gap:2px;align-items:center;justify-content:center;color:#aacabb;padding:6px 0 4px;min-height:49px;font-size:10px;font-weight:700;min-width:0}.bottom-nav button.active{color:#82ffb5;background:#1a684831}.bottom-icon{font-size:23px;line-height:1.1;font-weight:600}.bottom-nav button.active .bottom-icon{filter:drop-shadow(0 0 7px #49ff9b8a)}
-.app-view:not([hidden]){animation:pw-enter .3s ease both}@keyframes pw-enter{from{opacity:.55;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
-@media(max-width:700px){main{padding:0 12px 116px;margin-top:12px}.panel{padding:16px}.home-hero{padding:20px!important;min-height:unset}.home-hero h2{font-size:29px}.home-stat{padding:15px 11px;min-height:125px}.home-stat strong{font-size:clamp(20px,5vw,28px)}.home-stats{gap:9px}.home-stat span{font-size:11px}.home-stat small{font-size:10px}.bottom-nav{bottom:calc(7px + env(safe-area-inset-bottom,0px))}body>header{padding:12px 16px}.brand-name .brand-slogan{font-size:10px}}
-@media(max-width:390px){.home-stat strong{font-size:21px}.home-stat{padding:12px 9px}.bottom-nav button{font-size:9px}.bottom-icon{font-size:21px}}
+
+/* PewnaWycena 4.1 — Midnight Navy Premium Glass, kontrast WCAG */
+:root{--text:#ecf5ff;--muted:#b7cce4;--navy:#07182f;--navy2:#102947;--blue:#6fb8ff;--aqua:#64e0d4}
+html{background:#061326;scroll-behavior:smooth}
+body{background:radial-gradient(ellipse 80% 460px at 85% 0,#163c68 0%,transparent 85%),radial-gradient(ellipse 80% 620px at 5% 650px,#0b3156 0%,transparent 85%),linear-gradient(155deg,#081c35,#061326 80%);background-attachment:fixed;color:#eaf4ff;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",Inter,system-ui,sans-serif;letter-spacing:-.01em}
+body>header{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;background:rgba(6,21,43,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid #a3d4ff29;padding:13px max(20px,calc((100% - 1120px)/2));box-shadow:0 6px 30px #000b1e40}
+.brand-mark{width:43px;height:43px;background:linear-gradient(145deg,#46b2ec,#174b91);color:white;border:1px solid #a4e3ff9e;border-radius:15px;box-shadow:0 5px 18px #2a99f555;font-size:30px}
+.brand-name{display:flex;flex-direction:column;line-height:1.1;color:#f3f9ff}.brand-name>span{display:inline}.brand-name .brand-slogan{display:block!important;margin:5px 0 0!important;width:auto!important;color:#bbd2e8;font-size:11px;font-weight:500;letter-spacing:.01em}.header-version{margin-left:auto;font-size:12px;font-weight:800;color:#b6e5ff;background:#15365d;padding:7px 10px;border-radius:99px;white-space:nowrap}
+main{margin:22px auto 0;padding:0 18px 120px;max-width:1120px}
+h1,h2,h3{color:#f4f9ff;letter-spacing:-.025em}
+p,.hint{color:#c4d5e9}label{color:#e3f1ff}
+.panel,.job-card,.finance-settings,.finance-overview,.fin-panel,.protocol-form{background:linear-gradient(145deg,rgba(26,62,102,.94),rgba(11,35,65,.97))!important;border:1px solid #a0d2ff30!important;border-radius:20px!important;box-shadow:0 12px 34px #000e2640,inset 0 1px #ffffff0c;color:#eaf4ff}
+.panel{padding:20px}
+.home-hero{position:relative;overflow:hidden;min-height:208px;background:radial-gradient(circle at 90% 10%,#296ba1 0%,transparent 48%),linear-gradient(125deg,#173f73,#0b2347)!important;border-color:#9ddcff66!important;padding:26px!important}
+.home-hero:after{content:"✦";position:absolute;right:8%;top:0;color:#c6edff23;font-size:130px;pointer-events:none}.home-hero>div{position:relative;z-index:1}.home-hero h2{font-size:clamp(27px,4vw,38px);margin:8px 0;font-weight:850}.home-eyebrow{color:#9be4ff}.home-hero p{color:#d4e9fb}
+.home-stats{gap:12px;margin:15px 0 20px}.home-stat{position:relative;overflow:hidden;min-height:133px;border-radius:19px;background:linear-gradient(140deg,#1a4b7e,#0b294e);border:1px solid #a2d8ff40;padding:19px 16px;box-shadow:0 9px 26px #00142e42;transition:transform .2s ease,border-color .2s ease}.home-stat:nth-child(2){background:linear-gradient(140deg,#195477,#0c354c)}.home-stat:nth-child(3){background:linear-gradient(140deg,#5a394d,#30243c)}.home-stat:nth-child(4){background:linear-gradient(140deg,#24567a,#0e3150)}.home-stat span{color:#d3e7f9}.home-stat strong{color:#fff;font-size:clamp(24px,5vw,33px)}.home-stat small{color:#b6cfe4}.home-stat:hover{transform:translateY(-2px);border-color:#a4ddff9c}
+.home-sections .panel{background:linear-gradient(140deg,#14365f,#0a2445)!important}.home-item,.rem-item,.cal-job,.clientbook-row{background:#0c2849!important;border:1px solid #a7d9ff38!important;border-radius:14px!important;color:#edf7ff;padding:13px}.home-item-text small,.rem-item-info small,.cal-job-info small{color:#b9cde2}
+.menu-wrap{z-index:15;margin:15px 0 20px}.menu-toggle{background:#15385e!important;color:#eaf5ff!important;border:1px solid #9acbff59!important;border-radius:15px!important}.menu-active-label{color:#a9dfff}.menu-wrap .app-nav{background:#0b2749!important;border:1px solid #93caff57!important;box-shadow:0 20px 45px #000c24a0}.menu-wrap .app-nav .nav-tab{color:#e3f3ff!important;background:#183d65!important;border:1px solid #ffffff15!important}.menu-wrap .app-nav .nav-tab.active{color:#071e39!important;background:#8cdaff!important}
+button{border-radius:12px;transition:transform .17s ease,filter .17s ease,box-shadow .17s ease}button:active{transform:scale(.97)}button:hover{filter:brightness(1.07)}
+.primary,.pdf-btn{background:linear-gradient(135deg,#9ce6ff,#57b4f4)!important;color:#071c36!important;font-weight:850;box-shadow:0 5px 22px #259af542;border:1px solid #c6eeffb0!important}.secondary{background:#214e7a!important;color:#f1f9ff!important;border:1px solid #a4d5ff68!important}.neutral{background:#294766!important;color:#f1f8ff!important}.danger{background:#713849!important;color:#fff2f5!important}
+input,select,textarea{background:#0a2749!important;border:1px solid #8bc6ff77!important;border-radius:12px!important;color:#fff!important;box-shadow:inset 0 2px 7px #00102022}input::placeholder,textarea::placeholder{color:#b6c8df!important}option{background:#12365c;color:white}input:focus,select:focus,textarea:focus{border-color:#9fe5ff!important;box-shadow:0 0 0 3px #82d4ff35}
+.metric,.fin-summary,.rem-counter,.notice,.autosave-bar{background:#163e67!important;border:1px solid #9bcfff54!important;color:#e9f6ff!important;border-radius:15px!important}.metric small,.rem-counter span{color:#c8e0f5!important}.metric strong,.rem-counter strong{color:#a8e7ff!important}.fin-panel summary{color:#b5e8ff}.sum-row.final{color:#a9e7ff}
+.table-scroll{border-radius:13px}table th{color:#c1e3ff;border-bottom-color:#8dbde35a}table td{border-bottom-color:#7da8ce45}table th,table td{background:transparent}.status-badge{color:inherit}
+.bottom-nav{position:fixed;bottom:calc(10px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);z-index:30;width:min(580px,calc(100% - 24px));display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;padding:8px 7px;border-radius:23px;background:rgba(9,31,58,.97);border:1px solid #9ccfff61;box-shadow:0 8px 40px #000b22c0;backdrop-filter:blur(25px);-webkit-backdrop-filter:blur(25px)}.bottom-nav button{background:transparent;border:0;display:flex;flex-direction:column;gap:2px;align-items:center;justify-content:center;color:#c4d9eb;padding:6px 0 4px;min-height:49px;font-size:10px;font-weight:700;min-width:0}.bottom-nav button.active{color:#9be5ff;background:#2857866e}.bottom-icon{font-size:23px;line-height:1.1;font-weight:600}
+.app-view:not([hidden]){animation:pw-enter .25s ease both}@keyframes pw-enter{from{opacity:.7;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
-}
-@media print{.bottom-nav{display:none!important}}
+/* Poprawka kluczowa: stary asystent miał jasne tło i niemal biały tekst. */
+#view-estimate .assistant-scope{background:#102e53!important;border:1px solid #94caff73!important;border-radius:18px!important;color:#f2f8ff!important}
+#view-estimate .assistant-scope h3,#view-estimate .assistant-scope p,#view-estimate .assistant-scope label,#view-estimate .assistant-scope strong,#view-estimate .assistant-scope small{color:#eff7ff!important}
+#view-estimate .assistant-scope h3 small{color:#9fdbff!important}
+#view-estimate .assistant-scope label{background:#183e68!important;border:1px solid #8cc5fa66!important;border-radius:12px!important;padding:12px!important;display:flex;align-items:center;gap:10px}
+#view-estimate .assistant-scope input[type=checkbox]{accent-color:#67c9ff!important;min-width:19px;min-height:19px}
+#view-estimate .assistant-scope label:hover{background:#24547f!important}
+#view-estimate .assistant-scope *{text-shadow:none!important}
+/* Kontrast dla innych dawnych jasnych paneli i list */
+.job-card small,.fin-panel small,.panel small,.panel .hint,.panel p{color:#cbddef}
+.panel .assistant-scope p{color:#e4f2ff!important}
+.rem-overdue{border-left:4px solid #ff8191!important}
+.cal-day{background:#14395f!important;color:#eaf5ff!important;border-color:#77b4e65c!important}
+.cal-day.cal-selected{background:#245e92!important;outline-color:#9be3ff}
+.cal-weekdays span,.cal-job-info small{color:#c9dff2}
+.protocol-form label{color:#eff7ff}
+@media(max-width:600px){main{padding:0 13px 130px}.panel{padding:17px}.brand-name{font-size:19px}.home-stat{padding:14px 11px}}
+@media print{body{background:#fff!important;color:#111!important}body>header,.bottom-nav,.menu-wrap{display:none!important}}
+
 </style>
 </head>
 <body>
-<header><span class="brand-mark" aria-hidden="true">⌂</span><span class="brand-name">Pewna<span>Wycena</span><small class="brand-slogan">Twój biznes pod kontrolą</small></span><span class="header-version">4.0 <span aria-hidden="true">✦</span></span></header>
+<header><span class="brand-mark" aria-hidden="true">⌂</span><span class="brand-name">Pewna<span>Wycena</span><small class="brand-slogan">Twój biznes pod kontrolą</small></span><span class="header-version">4.1 <span aria-hidden="true">✦</span></span></header>
 <nav class="bottom-nav" aria-label="Szybka nawigacja">
 <button type="button" data-view="home" aria-label="Pulpit" aria-pressed="true"><span class="bottom-icon" aria-hidden="true">⌂</span><span>Pulpit</span></button>
 <button type="button" data-view="estimate" aria-label="Nowa wycena" aria-pressed="false"><span class="bottom-icon" aria-hidden="true">▤</span><span>Wycena</span></button>
