@@ -235,6 +235,11 @@ body.template-creative .print-document .print-title{font-style:italic}
 body.brand-preview-open{overflow:hidden}
 @media(max-width:600px){.brand-grid{grid-template-columns:1fr}.brand-preview-page .print-brand{font-size:17px}.brand-preview-page .print-title{font-size:18px}.brand-preview-page .print-columns{gap:12px}}
 @media print{.brand-preview-modal{display:none!important}.print-company-logo{max-height:20mm;max-width:52mm;break-inside:avoid}.print-custom-footer{font-size:9pt}}
+
+#view-company .company-branding{margin-top:18px}
+#view-company .template-picker{margin-top:18px}
+#view-company .panel>label{display:block;margin-top:12px}
+.company-legacy-fields[hidden]{display:none!important}
 </style>
 </head>
 <body>
@@ -248,28 +253,19 @@ body.brand-preview-open{overflow:hidden}
 <button type="button" class="nav-tab" data-view="saved" aria-pressed="false">Zapisane wyceny</button>
 <button type="button" class="nav-tab" data-view="clients" aria-pressed="false">Klienci</button>
 <button type="button" class="nav-tab" data-view="prices" aria-pressed="false">Mój cennik</button>
+<button type="button" class="nav-tab" data-view="company" aria-pressed="false">🏢 Moja firma</button>
 </nav>
 <div id="view-estimate" class="app-view">
 <div class="autosave-bar" role="status"><span id="draft-save-state">Autozapis: gotowy</span><button type="button" id="draft-clear" class="secondary">Wyczyść wersję roboczą</button></div>
 <section class="panel details" aria-labelledby="details-heading">
 <h2 id="details-heading">Dane do profesjonalnego kosztorysu</h2>
 <div class="client-grid">
-<div><h3>Twoja firma</h3><label for="company-name">Nazwa firmy / wykonawca</label><input id="company-name" placeholder="np. Firma Kowalski"><label for="company-contact">Adres, NIP, telefon, e-mail</label><textarea id="company-contact" placeholder="Adres firmy&#10;NIP: ...&#10;tel. ...&#10;e-mail: ..."></textarea></div>
+<div class="company-legacy-fields" hidden><h3>Twoja firma</h3><label for="company-name">Nazwa firmy / wykonawca</label><input id="company-name" placeholder="np. Firma Kowalski"><label for="company-contact">Adres, NIP, telefon, e-mail</label><textarea id="company-contact" placeholder="Adres firmy&#10;NIP: ...&#10;tel. ...&#10;e-mail: ..."></textarea></div>
 <div><h3>Klient</h3><div class="actions"><button id="client-quick-save" class="secondary" type="button">Zapisz klienta w bazie</button><button id="client-open-list" class="neutral" type="button">Wybierz z bazy</button></div><label for="client-name">Imię i nazwisko / firma</label><input id="client-name" placeholder="np. Jan Nowak"><label for="client-contact">Adres klienta / inwestycji</label><textarea id="client-contact" placeholder="Adres klienta lub miejsce wykonania usługi"></textarea></div>
 <div><label for="estimate-number">Numer kosztorysu</label><div class="actions" style="align-items:center"><input id="estimate-number" value="PW-001" style="flex:1;min-width:130px"><button id="next-number" type="button" class="secondary">Nowy numer</button></div></div>
 <div><label for="estimate-date">Data kosztorysu</label><input id="estimate-date" type="date"></div><div><label for="estimate-status">Status oferty</label><select id="estimate-status"><option value="draft">Robocza</option><option value="sent">Wysłana</option><option value="accepted">Zaakceptowana</option><option value="rejected">Odrzucona</option></select></div>
 </div>
-<section class="company-branding" aria-labelledby="branding-heading">
-<h3 id="branding-heading">🏢 Pakiet firmowy — wygląd oferty</h3>
-<p class="hint">Logo, kolor i stopka będą widoczne w wydruku i PDF. Ustawienia zapisują się tylko na tym urządzeniu.</p>
-<div class="brand-grid">
-<div><label for="brand-logo">Logo firmy (PNG, JPG, WEBP)</label><input id="brand-logo" type="file" accept="image/png,image/jpeg,image/webp"><p class="hint">Maksymalnie 1 MB. Logo pozostaje na tym urządzeniu.</p><div class="brand-logo-line"><img id="brand-logo-preview" alt="Podgląd logo firmy" hidden><button type="button" id="brand-logo-remove" class="neutral">Usuń logo</button></div></div>
-<div><label for="brand-color">Kolor firmowy</label><div class="brand-color-line"><input id="brand-color" type="color" value="#176b52"><button type="button" id="brand-color-reset" class="neutral">Przywróć zielony</button></div><p class="hint">Kolor zastępuje główne akcenty wybranego szablonu PDF.</p></div>
-</div>
-<label for="brand-footer">Własna stopka dokumentu</label><textarea id="brand-footer" rows="3" maxlength="600" placeholder="np. NIP: 123-456-78-90 · tel. 500 000 000 · Oferta ważna 14 dni"></textarea>
-<div class="actions"><button type="button" id="brand-preview-open" class="secondary">👁 Podgląd oferty</button></div>
-<p class="hint" id="brand-status" role="status" aria-live="polite"></p>
-</section>
+
 <label for="estimate-notes">Uwagi / warunki wyceny</label><textarea id="estimate-notes" placeholder="np. Wycena ważna 14 dni. Termin realizacji do uzgodnienia."></textarea>
 </section>
 <div class="layout">
@@ -303,20 +299,7 @@ body.brand-preview-open{overflow:hidden}
 <h2 id="result-heading">2. Twój kosztorys</h2>
 <div class="metrics"><div class="metric"><small>Robocizna</small><strong id="labor-metric">0 zł</strong></div><div class="metric"><small>Materiały</small><strong id="material-metric">0 zł</strong></div><div class="metric"><small>Cena końcowa</small><strong id="total-metric">0 zł</strong></div></div>
 <div class="table-scroll"><table><thead><tr><th>Pozycja</th><th>Typ</th><th>Ilość</th><th>Jedn.</th><th>Stawka (zł)</th><th>Razem</th><th></th></tr></thead><tbody id="items-body"></tbody></table></div>
-<section class="template-picker" aria-label="Szablony ofert">
-<button type="button" id="templates-toggle" class="secondary template-toggle" aria-expanded="false" aria-controls="templates-panel">🎨 Wybierz szablon oferty (6 wariantów) <span id="template-current">— Klasyczny</span> ▾</button>
-<div id="templates-panel" class="templates-panel" hidden>
-<p class="hint">Wybierz wariant. Zaznaczony szablon zostanie zastosowany do wydruku i PDF.</p>
-<div class="templates-grid" role="group" aria-label="Warianty szablonów">
-<button type="button" class="template-choice" data-template="classic" aria-pressed="true"><span class="template-swatch" style="--swatch:#176b52;--swatch-soft:#edf6f0"><i></i><b></b><em></em><em></em></span><strong>Klasyczny</strong><small>Zielony, firmowy</small></button>
-<button type="button" class="template-choice" data-template="modern" aria-pressed="false"><span class="template-swatch" style="--swatch:#1d4ed8;--swatch-soft:#eff6ff"><i></i><b></b><em></em><em></em></span><strong>Nowoczesny</strong><small>Granatowy, elegancki</small></button>
-<button type="button" class="template-choice" data-template="minimal" aria-pressed="false"><span class="template-swatch" style="--swatch:#222;--swatch-soft:#f3f4f6"><i></i><b></b><em></em><em></em></span><strong>Minimal</strong><small>Czarno-biały</small></button>
-<button type="button" class="template-choice" data-template="premium" aria-pressed="false"><span class="template-swatch" style="--swatch:#a16207;--swatch-soft:#fef9c3"><i></i><b></b><em></em><em></em></span><strong>Premium</strong><small>Złoto i krem</small></button>
-<button type="button" class="template-choice" data-template="technical" aria-pressed="false"><span class="template-swatch" style="--swatch:#475569;--swatch-soft:#e2e8f0"><i></i><b></b><em></em><em></em></span><strong>Techniczny</strong><small>Grafit, wyraźne linie</small></button>
-<button type="button" class="template-choice" data-template="creative" aria-pressed="false"><span class="template-swatch" style="--swatch:#7c3aed;--swatch-soft:#f3e8ff"><i></i><b></b><em></em><em></em></span><strong>Kreatywny</strong><small>Fiolet, mocne akcenty</small></button>
-</div>
-</div>
-</section>
+
 <div class="actions estimate-actions"><button id="quick-save" class="secondary" type="button">Zapisz wycenę</button><button id="add" class="secondary" type="button">+ Dodaj pozycję</button><button id="export" class="neutral" type="button">Eksport CSV</button><button id="pdf" class="pdf-btn" type="button">Zapisz jako PDF</button><button id="share-offer" class="secondary" type="button">Udostępnij ofertę</button><button id="copy-offer" class="neutral" type="button">Kopiuj wiadomość</button><button id="reset" class="neutral" type="button">Przywróć przykład</button></div>
 <div class="options"><div><label for="margin">Narzut (%)</label><input id="margin" type="number" min="0" step="1" value="20"></div><div><label for="extra">Koszty dodatkowe (zł)</label><input id="extra" type="number" min="0" step="0.01" value="150"></div></div>
 <div class="summary"><div class="sum-row"><span>Robocizna</span><b id="labor-sum">0 zł</b></div><div class="sum-row"><span>Materiały</span><b id="material-sum">0 zł</b></div><div class="sum-row"><span>Koszty dodatkowe</span><b id="extra-sum">0 zł</b></div><div class="sum-row"><span>Narzut</span><b id="margin-sum">0 zł</b></div><div class="sum-row final"><span>Do zapłaty</span><b id="total-sum">0 zł</b></div></div>
@@ -400,6 +383,37 @@ body.brand-preview-open{overflow:hidden}
 </div>
 <p class="footer">PewnaWycena · lokalny prototyp · wyceny i cennik przechowywane w tej przeglądarce. Pobieraj kopie zapasowe.</p>
 </main>
+<div id="view-company" class="app-view" hidden>
+<section class="panel">
+<h2>🏢 Moja firma — ustaw raz, korzystaj przy każdej wycenie</h2>
+<p class="hint">Dane firmy, logo, szablon, kolor i stopka są wspólne dla nowych kosztorysów. Wszystkie ustawienia zapisują się automatycznie na tym urządzeniu.</p>
+<label for="company-profile-name">Nazwa firmy / wykonawca</label><input id="company-profile-name" placeholder="np. Firma Kowalski">
+<label for="company-profile-contact">Adres, NIP, telefon i e-mail</label><textarea id="company-profile-contact" rows="4" placeholder="Adres firmy&#10;NIP: ...&#10;Telefon: ...&#10;E-mail: ..."></textarea>
+<section class="company-branding" aria-labelledby="branding-heading">
+<h3 id="branding-heading">🏢 Pakiet firmowy — wygląd oferty</h3>
+<p class="hint">Logo, kolor i stopka będą widoczne w wydruku i PDF. Ustawienia zapisują się tylko na tym urządzeniu.</p>
+<div class="brand-grid">
+<div><label for="brand-logo">Logo firmy (PNG, JPG, WEBP)</label><input id="brand-logo" type="file" accept="image/png,image/jpeg,image/webp"><p class="hint">Maksymalnie 1 MB. Logo pozostaje na tym urządzeniu.</p><div class="brand-logo-line"><img id="brand-logo-preview" alt="Podgląd logo firmy" hidden><button type="button" id="brand-logo-remove" class="neutral">Usuń logo</button></div></div>
+<div><label for="brand-color">Kolor firmowy</label><div class="brand-color-line"><input id="brand-color" type="color" value="#176b52"><button type="button" id="brand-color-reset" class="neutral">Przywróć zielony</button></div><p class="hint">Kolor zastępuje główne akcenty wybranego szablonu PDF.</p></div>
+</div>
+<label for="brand-footer">Własna stopka dokumentu</label><textarea id="brand-footer" rows="3" maxlength="600" placeholder="np. NIP: 123-456-78-90 · tel. 500 000 000 · Oferta ważna 14 dni"></textarea>
+<div class="actions"><button type="button" id="brand-preview-open" class="secondary">👁 Podgląd oferty</button></div>
+<p class="hint" id="brand-status" role="status" aria-live="polite"></p>
+</section><section class="template-picker" aria-label="Szablony ofert">
+<button type="button" id="templates-toggle" class="secondary template-toggle" aria-expanded="false" aria-controls="templates-panel">🎨 Wybierz szablon oferty (6 wariantów) <span id="template-current">— Klasyczny</span> ▾</button>
+<div id="templates-panel" class="templates-panel" hidden>
+<p class="hint">Wybierz wariant. Zaznaczony szablon zostanie zastosowany do wydruku i PDF.</p>
+<div class="templates-grid" role="group" aria-label="Warianty szablonów">
+<button type="button" class="template-choice" data-template="classic" aria-pressed="true"><span class="template-swatch" style="--swatch:#176b52;--swatch-soft:#edf6f0"><i></i><b></b><em></em><em></em></span><strong>Klasyczny</strong><small>Zielony, firmowy</small></button>
+<button type="button" class="template-choice" data-template="modern" aria-pressed="false"><span class="template-swatch" style="--swatch:#1d4ed8;--swatch-soft:#eff6ff"><i></i><b></b><em></em><em></em></span><strong>Nowoczesny</strong><small>Granatowy, elegancki</small></button>
+<button type="button" class="template-choice" data-template="minimal" aria-pressed="false"><span class="template-swatch" style="--swatch:#222;--swatch-soft:#f3f4f6"><i></i><b></b><em></em><em></em></span><strong>Minimal</strong><small>Czarno-biały</small></button>
+<button type="button" class="template-choice" data-template="premium" aria-pressed="false"><span class="template-swatch" style="--swatch:#a16207;--swatch-soft:#fef9c3"><i></i><b></b><em></em><em></em></span><strong>Premium</strong><small>Złoto i krem</small></button>
+<button type="button" class="template-choice" data-template="technical" aria-pressed="false"><span class="template-swatch" style="--swatch:#475569;--swatch-soft:#e2e8f0"><i></i><b></b><em></em><em></em></span><strong>Techniczny</strong><small>Grafit, wyraźne linie</small></button>
+<button type="button" class="template-choice" data-template="creative" aria-pressed="false"><span class="template-swatch" style="--swatch:#7c3aed;--swatch-soft:#f3e8ff"><i></i><b></b><em></em><em></em></span><strong>Kreatywny</strong><small>Fiolet, mocne akcenty</small></button>
+</div>
+</div>
+</section><p class="hint">Zapisz pełną kopię danych w zakładce „Zapisane wyceny”, aby przenieść także ustawienia firmy i logo na inne urządzenie.</p>
+</section></div>
 <section id="print-document" class="print-document" aria-label="Kosztorys do PDF">
   <div class="print-header"><div><img id="print-company-logo" class="print-company-logo" alt="Logo wykonawcy" hidden><div class="print-brand"><span class="print-brand-mark">✓</span> PewnaWycena</div><div class="print-meta">Profesjonalna wycena usług</div></div><div><h1 class="print-title">KOSZTORYS</h1><div class="print-meta">Numer: <span id="print-number"></span></div><div class="print-meta">Data: <span id="print-date"></span></div></div></div>
   <div class="print-columns"><div><h3>Wykonawca</h3><p id="print-company"></p></div><div><h3>Klient / inwestycja</h3><p id="print-client"></p></div></div>
@@ -604,8 +618,8 @@ byId('margin').addEventListener('input',calculate);
 byId('extra').addEventListener('input',calculate);
 
 function preparePrintDocument() {
-  const companyName=byId('company-name').value.trim();
-  const companyContact=byId('company-contact').value.trim();
+  const companyName=byId('company-profile-name').value.trim();
+  const companyContact=byId('company-profile-contact').value.trim();
   const clientName=byId('client-name').value.trim();
   const clientContact=byId('client-contact').value.trim();
   byId('print-company').textContent=[companyName||'Nie podano wykonawcy',companyContact].filter(Boolean).join('\n');
@@ -640,7 +654,7 @@ byId('pdf').addEventListener('click',()=>{preparePrintDocument();window.print();
 function shareOfferText(){
   preparePrintDocument();
   const number=byId('estimate-number').value.trim()||'bez numeru';
-  const company=byId('company-name').value.trim()||'Wykonawca';
+  const company=byId('company-profile-name').value.trim()||'Wykonawca';
   const client=byId('client-name').value.trim();
   const description=byId('description').value.trim();
   const total=byId('print-total').textContent;
@@ -711,6 +725,7 @@ function persistEstimates(){
 }
 function restoreEstimate(record){
   FIELD_IDS.forEach(id=>{
+    if(id==='company-name'||id==='company-contact')return;
     if(Object.prototype.hasOwnProperty.call(record.fields,id))byId(id).value=String(record.fields[id]??'');
   });
   lastExample=industryExamples[byId('category').value]||'';
@@ -870,7 +885,7 @@ loadPrices();
 
 // Nawigacja zakładkowa — nie zmienia zawartości formularzy ani zapisanych danych.
 function showAppView(view) {
-  const valid=['estimate','dashboard','saved','clients','prices'];
+  const valid=['estimate','dashboard','saved','clients','prices','company'];
   if(!valid.includes(view))return;
   valid.forEach(name=>{
     const panel=byId('view-'+name);
@@ -1038,6 +1053,9 @@ function readBackupState(){
     estimates:savedEstimates,
     clients:clientbook,
     prices:pricebook,
+    company:(()=>{try{return JSON.parse(localStorage.getItem('pewnawycena_company_profile_v1')||'null')}catch(e){return null}})(),
+    branding:(()=>{try{return JSON.parse(localStorage.getItem('pewnawycena_company_brand_v1')||'null')}catch(e){return null}})(),
+    template:localStorage.getItem('pewnawycena_pdf_template_v1')||'classic',
     draft:(()=>{try{const d=JSON.parse(localStorage.getItem(DRAFT_KEY)||'null');return validEstimate(d)?d:null;}catch(e){return null;}})()
   };
 }
@@ -1067,16 +1085,22 @@ function validateFullBackup(data){
     throw Error('Nieprawidłowy cennik.');
   if(d.draft!==null && d.draft!==undefined && !validEstimate(d.draft))
     throw Error('Nieprawidłowa wersja robocza.');
+  if(d.company!=null&&(!d.company||typeof d.company!=='object'||typeof d.company.name!=='string'||typeof d.company.contact!=='string'||d.company.name.length>500||d.company.contact.length>1500))throw Error('Nieprawidłowy profil firmy.');
+  if(d.branding!=null&&(!d.branding||typeof d.branding!=='object'||typeof d.branding.logo!=='string'||typeof d.branding.color!=='string'||typeof d.branding.footer!=='string'||d.branding.logo.length>1600000||!(d.branding.logo===''||/^data:image\/(png|jpeg|webp);base64,/.test(d.branding.logo))||!/^#[0-9a-fA-F]{6}$/.test(d.branding.color)||d.branding.footer.length>600))throw Error('Nieprawidłowe ustawienia wyglądu.');
+  if(d.template!=null&&!['classic','modern','minimal','premium','technical','creative'].includes(d.template))throw Error('Nieprawidłowy szablon.');
   return d;
 }
 function importFullBackup(data){
   // Import zastępuje całą bazę. Najpierw weryfikujemy plik, potem próbujemy
   // zapisać wszystkie klucze; przy błędzie odtwarzamy wcześniejszy stan.
-  const keys=[STORAGE_KEY,CLIENTS_STORAGE_KEY,PRICE_KEY,DRAFT_KEY];
+  const keys=[STORAGE_KEY,CLIENTS_STORAGE_KEY,PRICE_KEY,DRAFT_KEY,'pewnawycena_company_profile_v1','pewnawycena_company_brand_v1','pewnawycena_pdf_template_v1'];
   const previous=keys.map(key=>localStorage.getItem(key));
   const replacement=[
     JSON.stringify(data.estimates),JSON.stringify(data.clients),
-    JSON.stringify(data.prices),data.draft?JSON.stringify(data.draft):null
+    JSON.stringify(data.prices),data.draft?JSON.stringify(data.draft):null,
+    data.company?JSON.stringify(data.company):localStorage.getItem('pewnawycena_company_profile_v1'),
+    data.branding?JSON.stringify(data.branding):localStorage.getItem('pewnawycena_company_brand_v1'),
+    data.template||localStorage.getItem('pewnawycena_pdf_template_v1')||'classic'
   ];
   try{
     keys.forEach((key,i)=>replacement[i]===null?localStorage.removeItem(key):localStorage.setItem(key,replacement[i]));
@@ -1091,7 +1115,7 @@ function importFullBackup(data){
   renderSavedEstimates();renderClientbook();renderPrices();
   draftDirty=false;clearTimeout(draftTimer);
   backupAllStatus('Przywrócono dane: '+savedEstimates.length+' wycen, '+clientbook.length+' klientów, '+pricebook.length+' pozycji cennika.');
-  draftNotice(data.draft?'Przywrócono wersję roboczą. Odśwież aplikację, aby ją otworzyć.':'W kopii nie było wersji roboczej.');
+  draftNotice('Dane przywrócone. Odśwież aplikację, aby zobaczyć przywrócone ustawienia firmy i wersję roboczą.');
 }
 byId('backup-all').addEventListener('click',downloadFullBackup);
 byId('import-all').addEventListener('click',()=>byId('import-all-file').click());
@@ -1245,6 +1269,32 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
     });
   });
 }
+</script>
+<script>
+(function(){
+ const key='pewnawycena_company_profile_v1';
+ const name=document.getElementById('company-profile-name');
+ const contact=document.getElementById('company-profile-contact');
+ const originalName=document.getElementById('company-name');
+ const originalContact=document.getElementById('company-contact');
+ let stored=null;
+ try{stored=JSON.parse(localStorage.getItem(key)||'null')}catch(e){}
+ if(stored&&typeof stored==='object'){
+  if(typeof stored.name==='string')originalName.value=stored.name.slice(0,500);
+  if(typeof stored.contact==='string')originalContact.value=stored.contact.slice(0,1500);
+ }
+ name.value=originalName.value;contact.value=originalContact.value;
+ function persist(){
+  originalName.value=name.value;originalContact.value=contact.value;
+  try{localStorage.setItem(key,JSON.stringify({name:name.value,contact:contact.value}))}catch(e){}
+  originalName.dispatchEvent(new Event('input',{bubbles:true}));
+ }
+ name.addEventListener('input',persist);
+ contact.addEventListener('input',persist);
+ window.pwCompanyProfileRefresh=function(){
+  name.value=originalName.value;contact.value=originalContact.value;
+ };
+})();
 </script>
 <script>
 (function(){
