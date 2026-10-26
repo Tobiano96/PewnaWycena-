@@ -174,6 +174,38 @@ body.template-modern .print-document .print-brand-mark{border-radius:50%}
 .print-document .print-table th{background:var(--pdf-soft,#edf6f0)!important;color:var(--pdf-ink,#264737)!important}
 .print-document .print-totals .final{border-top-color:var(--pdf-accent,#176b52)!important}
 }
+
+/* 2.9.1: widoczny rozwijany wybór sześciu szablonów */
+.template-picker{margin:18px 0;padding:15px;border:2px solid #8cc7ab;border-radius:15px;background:#f4faf6}
+.template-toggle{display:block;width:100%;padding:14px 12px;font-size:15px;font-weight:800;text-align:left;line-height:1.5}
+.template-toggle span{font-weight:500;font-size:13px}
+.templates-panel{margin-top:15px}
+.templates-panel[hidden]{display:none!important}
+.templates-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+.template-choice{background:#fff!important;color:#23352a!important;border:2px solid #d9e7dd!important;border-radius:12px;padding:10px;display:flex;flex-direction:column;align-items:stretch;gap:5px;text-align:left;min-width:0}
+.template-choice[aria-pressed="true"]{border-color:#176b52!important;box-shadow:0 0 0 2px #c0e6d0}
+.template-choice strong{font-size:13px}
+.template-choice small{font-size:11px;color:#54665c}
+.template-swatch{height:70px;background:#fff;border:1px solid #e2e8e3;border-radius:5px;padding:8px;display:flex;flex-direction:column;gap:5px}
+.template-swatch i{display:block;height:10px;background:var(--swatch);width:75%;border-radius:2px}
+.template-swatch b{display:block;height:7px;background:var(--swatch-soft);width:100%}
+.template-swatch em{display:block;height:5px;background:#d9e0da;width:100%}
+.template-swatch em:last-child{width:65%}
+@media(max-width:550px){.templates-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+body.template-premium .print-document{--pdf-accent:#a16207;--pdf-soft:#fef9c3;--pdf-ink:#713f12}
+body.template-technical .print-document{--pdf-accent:#475569;--pdf-soft:#e2e8f0;--pdf-ink:#1e293b}
+body.template-creative .print-document{--pdf-accent:#7c3aed;--pdf-soft:#f3e8ff;--pdf-ink:#581c87}
+body.template-premium .print-document .print-header{border-bottom-style:double;border-bottom-width:5px}
+body.template-technical .print-document .print-header{border-bottom-style:solid;border-bottom-width:5px}
+body.template-creative .print-document .print-header{border-bottom-style:dashed}
+body.template-premium .print-document .print-title{letter-spacing:2px}
+body.template-technical .print-document .print-title{font-weight:900;text-transform:uppercase}
+body.template-creative .print-document .print-title{font-style:italic}
+@media print{
+ body.template-premium .print-document .print-header{border-bottom:5px double var(--pdf-accent)!important}
+ body.template-technical .print-document .print-header{border-bottom:5px solid var(--pdf-accent)!important}
+ body.template-creative .print-document .print-header{border-bottom:3px dashed var(--pdf-accent)!important}
+}
 </style>
 </head>
 <body>
@@ -231,14 +263,21 @@ body.template-modern .print-document .print-brand-mark{border-radius:50%}
 <h2 id="result-heading">2. Twój kosztorys</h2>
 <div class="metrics"><div class="metric"><small>Robocizna</small><strong id="labor-metric">0 zł</strong></div><div class="metric"><small>Materiały</small><strong id="material-metric">0 zł</strong></div><div class="metric"><small>Cena końcowa</small><strong id="total-metric">0 zł</strong></div></div>
 <div class="table-scroll"><table><thead><tr><th>Pozycja</th><th>Typ</th><th>Ilość</th><th>Jedn.</th><th>Stawka (zł)</th><th>Razem</th><th></th></tr></thead><tbody id="items-body"></tbody></table></div>
-<div class="actions estimate-actions"><button id="quick-save" class="secondary" type="button">Zapisz wycenę</button><button id="add" class="secondary" type="button">+ Dodaj pozycję</button><button id="export" class="neutral" type="button">Eksport CSV</button><label for="offer-template">Wygląd dokumentu PDF</label>
-<select id="offer-template" aria-label="Szablon dokumentu PDF">
-<option value="classic">Klasyczny — zielony</option>
-<option value="modern">Nowoczesny — granatowy</option>
-<option value="minimal">Minimalistyczny — czarno-biały</option>
-</select>
-<p class="hint">Szablon zmienia wygląd wydruku/PDF. Nie zmienia wartości wyceny ani danych klientów.</p>
-<button id="pdf" class="pdf-btn" type="button">Zapisz jako PDF</button><button id="share-offer" class="secondary" type="button">Udostępnij ofertę</button><button id="copy-offer" class="neutral" type="button">Kopiuj wiadomość</button><button id="reset" class="neutral" type="button">Przywróć przykład</button></div>
+<section class="template-picker" aria-label="Szablony ofert">
+<button type="button" id="templates-toggle" class="secondary template-toggle" aria-expanded="false" aria-controls="templates-panel">🎨 Wybierz szablon oferty (6 wariantów) <span id="template-current">— Klasyczny</span> ▾</button>
+<div id="templates-panel" class="templates-panel" hidden>
+<p class="hint">Wybierz wariant. Zaznaczony szablon zostanie zastosowany do wydruku i PDF.</p>
+<div class="templates-grid" role="group" aria-label="Warianty szablonów">
+<button type="button" class="template-choice" data-template="classic" aria-pressed="true"><span class="template-swatch" style="--swatch:#176b52;--swatch-soft:#edf6f0"><i></i><b></b><em></em><em></em></span><strong>Klasyczny</strong><small>Zielony, firmowy</small></button>
+<button type="button" class="template-choice" data-template="modern" aria-pressed="false"><span class="template-swatch" style="--swatch:#1d4ed8;--swatch-soft:#eff6ff"><i></i><b></b><em></em><em></em></span><strong>Nowoczesny</strong><small>Granatowy, elegancki</small></button>
+<button type="button" class="template-choice" data-template="minimal" aria-pressed="false"><span class="template-swatch" style="--swatch:#222;--swatch-soft:#f3f4f6"><i></i><b></b><em></em><em></em></span><strong>Minimal</strong><small>Czarno-biały</small></button>
+<button type="button" class="template-choice" data-template="premium" aria-pressed="false"><span class="template-swatch" style="--swatch:#a16207;--swatch-soft:#fef9c3"><i></i><b></b><em></em><em></em></span><strong>Premium</strong><small>Złoto i krem</small></button>
+<button type="button" class="template-choice" data-template="technical" aria-pressed="false"><span class="template-swatch" style="--swatch:#475569;--swatch-soft:#e2e8f0"><i></i><b></b><em></em><em></em></span><strong>Techniczny</strong><small>Grafit, wyraźne linie</small></button>
+<button type="button" class="template-choice" data-template="creative" aria-pressed="false"><span class="template-swatch" style="--swatch:#7c3aed;--swatch-soft:#f3e8ff"><i></i><b></b><em></em><em></em></span><strong>Kreatywny</strong><small>Fiolet, mocne akcenty</small></button>
+</div>
+</div>
+</section>
+<div class="actions estimate-actions"><button id="quick-save" class="secondary" type="button">Zapisz wycenę</button><button id="add" class="secondary" type="button">+ Dodaj pozycję</button><button id="export" class="neutral" type="button">Eksport CSV</button><button id="pdf" class="pdf-btn" type="button">Zapisz jako PDF</button><button id="share-offer" class="secondary" type="button">Udostępnij ofertę</button><button id="copy-offer" class="neutral" type="button">Kopiuj wiadomość</button><button id="reset" class="neutral" type="button">Przywróć przykład</button></div>
 <div class="options"><div><label for="margin">Narzut (%)</label><input id="margin" type="number" min="0" step="1" value="20"></div><div><label for="extra">Koszty dodatkowe (zł)</label><input id="extra" type="number" min="0" step="0.01" value="150"></div></div>
 <div class="summary"><div class="sum-row"><span>Robocizna</span><b id="labor-sum">0 zł</b></div><div class="sum-row"><span>Materiały</span><b id="material-sum">0 zł</b></div><div class="sum-row"><span>Koszty dodatkowe</span><b id="extra-sum">0 zł</b></div><div class="sum-row"><span>Narzut</span><b id="margin-sum">0 zł</b></div><div class="sum-row final"><span>Do zapłaty</span><b id="total-sum">0 zł</b></div></div>
 <p id="share-status" class="hint" role="status" aria-live="polite"></p><p class="hint">Udostępnianie wysyła podsumowanie tekstowe. Aby wysłać PDF, najpierw wybierz „Zapisz jako PDF”, a potem udostępnij zapisany plik z aplikacji Pliki.</p>
@@ -1166,19 +1205,32 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 </script>
 <script>
 (function(){
-  const select=document.getElementById('offer-template');
-  const key='pewnawycena_pdf_template_v1';
-  function apply(value){
-    const safe=['classic','modern','minimal'].includes(value)?value:'classic';
-    document.body.classList.remove('template-classic','template-modern','template-minimal');
-    document.body.classList.add('template-'+safe);
-    select.value=safe;
-    try{localStorage.setItem(key,safe)}catch(e){}
-  }
-  let previous='classic';
-  try{previous=localStorage.getItem(key)||'classic'}catch(e){}
-  apply(previous);
-  select.addEventListener('change',()=>apply(select.value));
+ const key='pewnawycena_pdf_template_v1';
+ const names={classic:'Klasyczny',modern:'Nowoczesny',minimal:'Minimal',premium:'Premium',technical:'Techniczny',creative:'Kreatywny'};
+ const toggle=document.getElementById('templates-toggle');
+ const panel=document.getElementById('templates-panel');
+ const current=document.getElementById('template-current');
+ const buttons=[...document.querySelectorAll('[data-template]')];
+ function apply(value){
+  const safe=Object.prototype.hasOwnProperty.call(names,value)?value:'classic';
+  Object.keys(names).forEach(name=>document.body.classList.remove('template-'+name));
+  document.body.classList.add('template-'+safe);
+  buttons.forEach(btn=>btn.setAttribute('aria-pressed',String(btn.dataset.template===safe)));
+  current.textContent='— '+names[safe];
+  try{localStorage.setItem(key,safe)}catch(e){}
+ }
+ toggle.addEventListener('click',()=>{
+  panel.hidden=!panel.hidden;
+  toggle.setAttribute('aria-expanded',String(!panel.hidden));
+ });
+ buttons.forEach(btn=>btn.addEventListener('click',()=>{
+  apply(btn.dataset.template);
+  panel.hidden=true;
+  toggle.setAttribute('aria-expanded','false');
+ }));
+ let initial='classic';
+ try{initial=localStorage.getItem(key)||'classic'}catch(e){}
+ apply(initial);
 })();
 </script>
 </body>
