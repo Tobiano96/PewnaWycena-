@@ -325,6 +325,23 @@ body.brand-preview-open{overflow:hidden}
  body.protocol-print .acceptance-signatures{break-inside:avoid}
  body.protocol-print .acceptance-header,body.protocol-print .acceptance-parties{break-inside:avoid}
 }
+
+/* 3.8 — pulpit */
+body.is-home #main-heading,body.is-home #main-heading+p{display:none}
+.home-hero{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:15px}
+.home-hero h2{margin:5px 0 8px}.home-eyebrow{font-size:11px;font-weight:800;letter-spacing:1.4px;color:#176b52}
+.home-actions{display:flex;gap:8px;flex-wrap:wrap}.home-actions button{min-height:46px}
+.home-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:16px 0}
+.home-stat{border:1px solid #cde4d5;border-radius:14px;background:#f3faf6;padding:18px 13px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.home-stat span{font-size:13px;color:#355b48;font-weight:600}.home-stat strong{font-size:clamp(22px,4vw,30px);color:#176b52;overflow-wrap:anywhere}.home-stat small{font-size:11px;color:#566b60}
+.home-sections{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.home-sections .panel{min-width:0}
+.home-section-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}.home-section-head h3{margin:0}
+.home-items{display:flex;flex-direction:column;gap:8px;margin:12px 0}.home-item{display:flex;align-items:center;gap:9px;justify-content:space-between;border:1px solid #dce8df;border-radius:10px;padding:10px}
+.home-item-text{min-width:0;display:flex;flex-direction:column;gap:4px;overflow-wrap:anywhere}.home-item-text strong{font-size:13px}.home-item-text small{font-size:11px;color:#65766d}
+.home-item button{flex-shrink:0}.home-disclaimer{margin-top:16px}
+@media(max-width:700px){.home-sections{grid-template-columns:1fr}}
+@media(max-width:360px){.home-stats{grid-template-columns:1fr}}
+@media print{#view-home{display:none!important}}
 </style>
 </head>
 <body>
@@ -335,11 +352,12 @@ body.brand-preview-open{overflow:hidden}
 <div class="menu-wrap">
 <button id="main-menu-toggle" type="button" class="menu-toggle" aria-expanded="false" aria-controls="main-menu-items">
 <span aria-hidden="true" class="menu-hamburger">☰</span><span>Menu</span>
-<span id="menu-active-label" class="menu-active-label">Nowa wycena</span>
+<span id="menu-active-label" class="menu-active-label">🏠 Pulpit</span>
 <span aria-hidden="true" class="menu-chevron">▾</span>
 </button>
 <nav id="main-menu-items" class="app-nav" aria-label="Nawigacja po aplikacji" hidden>
-<button type="button" class="nav-tab active" data-view="estimate" aria-pressed="true">Nowa wycena</button>
+<button type="button" class="nav-tab active" data-view="home" aria-pressed="true">🏠 Pulpit</button>
+<button type="button" class="nav-tab" data-view="estimate" aria-pressed="false">Nowa wycena</button>
 <button type="button" class="nav-tab" data-view="dashboard">Statystyki</button>
 <button type="button" class="nav-tab" data-view="saved" aria-pressed="false">Zapisane wyceny</button>
 <button type="button" class="nav-tab" data-view="clients" aria-pressed="false">Klienci</button>
@@ -350,7 +368,24 @@ body.brand-preview-open{overflow:hidden}
 <button type="button" class="nav-tab" data-view="company" aria-pressed="false">🏢 Moja firma</button>
 </nav>
 </div>
-<div id="view-estimate" class="app-view">
+<div id="view-home" class="app-view">
+<section class="panel home-hero">
+<div><p class="home-eyebrow">CENTRUM TWOJEJ FIRMY</p><h2>🏠 Pulpit przedsiębiorcy</h2><p id="home-date" class="hint"></p><p>Najważniejsze sprawy w jednym miejscu. Wszystkie dane pozostają na tym urządzeniu.</p></div>
+<div class="home-actions"><button type="button" class="primary" data-home-view="estimate">＋ Nowa wycena</button><button type="button" class="secondary" data-home-view="jobs">🛠️ Zlecenia</button></div>
+</section>
+<section class="home-stats" aria-label="Najważniejsze wskaźniki">
+<div class="home-stat"><span>Aktywne zlecenia</span><strong id="home-active">0</strong><small>Do rozpoczęcia i w realizacji</small></div>
+<div class="home-stat"><span>Do otrzymania od klientów</span><strong id="home-unpaid">0,00 zł</strong><small id="home-unpaid-note">Na podstawie finansów zleceń</small></div>
+<div class="home-stat"><span>Zaległe terminy</span><strong id="home-overdue">0</strong><small>Niezakończone sprawy</small></div>
+<div class="home-stat"><span>Sprawy na dziś</span><strong id="home-today">0</strong><small>Terminy i przypomnienia</small></div>
+</section>
+<div class="home-sections">
+<section class="panel"><div class="home-section-head"><h3>📅 Najbliższe 7 dni</h3><button type="button" class="secondary" data-home-view="calendar">Terminarz</button></div><div id="home-upcoming" class="home-items"></div><button type="button" class="secondary" data-home-view="reminders">Wszystkie przypomnienia</button></section>
+<section class="panel"><div class="home-section-head"><h3>🛠️ Aktywne zlecenia</h3><button type="button" class="secondary" data-home-view="jobs">Wszystkie zlecenia</button></div><div id="home-jobs" class="home-items"></div></section>
+</div>
+<p class="hint home-disclaimer">Kwota „Do otrzymania” to suma dodatnich sald wpisanych w finansach zleceń, a nie automatyczny odczyt bankowy. Wprowadź wartość zlecenia i wpłaty, aby wynik był miarodajny.</p>
+</div>
+<div id="view-estimate" class="app-view" hidden>
 <div class="autosave-bar" role="status"><span id="draft-save-state">Autozapis: gotowy</span><button type="button" id="draft-clear" class="secondary">Wyczyść wersję roboczą</button></div>
 <section class="panel details" aria-labelledby="details-heading">
 <h2 id="details-heading">Dane do profesjonalnego kosztorysu</h2>
@@ -893,6 +928,8 @@ function restoreEstimate(record){
   byId('estimate-status').value=record.fields['estimate-status']||'draft';
   statusMessage('Wczytano wycenę. Możesz ją edytować i ponownie zapisać.');
   showAppView('estimate');
+  document.body.classList.toggle('is-home',view==='home');
+  if(view==='home')renderHome();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function renderSavedEstimates(){
@@ -1065,7 +1102,7 @@ document.addEventListener('keydown',event=>{
 
 // Nawigacja zakładkowa — nie zmienia zawartości formularzy ani zapisanych danych.
 function showAppView(view) {
-  const valid=['estimate','dashboard','saved','clients','prices','company','jobs','calendar','reminders'];
+  const valid=['home','estimate','dashboard','saved','clients','prices','company','jobs','calendar','reminders'];
   if(!valid.includes(view))return;
   valid.forEach(name=>{
     const panel=byId('view-'+name);
@@ -2005,6 +2042,54 @@ $('brand-preview-close').addEventListener('click',close);
 modal.addEventListener('click',event=>{if(event.target===modal)close()});
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!modal.hidden)close()});
 render();
+})();
+</script>
+<script>
+// PewnaWycena 3.8 — pulpit oparty na istniejących lokalnych danych.
+(function(){
+'use strict';
+const $=id=>document.getElementById(id);
+const pln=new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN'});
+const dateLabel=new Intl.DateTimeFormat('pl-PL',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+function dayISO(d){return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-')}
+function plusDays(d,n){const copy=new Date(d.getFullYear(),d.getMonth(),d.getDate(),12);copy.setDate(copy.getDate()+n);return dayISO(copy)}
+function node(tag,cls,text){const el=document.createElement(tag);if(cls)el.className=cls;if(text!==undefined)el.textContent=text;return el}
+function openView(view){showAppView(view)}
+document.querySelectorAll('[data-home-view]').forEach(b=>b.addEventListener('click',()=>openView(b.dataset.homeView)));
+function empty(root,message){root.append(node('p','hint',message))}
+function addRow(root,title,subtitle,view){
+ const row=node('div','home-item');const info=node('div','home-item-text');
+ info.append(node('strong','',title),node('small','',subtitle));
+ const button=node('button','secondary','Otwórz');button.type='button';
+ button.addEventListener('click',()=>openView(view));row.append(info,button);root.append(row);
+}
+window.renderHome=function renderHome(){
+ const today=new Date(),iso=dayISO(today),end=plusDays(today,7);
+ $('home-date').textContent=dateLabel.format(today);
+ const active=jobs.filter(j=>j.status!=='done');
+ $('home-active').textContent=String(active.length);
+ let unpaid=0,unpriced=0;
+ for(const j of jobs){
+  const f=j.finance;
+  if(!f||!validFinance(f)||f.contractNet===0){unpriced++;continue}
+  const c=financeCalc(f);unpaid+=Math.max(0,c.balance);
+ }
+ $('home-unpaid').textContent=pln.format(unpaid/100);
+ $('home-unpaid-note').textContent=unpriced?('Bez '+unpriced+' zleceń bez wpisanej wartości'):'Na podstawie finansów zleceń';
+ const entries=reminderEntries();
+ $('home-overdue').textContent=String(entries.filter(r=>r.date<iso).length);
+ $('home-today').textContent=String(entries.filter(r=>r.date===iso).length);
+ const upcoming=entries.filter(r=>r.date>=iso&&r.date<=end).slice(0,7);
+ const upcomingRoot=$('home-upcoming');upcomingRoot.replaceChildren();
+ if(!upcoming.length)empty(upcomingRoot,'Brak terminów na najbliższe 7 dni.');
+ for(const r of upcoming)addRow(upcomingRoot,r.title,(r.date===iso?'Dzisiaj · ':'')+r.date+(r.automatic?' · ze zlecenia':' · przypomnienie'),'reminders');
+ const jobRoot=$('home-jobs');jobRoot.replaceChildren();
+ const sorted=active.slice().sort((a,b)=>(a.deadline||'9999-12-31').localeCompare(b.deadline||'9999-12-31')).slice(0,5);
+ if(!sorted.length)empty(jobRoot,'Brak aktywnych zleceń.');
+ for(const j of sorted)addRow(jobRoot,j.number+' — '+j.client,(j.status==='progress'?'W realizacji':'Do rozpoczęcia')+(j.deadline?' · termin '+j.deadline:''),'jobs');
+};
+// Start na pulpicie dopiero po inicjalizacji wszystkich modułów.
+showAppView('home');
 })();
 </script>
 </body>
