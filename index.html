@@ -244,6 +244,27 @@ body.brand-preview-open{overflow:hidden}
 .job-card h3{margin:0}
 .job-card label{font-weight:700;font-size:13px}
 .job-card textarea{width:100%}
+
+.calendar-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:12px 0}
+.calendar-toolbar strong{text-transform:capitalize;text-align:center}
+.calendar-toolbar button{min-width:42px}
+.cal-legend{display:flex;gap:12px;flex-wrap:wrap;margin:12px 0;font-size:12px}
+.cal-legend span{display:inline-flex;align-items:center;gap:5px}
+.cal-dot{display:inline-block;flex:none;width:8px;height:8px;border-radius:50%}
+.cal-todo{background:#2563eb}.cal-progress{background:#d97706}.cal-done{background:#15803d}
+.cal-weekdays,.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.cal-weekdays span{text-align:center;font-size:12px;font-weight:700;color:#53635c;padding:8px 0}
+.cal-day{min-width:0!important;min-height:54px;padding:5px 2px!important;border:1px solid #d6e2da!important;background:#f8fbf9!important;color:#24382b!important;border-radius:8px!important;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:4px;font-size:13px}
+.cal-day.cal-selected{outline:2px solid #176b52;outline-offset:-2px;background:#e7f4ec!important}
+.cal-day.cal-today>span:first-child{font-weight:900;text-decoration:underline}
+.cal-dots{display:flex;justify-content:center;gap:2px;align-items:center;flex-wrap:wrap}
+.cal-dots .cal-dot{width:6px;height:6px}
+.cal-dots small{font-size:9px}
+.cal-job{display:flex;align-items:center;gap:10px;padding:12px 8px;margin:8px 0;border:1px solid #d6e2da;border-radius:10px;background:#f8fbf9}
+.cal-job-info{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px;overflow-wrap:anywhere}
+.cal-job-info strong{font-size:13px}.cal-job-info small{color:#56675e;font-size:11px}
+.cal-job button{font-size:12px;padding:8px}
+#cal-list-view[hidden],#cal-month-view[hidden]{display:none!important}
 </style>
 </head>
 <body>
@@ -258,6 +279,7 @@ body.brand-preview-open{overflow:hidden}
 <button type="button" class="nav-tab" data-view="clients" aria-pressed="false">Klienci</button>
 <button type="button" class="nav-tab" data-view="prices" aria-pressed="false">Mój cennik</button>
 <button type="button" class="nav-tab" data-view="jobs" aria-pressed="false">🛠️ Zlecenia</button>
+<button type="button" class="nav-tab" data-view="calendar" aria-pressed="false">📅 Terminarz</button>
 <button type="button" class="nav-tab" data-view="company" aria-pressed="false">🏢 Moja firma</button>
 </nav>
 <div id="view-estimate" class="app-view">
@@ -357,6 +379,30 @@ body.brand-preview-open{overflow:hidden}
 </div><p id="saved-results-count" class="hint" role="status"></p><div id="saved-list"></div>
 </section>
 </div>
+<div id="view-calendar" class="app-view" hidden>
+<section class="panel">
+<h2>📅 Terminarz zleceń</h2>
+<p class="hint">Kalendarz korzysta z tych samych terminów co „Zlecenia”. Kolory oznaczają etap realizacji. Kliknij dzień, aby zobaczyć prace i przejść do ich szczegółów.</p>
+<div class="calendar-toolbar">
+<button type="button" id="cal-prev" class="secondary" aria-label="Poprzedni miesiąc">‹</button>
+<strong id="cal-month" aria-live="polite"></strong>
+<button type="button" id="cal-next" class="secondary" aria-label="Następny miesiąc">›</button>
+</div>
+<div class="calendar-toolbar">
+<button type="button" id="cal-today" class="secondary">Bieżący miesiąc</button>
+<label for="cal-mode">Widok</label>
+<select id="cal-mode"><option value="month">Miesiąc</option><option value="list">Lista terminów</option></select>
+</div>
+<div class="cal-legend"><span><i class="cal-dot cal-todo"></i> Do rozpoczęcia</span><span><i class="cal-dot cal-progress"></i> W trakcie</span><span><i class="cal-dot cal-done"></i> Zakończone</span></div>
+<div id="cal-month-view">
+<div class="cal-weekdays" aria-hidden="true"><span>Pn</span><span>Wt</span><span>Śr</span><span>Cz</span><span>Pt</span><span>So</span><span>Nd</span></div>
+<div id="cal-grid" class="cal-grid" role="group" aria-label="Dni miesiąca"></div>
+<h3 id="cal-selected-heading"></h3>
+<div id="cal-day-jobs"></div>
+</div>
+<div id="cal-list-view" hidden></div>
+<p id="cal-message" class="hint" role="status" aria-live="polite"></p>
+</section></div>
 <div id="view-jobs" class="app-view" hidden>
 <section class="panel">
 <h2>🛠️ Centrum zleceń</h2>
@@ -905,7 +951,7 @@ loadPrices();
 
 // Nawigacja zakładkowa — nie zmienia zawartości formularzy ani zapisanych danych.
 function showAppView(view) {
-  const valid=['estimate','dashboard','saved','clients','prices','company','jobs'];
+  const valid=['estimate','dashboard','saved','clients','prices','company','jobs','calendar'];
   if(!valid.includes(view))return;
   valid.forEach(name=>{
     const panel=byId('view-'+name);
@@ -1136,7 +1182,7 @@ function importFullBackup(data){
   clientbook=data.clients;
   pricebook=data.prices;
   if(data.jobs!==undefined)jobs=data.jobs;
-  renderJobs();
+  renderJobs();renderCalendar();
   renderSavedEstimates();renderClientbook();renderPrices();
   draftDirty=false;clearTimeout(draftTimer);
   backupAllStatus('Przywrócono dane: '+savedEstimates.length+' wycen, '+clientbook.length+' klientów, '+pricebook.length+' pozycji cennika i '+jobs.length+' zleceń.');
@@ -1168,6 +1214,7 @@ function validJob(j){
   &&typeof j.client==='string'&&j.client.length<=500
   &&Object.prototype.hasOwnProperty.call(JOB_STATUSES,j.status)
   &&typeof j.deadline==='string'&&j.deadline.length<=20
+  &&(j.startDate===undefined||(typeof j.startDate==='string'&&j.startDate.length<=20&&(!j.startDate||/^\d{4}-\d{2}-\d{2}$/.test(j.startDate))))
   &&(!j.deadline||/^\d{4}-\d{2}-\d{2}$/.test(j.deadline))
   &&typeof j.notes==='string'&&j.notes.length<=3000
   &&typeof j.createdAt==='string'&&j.createdAt.length<80);
@@ -1193,10 +1240,10 @@ function createJobFromEstimate(record){
  const job={id:String(Date.now())+'-'+Math.random().toString(36).slice(2,9),
   estimateId:record.id,number:String(record.fields['estimate-number']||'Bez numeru').slice(0,300),
   client:String(record.fields['client-name']||'Klient niepodany').slice(0,500),
-  status:'todo',deadline:'',notes:'',createdAt:new Date().toISOString()};
+  status:'todo',startDate:'',deadline:'',notes:'',createdAt:new Date().toISOString()};
  jobs.unshift(job);
  if(!persistJobs()){jobs.shift();return}
- renderJobs();showAppView('jobs');
+ renderJobs();renderCalendar();showAppView('jobs');
  byId('jobs-status').textContent='Utworzono zlecenie na podstawie zaakceptowanej wyceny.';
 }
 function renderJobs(){
@@ -1213,10 +1260,29 @@ function renderJobs(){
   const status=document.createElement('select');
   Object.entries(JOB_STATUSES).forEach(([value,title])=>{const opt=document.createElement('option');opt.value=value;opt.textContent=title;status.append(opt)});
   status.value=job.status;
-  status.addEventListener('change',()=>{const old=job.status;job.status=status.value;if(!persistJobs()){job.status=old;status.value=old}renderJobs()});
-  const dateLabel=document.createElement('label');dateLabel.textContent='Termin realizacji';
+  status.addEventListener('change',()=>{const old=job.status;job.status=status.value;if(!persistJobs()){job.status=old;status.value=old}renderJobs();renderCalendar()});
+  const startLabel=document.createElement('label');startLabel.textContent='Data rozpoczęcia';
+  const startInput=document.createElement('input');startInput.type='date';startInput.value=job.startDate||'';
+  startInput.addEventListener('change',()=>{
+   if(startInput.value&&job.deadline&&startInput.value>job.deadline){
+    byId('jobs-status').textContent='Data rozpoczęcia nie może być późniejsza niż zakończenie.';
+    startInput.value=job.startDate||'';return;
+   }
+   const old=job.startDate||'';job.startDate=startInput.value;
+   if(!persistJobs()){job.startDate=old;startInput.value=old;return}
+   checkJobConflicts(job);renderCalendar();
+  });
+  const dateLabel=document.createElement('label');dateLabel.textContent='Data zakończenia / termin realizacji';
   const date=document.createElement('input');date.type='date';date.value=job.deadline;
-  date.addEventListener('change',()=>{const old=job.deadline;job.deadline=date.value;if(!persistJobs()){job.deadline=old;date.value=old}});
+  date.addEventListener('change',()=>{
+   if(date.value&&job.startDate&&date.value<job.startDate){
+    byId('jobs-status').textContent='Zakończenie nie może wypadać przed rozpoczęciem.';
+    date.value=job.deadline;return;
+   }
+   const old=job.deadline;job.deadline=date.value;
+   if(!persistJobs()){job.deadline=old;date.value=old;return}
+   checkJobConflicts(job);renderCalendar();
+  });
   const notesLabel=document.createElement('label');notesLabel.textContent='Notatki do zlecenia';
   const notes=document.createElement('textarea');notes.rows=2;notes.maxLength=3000;notes.value=job.notes;notes.placeholder='Ustalenia, postęp, materiały…';
   notes.addEventListener('change',()=>{const old=job.notes;job.notes=notes.value;if(!persistJobs()){job.notes=old;notes.value=old}});
@@ -1232,15 +1298,103 @@ function renderJobs(){
    if(!confirm('Usunąć zlecenie? Oryginalna wycena pozostanie zapisana.'))return;
    const before=jobs.slice();jobs=jobs.filter(x=>x.id!==job.id);
    if(!persistJobs())jobs=before;
-   renderJobs();
+   renderJobs();renderCalendar();
   });
   actions.append(original,remove);
-  card.append(heading,meta,statusLabel,status,dateLabel,date,notesLabel,notes,actions);
+  card.append(heading,meta,statusLabel,status,startLabel,startInput,dateLabel,date,notesLabel,notes,actions);
   root.append(card);
  });
 }
 byId('jobs-filter').addEventListener('change',renderJobs);
 renderJobs();
+
+// 3.3 — Terminarz, wspólna baza danych z Centrum zleceń.
+let calViewMonth=new Date();
+calViewMonth=new Date(calViewMonth.getFullYear(),calViewMonth.getMonth(),1);
+let calSelectedDay=new Date().toISOString().slice(0,10);
+const calDateFmt=new Intl.DateTimeFormat('pl-PL',{day:'numeric',month:'long',year:'numeric'});
+const calMonthFmt=new Intl.DateTimeFormat('pl-PL',{month:'long',year:'numeric'});
+function calIso(y,m,d){return String(y).padStart(4,'0')+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0')}
+function calDates(job){
+ const start=job.startDate||job.deadline||'';
+ const end=job.deadline||job.startDate||'';
+ return {start,end};
+}
+function calIncludes(job,date){
+ const {start,end}=calDates(job);
+ return !!start&&start<=date&&date<=end;
+}
+function calOverlaps(a,b){
+ const x=calDates(a),y=calDates(b);
+ return !!(x.start&&y.start&&x.start<=y.end&&y.start<=x.end);
+}
+function checkJobConflicts(job){
+ if(job.status==='done')return;
+ const overlapping=jobs.filter(other=>other.id!==job.id&&other.status!=='done'&&calOverlaps(job,other));
+ byId('jobs-status').textContent=overlapping.length
+  ?'⚠️ Uwaga: termin nakłada się na '+overlapping.length+' inne aktywne zlecenie/zlecenia. Sprawdź Terminarz.'
+  :'Termin zapisany. Zobacz go w zakładce Terminarz.';
+}
+function calJobCard(job){
+ const card=document.createElement('div');card.className='cal-job';
+ const marker=document.createElement('span');marker.className='cal-dot cal-'+job.status;
+ const info=document.createElement('div');info.className='cal-job-info';
+ const name=document.createElement('strong');name.textContent=job.number+' — '+job.client;
+ const detail=document.createElement('small');
+ const {start,end}=calDates(job);
+ detail.textContent=JOB_STATUSES[job.status]+' · '+(start===end?start:start+' → '+end);
+ info.append(name,detail);
+ const open=document.createElement('button');open.type='button';open.className='secondary';open.textContent='Otwórz';
+ open.addEventListener('click',()=>{showAppView('jobs');byId('jobs-filter').value='all';renderJobs();byId('jobs-status').textContent='Zlecenie: '+job.number+' — '+job.client});
+ card.append(marker,info,open);
+ return card;
+}
+function renderCalendar(){
+ const grid=byId('cal-grid');if(!grid)return;
+ const year=calViewMonth.getFullYear(),month=calViewMonth.getMonth();
+ byId('cal-month').textContent=calMonthFmt.format(calViewMonth);
+ const listMode=byId('cal-mode').value==='list';
+ byId('cal-month-view').hidden=listMode;
+ byId('cal-list-view').hidden=!listMode;
+ const firstDay=(new Date(year,month,1).getDay()+6)%7;
+ const count=new Date(year,month+1,0).getDate();
+ grid.replaceChildren();
+ for(let i=0;i<firstDay;i++){const empty=document.createElement('span');empty.className='cal-empty';grid.append(empty)}
+ for(let day=1;day<=count;day++){
+  const iso=calIso(year,month,day);
+  const active=jobs.filter(j=>calIncludes(j,iso));
+  const btn=document.createElement('button');btn.type='button';btn.className='cal-day';
+  if(iso===calSelectedDay)btn.classList.add('cal-selected');
+  if(iso===calIso(new Date().getFullYear(),new Date().getMonth(),new Date().getDate()))btn.classList.add('cal-today');
+  btn.setAttribute('aria-label',day+' '+calMonthFmt.format(calViewMonth)+', '+active.length+' zleceń');
+  const number=document.createElement('span');number.textContent=String(day);btn.append(number);
+  const dots=document.createElement('span');dots.className='cal-dots';
+  active.slice(0,3).forEach(j=>{const dot=document.createElement('i');dot.className='cal-dot cal-'+j.status;dots.append(dot)});
+  if(active.length>3){const extra=document.createElement('small');extra.textContent='+'+(active.length-3);dots.append(extra)}
+  btn.append(dots);
+  btn.addEventListener('click',()=>{calSelectedDay=iso;renderCalendar()});
+  grid.append(btn);
+ }
+ const selected=byId('cal-day-jobs');selected.replaceChildren();
+ byId('cal-selected-heading').textContent='Zlecenia: '+calSelectedDay;
+ const todayJobs=jobs.filter(j=>calIncludes(j,calSelectedDay));
+ if(todayJobs.length)todayJobs.forEach(j=>selected.append(calJobCard(j)));
+ else{const p=document.createElement('p');p.className='hint';p.textContent='Brak zleceń na ten dzień.';selected.append(p)}
+ const list=byId('cal-list-view');list.replaceChildren();
+ const first=calIso(year,month,1),last=calIso(year,month,count);
+ const monthJobs=jobs.filter(j=>{const d=calDates(j);return d.start&&d.start<=last&&d.end>=first});
+ monthJobs.sort((a,b)=>calDates(a).start.localeCompare(calDates(b).start));
+ if(monthJobs.length)monthJobs.forEach(j=>list.append(calJobCard(j)));
+ else{const p=document.createElement('p');p.className='hint';p.textContent='Brak zaplanowanych zleceń w tym miesiącu.';list.append(p)}
+ const without=jobs.filter(j=>!calDates(j).start).length;
+ byId('cal-message').textContent=without?without+' zleceń nie ma jeszcze terminu — uzupełnij daty w Centrum zleceń.':'Wszystkie zlecenia mają ustalone terminy.';
+}
+byId('cal-prev').addEventListener('click',()=>{calViewMonth=new Date(calViewMonth.getFullYear(),calViewMonth.getMonth()-1,1);calSelectedDay=calIso(calViewMonth.getFullYear(),calViewMonth.getMonth(),1);renderCalendar()});
+byId('cal-next').addEventListener('click',()=>{calViewMonth=new Date(calViewMonth.getFullYear(),calViewMonth.getMonth()+1,1);calSelectedDay=calIso(calViewMonth.getFullYear(),calViewMonth.getMonth(),1);renderCalendar()});
+byId('cal-today').addEventListener('click',()=>{const today=new Date();calViewMonth=new Date(today.getFullYear(),today.getMonth(),1);calSelectedDay=calIso(today.getFullYear(),today.getMonth(),today.getDate());renderCalendar()});
+byId('cal-mode').addEventListener('change',renderCalendar);
+renderCalendar();
+
 
 
 
