@@ -11,7 +11,7 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
-<title>PewnaWycena 4.4 — Premium Glass</title>
+<title>PewnaWycena 4.5 — Premium Glass</title>
 <style>
 :root{--green:#176b52;--dark:#143b31;--bg:#f3f7f4;--border:#dce7df;--muted:#607269}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);font:15px/1.5 system-ui,Arial,sans-serif;color:#18251e}
@@ -344,7 +344,7 @@ body.is-home #main-heading,body.is-home #main-heading+p{display:none}
 @media print{#view-home{display:none!important}}
 
 
-/* PewnaWycena 4.4 — Midnight Navy Premium Glass, kontrast WCAG */
+/* PewnaWycena 4.5 — Midnight Navy Premium Glass, kontrast WCAG */
 :root{--text:#ecf5ff;--muted:#b7cce4;--navy:#07182f;--navy2:#102947;--blue:#6fb8ff;--aqua:#64e0d4}
 html{background:#061326;scroll-behavior:smooth}
 body{background:radial-gradient(ellipse 80% 460px at 85% 0,#163c68 0%,transparent 85%),radial-gradient(ellipse 80% 620px at 5% 650px,#0b3156 0%,transparent 85%),linear-gradient(155deg,#081c35,#061326 80%);background-attachment:fixed;color:#eaf4ff;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",Inter,system-ui,sans-serif;letter-spacing:-.01em}
@@ -389,7 +389,7 @@ input,select,textarea{background:#0a2749!important;border:1px solid #8bc6ff77!im
 @media print{body{background:#fff!important;color:#111!important}body>header,.bottom-nav,.menu-wrap{display:none!important}}
 
 
-/* PewnaWycena 4.4 — polish: mobile usability, legibility and accessibility */
+/* PewnaWycena 4.5 — polish: mobile usability, legibility and accessibility */
 :root{--green:#63c7ff;--dark:#07182f;--bg:#07182f;--border:#365c80;--muted:#bed2e8}
 .visually-hidden{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 body{line-height:1.55;-webkit-font-smoothing:antialiased}
@@ -476,7 +476,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 }
 
 
-/* PewnaWycena 4.4 — premium dashboard and motion */
+/* PewnaWycena 4.5 — premium dashboard and motion */
 .home-hero{display:flex;justify-content:space-between;align-items:center;gap:12px;isolation:isolate;min-height:225px!important}
 .home-hero-copy{position:relative;z-index:2;max-width:620px}
 .home-hero .home-eyebrow{font-size:10px;font-weight:850;letter-spacing:.18em;margin:0 0 14px;color:#8ddcff!important}
@@ -1116,6 +1116,7 @@ function loadStoredEstimates(){
   try{
     const value=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
     savedEstimates=Array.isArray(value)?value.filter(validEstimate):[];
+    if(!Array.isArray(value)||savedEstimates.length!==value.length)statusMessage('⚠️ Niektóre zapisane wyceny mają niepoprawne dane. Nie zapisuj nowych wycen przed wykonaniem kopii i sprawdzeniem danych.');
   }catch(err){savedEstimates=[];statusMessage('Nie można odczytać zapisów w tej przeglądarce. Użyj kopii zapasowej JSON.');}
   renderSavedEstimates();
 }
@@ -1261,7 +1262,7 @@ function renderPrices(){
   del.addEventListener('click',()=>{if(!confirm('Usunąć tę pozycję z cennika?'))return;const old=pricebook.slice();pricebook.splice(index,1);if(!storePrices())pricebook=old;renderPrices();});delCell.append(del);tr.append(delCell);body.append(tr);
  });
 }
-function loadPrices(){try{const data=JSON.parse(localStorage.getItem(PRICE_KEY)||'[]');pricebook=Array.isArray(data)?data.filter(validPrice):[];}catch(e){pricebook=[];priceStatus('Nie udało się odczytać cennika. Możesz wczytać kopię JSON.');}renderPrices();}
+function loadPrices(){try{const data=JSON.parse(localStorage.getItem(PRICE_KEY)||'[]');pricebook=Array.isArray(data)?data.filter(validPrice):[];if(!Array.isArray(data)||pricebook.length!==data.length)priceStatus('⚠️ Cennik zawiera niepoprawne rekordy. Pobierz kopię JSON przed dalszą edycją.');}catch(e){pricebook=[];priceStatus('Nie udało się odczytać cennika. Możesz wczytać kopię JSON.');}renderPrices();}
 byId('price-save').addEventListener('click',()=>{
  const p={name:byId('price-name').value.trim(),type:byId('price-type').value,unit:byId('price-unit').value.trim(),rate:Number(byId('price-rate').value)};
  if(!validPrice(p)){priceStatus('Podaj nazwę, jednostkę i prawidłową stawkę (0 zł lub więcej).');return;}
@@ -1345,7 +1346,7 @@ let clientbook=[];
 function clientbookStatus(message){byId('clientbook-status').textContent=message;}
 function isValidClient(c){return c && typeof c==='object' && typeof c.id==='string' && typeof c.name==='string' && c.name.length<=300 && c.name.trim() && typeof c.contact==='string' && c.contact.length<=5000;}
 function readClients(){
- try{const parsed=JSON.parse(localStorage.getItem(CLIENTS_STORAGE_KEY)||'[]');clientbook=Array.isArray(parsed)?parsed.filter(isValidClient):[];}
+ try{const parsed=JSON.parse(localStorage.getItem(CLIENTS_STORAGE_KEY)||'[]');clientbook=Array.isArray(parsed)?parsed.filter(isValidClient):[];if(!Array.isArray(parsed)||clientbook.length!==parsed.length)clientbookStatus('⚠️ Baza klientów zawiera niepoprawne rekordy. Pobierz kopię JSON przed dalszą edycją.');}
  catch(e){clientbook=[];clientbookStatus('Nie udało się odczytać bazy klientów. Możesz wczytać kopię JSON.');}
  renderClientbook();
 }
@@ -1499,12 +1500,36 @@ function readBackupState(){
     draft:(()=>{try{const d=JSON.parse(localStorage.getItem(DRAFT_KEY)||'null');return validEstimate(d)?d:null;}catch(e){return null;}})()
   };
 }
+function assertLocalCollectionsIntact(){
+ const collections=[
+  [STORAGE_KEY,validEstimate,5000,'wyceny'],
+  [CLIENTS_STORAGE_KEY,isValidClient,5000,'klienci'],
+  [PRICE_KEY,validPrice,2000,'cennik'],
+  [JOBS_KEY,validJob,5000,'zlecenia'],
+  [REMINDERS_KEY,validReminder,3000,'przypomnienia']
+ ];
+ for(const [key,validate,limit,label] of collections){
+  const raw=localStorage.getItem(key);
+  if(raw===null)continue;
+  let parsed;
+  try{parsed=JSON.parse(raw)}catch(e){throw Error('Nie można odczytać: '+label+'. Zachowaj dane i skontaktuj się z pomocą.');}
+  if(!Array.isArray(parsed)||parsed.length>limit||!parsed.every(validate))
+   throw Error('Nieprawidłowe dane: '+label+'. Eksport przerwany, aby nie utworzyć niepełnej kopii.');
+ }
+ const draftRaw=localStorage.getItem(DRAFT_KEY);
+ if(draftRaw){let draft;try{draft=JSON.parse(draftRaw)}catch(e){throw Error('Nieprawidłowa wersja robocza.');}
+  if(!validEstimate(draft))throw Error('Nieprawidłowa wersja robocza.');}
+}
 function downloadFullBackup(){
   try{
+    assertLocalCollectionsIntact();
     saveDraftNow();
+    assertLocalCollectionsIntact();
     const backup={app:'PewnaWycena',kind:FULL_BACKUP_KIND,version:1,
       exportedAt:new Date().toISOString(),data:readBackupState()};
+    validateFullBackup(backup);
     const json=JSON.stringify(backup,null,2);
+    if(new Blob([json]).size>FULL_BACKUP_LIMIT)throw Error('Kopia przekracza limit 12 MB.');
     const url=URL.createObjectURL(new Blob([json],{type:'application/json'}));
     const a=document.createElement('a');a.href=url;
     a.download='PewnaWycena-pelna-kopia-'+new Date().toISOString().slice(0,10)+'.json';
@@ -1550,8 +1575,9 @@ function importFullBackup(data){
   ];
   try{
     keys.forEach((key,i)=>replacement[i]===null?localStorage.removeItem(key):localStorage.setItem(key,replacement[i]));
+    keys.forEach((key,i)=>{if(localStorage.getItem(key)!==replacement[i])throw Error('Weryfikacja zapisu nie powiodła się.');});
   }catch(err){
-    try{keys.forEach((key,i)=>previous[i]===null?localStorage.removeItem(key):localStorage.setItem(key,previous[i]));}
+    try{for(let i=keys.length-1;i>=0;i--)previous[i]===null?localStorage.removeItem(keys[i]):localStorage.setItem(keys[i],previous[i]);}
     catch(rollbackError){throw Error('Nie udało się przywrócić poprzednich danych. Zachowaj kopię JSON i nie zamykaj aplikacji.');}
     throw Error('Brak miejsca na dane lub blokada pamięci przeglądarki. Import anulowany.');
   }
@@ -1568,7 +1594,7 @@ function importFullBackup(data){
   draftNotice('Dane przywrócone. Odśwież aplikację, aby zobaczyć przywrócone ustawienia firmy i wersję roboczą.');
 }
 
-// PewnaWycena 4.4 — diagnostyka, która NIE usuwa ani nie nadpisuje danych.
+// PewnaWycena 4.5 — diagnostyka, która NIE usuwa ani nie nadpisuje danych.
 function inspectLocalData(){
  const checks=[], add=(ok,text)=>checks.push({ok,text});
  let canWrite=false;
@@ -1598,6 +1624,7 @@ function inspectLocalData(){
   add(!draftRaw||validEstimate(JSON.parse(draftRaw)),'Wersja robocza kosztorysu');
  }catch(e){add(false,'Wersja robocza kosztorysu: błąd odczytu')}
  try{
+  assertLocalCollectionsIntact();
   const b={app:'PewnaWycena',kind:FULL_BACKUP_KIND,version:1,data:readBackupState()};
   const json=JSON.stringify(b);
   validateFullBackup(JSON.parse(json));
@@ -1799,7 +1826,7 @@ function validJob(j){
 let jobs=[];
 try{
  const stored=JSON.parse(localStorage.getItem(JOBS_KEY)||'[]');
- jobs=Array.isArray(stored)?stored.filter(validJob).slice(0,5000):[];
+ jobs=Array.isArray(stored)?stored.filter(validJob).slice(0,5000):[];if(!Array.isArray(stored)||jobs.length!==stored.length)alert('⚠️ Wykryto niepoprawne dane zleceń. Nie edytuj danych przed sprawdzeniem kopii zapasowej.');
 }catch(e){jobs=[];}
 function persistJobs(){
  try{localStorage.setItem(JOBS_KEY,JSON.stringify(jobs));return true}
@@ -1989,7 +2016,7 @@ function validReminder(r){
 let reminders=[];
 try{
  const loaded=JSON.parse(localStorage.getItem(REMINDERS_KEY)||'[]');
- reminders=Array.isArray(loaded)?loaded.filter(validReminder).slice(0,3000):[];
+ reminders=Array.isArray(loaded)?loaded.filter(validReminder).slice(0,3000):[];if(!Array.isArray(loaded)||reminders.length!==loaded.length)alert('⚠️ Wykryto niepoprawne przypomnienia. Nie edytuj danych przed sprawdzeniem kopii zapasowej.');
 }catch(e){reminders=[]}
 function saveReminders(){
  try{localStorage.setItem(REMINDERS_KEY,JSON.stringify(reminders));return true}
