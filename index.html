@@ -278,6 +278,19 @@ body.brand-preview-open{overflow:hidden}
 .menu-wrap .app-nav .nav-tab{min-width:0!important;min-height:48px!important;flex:none!important;text-align:left!important;font-size:14px!important;padding:10px 12px!important}
 @media(max-width:390px){.menu-wrap .app-nav{grid-template-columns:1fr!important}}
 @media print{.menu-wrap{display:none!important}}
+
+.finance-settings,.finance-overview,.fin-panel{border:1px solid #d2e4d8;background:#f7faf8;border-radius:12px;padding:14px;margin:12px 0}
+.fin-panel summary{font-weight:800;cursor:pointer;padding:5px 0;color:#176b52}
+.fin-body{display:grid;gap:10px;margin-top:14px}
+.fin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,185px),1fr));gap:9px;align-items:end}
+.fin-field{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700}
+.fin-field input,.fin-field select,.fin-grid>input,.fin-grid>select{width:100%;min-width:0}
+.fin-summary{background:#edf6f0;padding:10px;border-radius:9px}
+.fin-line{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid #dbe7df;font-size:13px;align-items:start}
+.fin-line span{flex:1}.fin-line strong{text-align:right;white-space:nowrap}
+.fin-entry{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px;border-bottom:1px solid #dbe7df;font-size:13px}
+.fin-entry span{overflow-wrap:anywhere;min-width:0}.fin-entry button{flex:none}
+@media print{.finance-settings,.finance-overview,.fin-panel{display:none!important}}
 </style>
 </head>
 <body>
@@ -427,7 +440,7 @@ body.brand-preview-open{overflow:hidden}
 <section class="panel">
 <h2>🛠️ Centrum zleceń</h2>
 <p class="hint">Zaakceptowaną, zapisaną wycenę zamienisz w zlecenie jednym kliknięciem w zakładce „Zapisane wyceny”. Tu śledzisz realizację, termin i notatki. Zlecenia są przechowywane lokalnie.</p>
-<div class="actions"><label for="jobs-filter">Pokaż zlecenia</label><select id="jobs-filter"><option value="all">Wszystkie</option><option value="todo">Do rozpoczęcia</option><option value="progress">W trakcie</option><option value="done">Zakończone</option></select></div>
+<div class="finance-overview" id="finance-overview" aria-live="polite"></div><div class="actions"><label for="jobs-filter">Pokaż zlecenia</label><select id="jobs-filter"><option value="all">Wszystkie</option><option value="todo">Do rozpoczęcia</option><option value="progress">W trakcie</option><option value="done">Zakończone</option></select></div>
 <p id="jobs-count" class="hint" role="status"></p>
 <div id="jobs-list"></div>
 <p id="jobs-status" class="hint" role="status" aria-live="polite"></p>
@@ -467,7 +480,7 @@ body.brand-preview-open{overflow:hidden}
 <section class="panel">
 <h2>🏢 Moja firma — ustaw raz, korzystaj przy każdej wycenie</h2>
 <p class="hint">Dane firmy, logo, szablon, kolor i stopka są wspólne dla nowych kosztorysów. Wszystkie ustawienia zapisują się automatycznie na tym urządzeniu.</p>
-<label for="company-profile-name">Nazwa firmy / wykonawca</label><input id="company-profile-name" placeholder="np. Firma Kowalski">
+<div class="finance-settings"><h3>💰 Ustawienia VAT</h3><label for="company-vat-mode">Sposób rozliczania sprzedaży</label><select id="company-vat-mode"><option value="active">Czynny podatnik VAT</option><option value="exempt">Sprzedaż zwolniona z VAT</option></select><p class="hint">Ustawienie domyślne dla nowych zleceń. Stawkę VAT wybierasz osobno przy każdym zleceniu.</p></div><label for="company-profile-name">Nazwa firmy / wykonawca</label><input id="company-profile-name" placeholder="np. Firma Kowalski">
 <label for="company-profile-contact">Adres, NIP, telefon i e-mail</label><textarea id="company-profile-contact" rows="4" placeholder="Adres firmy&#10;NIP: ...&#10;Telefon: ...&#10;E-mail: ..."></textarea>
 <section class="company-branding" aria-labelledby="branding-heading">
 <h3 id="branding-heading">🏢 Pakiet firmowy — wygląd oferty</h3>
@@ -1164,6 +1177,7 @@ function readBackupState(){
     company:(()=>{try{return JSON.parse(localStorage.getItem('pewnawycena_company_profile_v1')||'null')}catch(e){return null}})(),
     branding:(()=>{try{return JSON.parse(localStorage.getItem('pewnawycena_company_brand_v1')||'null')}catch(e){return null}})(),
     jobs:jobs,
+    vatSettings:localStorage.getItem('pewnawycena_vat_mode_v1')||'active',
     template:localStorage.getItem('pewnawycena_pdf_template_v1')||'classic',
     draft:(()=>{try{const d=JSON.parse(localStorage.getItem(DRAFT_KEY)||'null');return validEstimate(d)?d:null;}catch(e){return null;}})()
   };
@@ -1194,6 +1208,7 @@ function validateFullBackup(data){
     throw Error('Nieprawidłowy cennik.');
   if(d.draft!==null && d.draft!==undefined && !validEstimate(d.draft))
     throw Error('Nieprawidłowa wersja robocza.');
+  if(d.vatSettings!==undefined&&!['active','exempt'].includes(d.vatSettings))throw Error('Nieprawidłowy status VAT.');
   if(d.jobs!==undefined&&(!Array.isArray(d.jobs)||d.jobs.length>5000||!d.jobs.every(validJob)))throw Error('Nieprawidłowa lista zleceń.');
   if(d.company!=null&&(!d.company||typeof d.company!=='object'||typeof d.company.name!=='string'||typeof d.company.contact!=='string'||d.company.name.length>500||d.company.contact.length>1500))throw Error('Nieprawidłowy profil firmy.');
   if(d.branding!=null&&(!d.branding||typeof d.branding!=='object'||typeof d.branding.logo!=='string'||typeof d.branding.color!=='string'||typeof d.branding.footer!=='string'||d.branding.logo.length>1600000||!(d.branding.logo===''||/^data:image\/(png|jpeg|webp);base64,/.test(d.branding.logo))||!/^#[0-9a-fA-F]{6}$/.test(d.branding.color)||d.branding.footer.length>600))throw Error('Nieprawidłowe ustawienia wyglądu.');
@@ -1203,7 +1218,7 @@ function validateFullBackup(data){
 function importFullBackup(data){
   // Import zastępuje całą bazę. Najpierw weryfikujemy plik, potem próbujemy
   // zapisać wszystkie klucze; przy błędzie odtwarzamy wcześniejszy stan.
-  const keys=[STORAGE_KEY,CLIENTS_STORAGE_KEY,PRICE_KEY,DRAFT_KEY,'pewnawycena_company_profile_v1','pewnawycena_company_brand_v1','pewnawycena_pdf_template_v1',JOBS_KEY];
+  const keys=[STORAGE_KEY,CLIENTS_STORAGE_KEY,PRICE_KEY,DRAFT_KEY,'pewnawycena_company_profile_v1','pewnawycena_company_brand_v1','pewnawycena_pdf_template_v1',JOBS_KEY,'pewnawycena_vat_mode_v1'];
   const previous=keys.map(key=>localStorage.getItem(key));
   const replacement=[
     JSON.stringify(data.estimates),JSON.stringify(data.clients),
@@ -1211,7 +1226,8 @@ function importFullBackup(data){
     data.company?JSON.stringify(data.company):localStorage.getItem('pewnawycena_company_profile_v1'),
     data.branding?JSON.stringify(data.branding):localStorage.getItem('pewnawycena_company_brand_v1'),
     data.template||localStorage.getItem('pewnawycena_pdf_template_v1')||'classic',
-    JSON.stringify(data.jobs===undefined?jobs:data.jobs)
+    JSON.stringify(data.jobs===undefined?jobs:data.jobs),
+    data.vatSettings||localStorage.getItem('pewnawycena_vat_mode_v1')||'active'
   ];
   try{
     keys.forEach((key,i)=>replacement[i]===null?localStorage.removeItem(key):localStorage.setItem(key,replacement[i]));
@@ -1224,6 +1240,7 @@ function importFullBackup(data){
   clientbook=data.clients;
   pricebook=data.prices;
   if(data.jobs!==undefined)jobs=data.jobs;
+  byId('company-vat-mode').value=data.vatSettings||localStorage.getItem('pewnawycena_vat_mode_v1')||'active';
   renderJobs();renderCalendar();
   renderSavedEstimates();renderClientbook();renderPrices();
   draftDirty=false;clearTimeout(draftTimer);
@@ -1246,6 +1263,59 @@ byId('import-all-file').addEventListener('change',async event=>{
 });
 
 
+// 3.5 — Finanse i VAT. Kwoty w groszach dla stabilnych obliczeń.
+const VAT_RATES=['23','8','5','0'];
+function moneyGr(n){return (n/100).toLocaleString('pl-PL',{style:'currency',currency:'PLN'});}
+function gr(value){const n=Number(value);return Number.isFinite(n)&&n>=0&&n<=100000000?Math.round(n*100):null;}
+function newFinance(){return {vatMode:localStorage.getItem('pewnawycena_vat_mode_v1')==='exempt'?'exempt':'active',rate:'23',contractNet:0,expenses:[],payments:[]};}
+function validMoney(n){return Number.isSafeInteger(n)&&n>=0&&n<=10000000000;}
+function validFinance(f){return !!(f&&typeof f==='object'&&['active','exempt'].includes(f.vatMode)&&VAT_RATES.includes(f.rate)&&validMoney(f.contractNet)&&Array.isArray(f.expenses)&&f.expenses.length<=500&&f.expenses.every(x=>x&&typeof x.name==='string'&&x.name.length<=160&&validMoney(x.gross)&&VAT_RATES.includes(x.rate)&&typeof x.deductible==='boolean')&&Array.isArray(f.payments)&&f.payments.length<=500&&f.payments.every(x=>x&&typeof x.name==='string'&&x.name.length<=160&&validMoney(x.amount)));}
+function financeOf(job){if(!validFinance(job.finance))job.finance=newFinance();return job.finance;}
+function financeCalc(f){
+ const salesVat=f.vatMode==='active'?Math.round(f.contractNet*Number(f.rate)/100):0;
+ const gross=f.contractNet+salesVat;
+ let expenseGross=0,expenseVatDeductible=0;
+ for(const x of f.expenses){expenseGross+=x.gross;if(f.vatMode==='active'&&x.deductible)expenseVatDeductible+=Math.round(x.gross*Number(x.rate)/(100+Number(x.rate)));}
+ const payments=f.payments.reduce((sum,x)=>sum+x.amount,0);
+ return {salesVat,gross,expenseGross,expenseVatDeductible,payments,balance:gross-payments,vatDifference:salesVat-expenseVatDeductible,result:f.vatMode==='active'?f.contractNet-(expenseGross-expenseVatDeductible):gross-expenseGross};
+}
+function financeField(label,type,value,onChange,options){
+ const wrap=document.createElement('label');wrap.className='fin-field';wrap.append(document.createTextNode(label));
+ const el=document.createElement(options?'select':'input');if(!options){el.type=type;el.min='0';el.step='0.01';el.inputMode='decimal';el.value=value;}else{options.forEach(([v,t])=>{const opt=document.createElement('option');opt.value=v;opt.textContent=t;el.append(opt)});el.value=value;}
+ el.addEventListener('change',()=>onChange(el.value,el));wrap.append(el);return wrap;
+}
+function buildJobFinance(job){
+ const f=financeOf(job),c=financeCalc(f),details=document.createElement('details');details.className='fin-panel';
+ const title=document.createElement('summary');title.textContent='💰 Finanse i VAT · '+moneyGr(c.result)+' wyniku';details.append(title);
+ const body=document.createElement('div');body.className='fin-body';
+ const redraw=()=>{if(!persistJobs())return;renderJobs();renderCalendar();const panels=Array.from(byId('jobs-list').querySelectorAll('.job-card'));const card=panels.find(x=>x.dataset.jobId===job.id);if(card){const d=card.querySelector('.fin-panel');if(d)d.open=true;}};
+ const settings=document.createElement('div');settings.className='fin-grid';
+ settings.append(financeField('Rozliczenie VAT','',f.vatMode,v=>{f.vatMode=v;redraw()},[['active','Czynny VAT'],['exempt','Zwolniony z VAT']]));
+ settings.append(financeField('Stawka VAT sprzedaży','',f.rate,v=>{f.rate=v;redraw()},VAT_RATES.map(v=>[v,v+'%'])));
+ settings.append(financeField('Wartość zlecenia netto (zł)','number',(f.contractNet/100).toFixed(2),(v,el)=>{const x=gr(v);if(x===null){el.value=(f.contractNet/100).toFixed(2);return}f.contractNet=x;redraw()}));
+ const summary=document.createElement('div');summary.className='fin-summary';
+ const lines=[['Sprzedaż netto',f.contractNet],['VAT sprzedaży',c.salesVat],['Wartość brutto',c.gross],['Koszty brutto',c.expenseGross],['VAT naliczony do odliczenia (szac.)',c.expenseVatDeductible],['Wpłaty od klienta',c.payments],['Pozostało do zapłaty',c.balance],['Wynik zlecenia przed podatkiem dochodowym i kosztami firmy',c.result],['Różnica VAT sprzedaż − VAT odliczalny (szac.)',c.vatDifference]];
+ lines.forEach(([name,value])=>{const row=document.createElement('div');row.className='fin-line';const a=document.createElement('span');a.textContent=name;const b=document.createElement('strong');b.textContent=(value<0?'−':'')+moneyGr(Math.abs(value));row.append(a,b);summary.append(row)});
+ const expTitle=document.createElement('h4');expTitle.textContent='Wydatki rzeczywiste (kwoty brutto)';
+ const expenses=document.createElement('div');
+ f.expenses.forEach((x,i)=>{const row=document.createElement('div');row.className='fin-entry';const txt=document.createElement('span');txt.textContent=x.name+' · '+moneyGr(x.gross)+' · VAT '+x.rate+'%'+(x.deductible?' · odliczany':' · nieodliczany');const del=document.createElement('button');del.type='button';del.className='neutral';del.textContent='Usuń';del.addEventListener('click',()=>{f.expenses.splice(i,1);redraw()});row.append(txt,del);expenses.append(row)});
+ const expForm=document.createElement('div');expForm.className='fin-grid';
+ const expName=document.createElement('input');expName.placeholder='Opis wydatku (np. materiały)';expName.maxLength=160;
+ const expAmount=document.createElement('input');expAmount.type='number';expAmount.min='0';expAmount.step='0.01';expAmount.placeholder='Kwota brutto zł';
+ const expRate=document.createElement('select');VAT_RATES.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent='VAT '+v+'%';expRate.append(o)});
+ const expDed=document.createElement('label');const cb=document.createElement('input');cb.type='checkbox';cb.checked=true;expDed.append(cb,document.createTextNode(' VAT do odliczenia (jeśli przysługuje)'));
+ const addExp=document.createElement('button');addExp.type='button';addExp.className='secondary';addExp.textContent='+ Dodaj wydatek';
+ addExp.addEventListener('click',()=>{const amount=gr(expAmount.value);if(!expName.value.trim()||amount===null||amount===0||f.expenses.length>=500){alert('Wpisz opis i dodatnią kwotę wydatku.');return}f.expenses.push({name:expName.value.trim(),gross:amount,rate:expRate.value,deductible:cb.checked});redraw()});
+ expForm.append(expName,expAmount,expRate,expDed,addExp);
+ const payTitle=document.createElement('h4');payTitle.textContent='Wpłaty klienta (kwoty brutto)';
+ const payments=document.createElement('div');f.payments.forEach((x,i)=>{const row=document.createElement('div');row.className='fin-entry';const txt=document.createElement('span');txt.textContent=x.name+' · '+moneyGr(x.amount);const del=document.createElement('button');del.type='button';del.className='neutral';del.textContent='Usuń';del.addEventListener('click',()=>{f.payments.splice(i,1);redraw()});row.append(txt,del);payments.append(row)});
+ const payForm=document.createElement('div');payForm.className='fin-grid';const payName=document.createElement('input');payName.placeholder='Opis (np. zaliczka)';payName.maxLength=160;const payAmount=document.createElement('input');payAmount.type='number';payAmount.min='0';payAmount.step='0.01';payAmount.placeholder='Wpłata brutto zł';const addPay=document.createElement('button');addPay.type='button';addPay.className='secondary';addPay.textContent='+ Dodaj wpłatę';addPay.addEventListener('click',()=>{const amount=gr(payAmount.value);if(!payName.value.trim()||amount===null||amount===0||f.payments.length>=500){alert('Wpisz opis i dodatnią kwotę wpłaty.');return}f.payments.push({name:payName.value.trim(),amount});redraw()});payForm.append(payName,payAmount,addPay);
+ const disclaimer=document.createElement('p');disclaimer.className='hint';disclaimer.textContent='Obliczenia orientacyjne, nie deklaracja VAT ani księgowość. Zastosowanie stawki, prawo do odliczenia i szczególne procedury VAT wymagają weryfikacji. Wartość netto wpisz zgodnie z umową/wyceną. Wynik nie obejmuje podatku dochodowego ani innych kosztów firmy.';
+ body.append(settings,summary,expTitle,expenses,expForm,payTitle,payments,payForm,disclaimer);details.append(body);return details;
+}
+function renderFinanceOverview(){const el=byId('finance-overview');if(!el)return;let gross=0,cost=0,paid=0,result=0;for(const j of jobs){const c=financeCalc(financeOf(j));gross+=c.gross;cost+=c.expenseGross;paid+=c.payments;result+=c.result;}el.replaceChildren();const title=document.createElement('strong');title.textContent='💰 Podsumowanie finansów zleceń';el.append(title);[['Zlecenia brutto',gross],['Wydatki brutto',cost],['Wpłaty klientów',paid],['Pozostało do zapłaty',gross-paid],['Wynik przed podatkiem dochodowym',result]].forEach(([name,value])=>{const row=document.createElement('div');row.className='fin-line';const label=document.createElement('span');label.textContent=name;const amount=document.createElement('strong');amount.textContent=(value<0?'−':'')+moneyGr(Math.abs(value));row.append(label,amount);el.append(row)});}
+const vatModeInput=byId('company-vat-mode');vatModeInput.value=localStorage.getItem('pewnawycena_vat_mode_v1')==='exempt'?'exempt':'active';vatModeInput.addEventListener('change',()=>{try{localStorage.setItem('pewnawycena_vat_mode_v1',vatModeInput.value)}catch(e){alert('Nie udało się zapisać ustawień VAT.')}});
+
 // PewnaWycena 3.2 — lokalne Centrum zleceń.
 const JOBS_KEY='pewnawycena_jobs_v1';
 const JOB_STATUSES={todo:'Do rozpoczęcia',progress:'W trakcie',done:'Zakończone'};
@@ -1259,7 +1329,8 @@ function validJob(j){
   &&(j.startDate===undefined||(typeof j.startDate==='string'&&j.startDate.length<=20&&(!j.startDate||/^\d{4}-\d{2}-\d{2}$/.test(j.startDate))))
   &&(!j.deadline||/^\d{4}-\d{2}-\d{2}$/.test(j.deadline))
   &&typeof j.notes==='string'&&j.notes.length<=3000
-  &&typeof j.createdAt==='string'&&j.createdAt.length<80);
+  &&typeof j.createdAt==='string'&&j.createdAt.length<80
+  &&(j.finance===undefined||validFinance(j.finance)));
 }
 let jobs=[];
 try{
@@ -1282,7 +1353,7 @@ function createJobFromEstimate(record){
  const job={id:String(Date.now())+'-'+Math.random().toString(36).slice(2,9),
   estimateId:record.id,number:String(record.fields['estimate-number']||'Bez numeru').slice(0,300),
   client:String(record.fields['client-name']||'Klient niepodany').slice(0,500),
-  status:'todo',startDate:'',deadline:'',notes:'',createdAt:new Date().toISOString()};
+  status:'todo',startDate:'',deadline:'',notes:'',createdAt:new Date().toISOString(),finance:newFinance()};
  jobs.unshift(job);
  if(!persistJobs()){jobs.shift();return}
  renderJobs();renderCalendar();showAppView('jobs');
@@ -1295,7 +1366,7 @@ function renderJobs(){
  byId('jobs-count').textContent='Wyświetlono '+shown.length+' z '+jobs.length+' zleceń.';
  if(!shown.length){const p=document.createElement('p');p.className='hint';p.textContent='Brak zleceń w tym widoku.';root.append(p);return}
  shown.forEach(job=>{
-  const card=document.createElement('article');card.className='job-card';
+  const card=document.createElement('article');card.className='job-card';card.dataset.jobId=job.id;
   const heading=document.createElement('h3');heading.textContent=job.number+' — '+job.client;
   const meta=document.createElement('p');meta.className='hint';meta.textContent='Utworzono: '+new Date(job.createdAt).toLocaleDateString('pl-PL');
   const statusLabel=document.createElement('label');statusLabel.textContent='Etap realizacji';
@@ -1328,6 +1399,7 @@ function renderJobs(){
   const notesLabel=document.createElement('label');notesLabel.textContent='Notatki do zlecenia';
   const notes=document.createElement('textarea');notes.rows=2;notes.maxLength=3000;notes.value=job.notes;notes.placeholder='Ustalenia, postęp, materiały…';
   notes.addEventListener('change',()=>{const old=job.notes;job.notes=notes.value;if(!persistJobs()){job.notes=old;notes.value=old}});
+  card.append(buildJobFinance(job));
   const actions=document.createElement('div');actions.className='actions';
   const original=document.createElement('button');original.type='button';original.className='secondary';original.textContent='Otwórz wycenę';
   original.addEventListener('click',()=>{
@@ -1346,6 +1418,7 @@ function renderJobs(){
   card.append(heading,meta,statusLabel,status,startLabel,startInput,dateLabel,date,notesLabel,notes,actions);
   root.append(card);
  });
+ renderFinanceOverview();
 }
 byId('jobs-filter').addEventListener('change',renderJobs);
 renderJobs();
