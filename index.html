@@ -212,9 +212,10 @@ header span:not(.brand-mark){color:#b8f3d7}
 <h2 id="result-heading">2. Twój kosztorys</h2>
 <div class="metrics"><div class="metric"><small>Robocizna</small><strong id="labor-metric">0 zł</strong></div><div class="metric"><small>Materiały</small><strong id="material-metric">0 zł</strong></div><div class="metric"><small>Cena końcowa</small><strong id="total-metric">0 zł</strong></div></div>
 <div class="table-scroll"><table><thead><tr><th>Pozycja</th><th>Typ</th><th>Ilość</th><th>Jedn.</th><th>Stawka (zł)</th><th>Razem</th><th></th></tr></thead><tbody id="items-body"></tbody></table></div>
-<div class="actions estimate-actions"><button id="quick-save" class="secondary" type="button">Zapisz wycenę</button><button id="add" class="secondary" type="button">+ Dodaj pozycję</button><button id="export" class="neutral" type="button">Eksport CSV</button><button id="pdf" class="pdf-btn" type="button">Zapisz jako PDF</button><button id="reset" class="neutral" type="button">Przywróć przykład</button></div>
+<div class="actions estimate-actions"><button id="quick-save" class="secondary" type="button">Zapisz wycenę</button><button id="add" class="secondary" type="button">+ Dodaj pozycję</button><button id="export" class="neutral" type="button">Eksport CSV</button><button id="pdf" class="pdf-btn" type="button">Zapisz jako PDF</button><button id="share-offer" class="secondary" type="button">Udostępnij ofertę</button><button id="copy-offer" class="neutral" type="button">Kopiuj wiadomość</button><button id="reset" class="neutral" type="button">Przywróć przykład</button></div>
 <div class="options"><div><label for="margin">Narzut (%)</label><input id="margin" type="number" min="0" step="1" value="20"></div><div><label for="extra">Koszty dodatkowe (zł)</label><input id="extra" type="number" min="0" step="0.01" value="150"></div></div>
 <div class="summary"><div class="sum-row"><span>Robocizna</span><b id="labor-sum">0 zł</b></div><div class="sum-row"><span>Materiały</span><b id="material-sum">0 zł</b></div><div class="sum-row"><span>Koszty dodatkowe</span><b id="extra-sum">0 zł</b></div><div class="sum-row"><span>Narzut</span><b id="margin-sum">0 zł</b></div><div class="sum-row final"><span>Do zapłaty</span><b id="total-sum">0 zł</b></div></div>
+<p id="share-status" class="hint" role="status" aria-live="polite"></p><p class="hint">Udostępnianie wysyła podsumowanie tekstowe. Aby wysłać PDF, najpierw wybierz „Zapisz jako PDF”, a potem udostępnij zapisany plik z aplikacji Pliki.</p>
 <p class="hint">Narzut liczony od sumy robocizny, materiałów i kosztów dodatkowych. Podatki nie są doliczane automatycznie.</p><p class="pdf-hint">Aby otrzymać PDF, kliknij „Zapisz jako PDF”, a w oknie drukowania wybierz „Zapisz jako PDF”.</p>
 </section>
 </div>
@@ -527,6 +528,48 @@ function preparePrintDocument() {
   byId('print-total').textContent=formatMoney(labor+materials+extra+markup);
 }
 byId('pdf').addEventListener('click',()=>{preparePrintDocument();window.print();});
+
+function shareOfferText(){
+  preparePrintDocument();
+  const number=byId('estimate-number').value.trim()||'bez numeru';
+  const company=byId('company-name').value.trim()||'Wykonawca';
+  const client=byId('client-name').value.trim();
+  const description=byId('description').value.trim();
+  const total=byId('print-total').textContent;
+  return [
+    'OFERTA / KOSZTORYS — PewnaWycena',
+    'Numer: '+number,
+    'Wykonawca: '+company,
+    client?'Klient: '+client:null,
+    description?'Zakres prac: '+description:null,
+    'Łączna wartość wyceny: '+total,
+    'Wycena orientacyjna. Zakres, ceny i ilości wymagają potwierdzenia. Podatki nie są doliczane automatycznie.'
+  ].filter(Boolean).join('\n');
+}
+byId('share-offer').addEventListener('click',async()=>{
+  const text=shareOfferText();
+  const title='Oferta '+(byId('estimate-number').value.trim()||'PewnaWycena');
+  if(navigator.share){
+    try{
+      await navigator.share({title,text});
+      byId('share-status').textContent='Otwarto udostępnianie oferty.';
+    }catch(error){
+      byId('share-status').textContent=error.name==='AbortError'?'Anulowano udostępnianie.':'Nie udało się udostępnić. Spróbuj „Kopiuj wiadomość”.';
+    }
+  }else{
+    byId('share-status').textContent='Na tym urządzeniu brak systemowego udostępniania. Użyj „Kopiuj wiadomość”.';
+  }
+});
+byId('copy-offer').addEventListener('click',async()=>{
+  const text=shareOfferText();
+  try{
+    await navigator.clipboard.writeText(text);
+    byId('share-status').textContent='Skopiowano podsumowanie. Możesz wkleić je do wiadomości lub e-maila.';
+  }catch(error){
+    byId('share-status').textContent='Nie udało się skopiować automatycznie. Użyj „Udostępnij ofertę”.';
+  }
+});
+
 byId('estimate-date').value=new Date().toLocaleDateString('en-CA');
 createEstimate();
 
