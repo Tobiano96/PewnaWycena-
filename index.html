@@ -291,6 +291,17 @@ body.brand-preview-open{overflow:hidden}
 .fin-entry{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px;border-bottom:1px solid #dbe7df;font-size:13px}
 .fin-entry span{overflow-wrap:anywhere;min-width:0}.fin-entry button{flex:none}
 @media print{.finance-settings,.finance-overview,.fin-panel{display:none!important}}
+
+.rem-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:15px 0}
+.rem-counter{background:#eaf4ed;border:1px solid #d0e5d6;border-radius:12px;padding:12px 6px;text-align:center;display:flex;flex-direction:column;gap:4px}
+.rem-counter strong{font-size:26px;color:#155b41}.rem-counter span{font-size:11px;color:#355b48}
+.rem-item{border:1px solid #d6e2da;border-radius:12px;padding:12px;margin:8px 0;background:#f8fbf9;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.rem-overdue{border-left:4px solid #dc2626;background:#fff7f5}
+.rem-item-info{flex:1;min-width:170px;overflow-wrap:anywhere;display:flex;flex-direction:column;gap:4px}
+.rem-item-info small{font-size:12px;color:#53635c}
+.rem-item-actions{display:flex;gap:5px;flex-wrap:wrap}
+.rem-form{display:grid;gap:12px;margin:12px 0}.rem-form label{display:block;margin-bottom:5px}
+@media print{#view-reminders{display:none!important}}
 </style>
 </head>
 <body>
@@ -311,6 +322,7 @@ body.brand-preview-open{overflow:hidden}
 <button type="button" class="nav-tab" data-view="clients" aria-pressed="false">Klienci</button>
 <button type="button" class="nav-tab" data-view="prices" aria-pressed="false">Mój cennik</button>
 <button type="button" class="nav-tab" data-view="jobs" aria-pressed="false">🛠️ Zlecenia</button>
+<button type="button" class="nav-tab" data-view="reminders" aria-pressed="false">🔔 Przypomnienia</button>
 <button type="button" class="nav-tab" data-view="calendar" aria-pressed="false">📅 Terminarz</button>
 <button type="button" class="nav-tab" data-view="company" aria-pressed="false">🏢 Moja firma</button>
 </nav>
@@ -412,6 +424,22 @@ body.brand-preview-open{overflow:hidden}
 </div><p id="saved-results-count" class="hint" role="status"></p><div id="saved-list"></div>
 </section>
 </div>
+<div id="view-reminders" class="app-view" hidden>
+<section class="panel">
+<h2>🔔 Przypomnienia i ważne terminy</h2>
+<p class="hint">Twoje terminy zleceń i własne zadania w jednym miejscu. Powiadomienia widoczne są po otwarciu aplikacji — nie są to automatyczne powiadomienia systemowe przy zamkniętej aplikacji.</p>
+<div class="rem-summary" id="rem-summary" aria-live="polite"></div>
+<div class="actions"><label for="rem-filter">Pokaż</label><select id="rem-filter"><option value="all">Wszystkie</option><option value="overdue">Zaległe</option><option value="today">Dzisiaj</option><option value="soon">Najbliższe 7 dni</option><option value="later">Późniejsze</option></select></div>
+<div id="rem-list"></div>
+<h3>➕ Dodaj własne przypomnienie</h3>
+<div class="rem-form">
+<div><label for="rem-title">Co trzeba zrobić?</label><input id="rem-title" maxlength="160" placeholder="np. Zamówić materiały"></div>
+<div><label for="rem-date">Termin</label><input id="rem-date" type="date"></div>
+<div><label for="rem-job">Powiązane zlecenie (opcjonalnie)</label><select id="rem-job"><option value="">Bez zlecenia</option></select></div>
+<button id="rem-add" type="button" class="primary">Dodaj przypomnienie</button>
+</div>
+<p id="rem-status" class="hint" role="status" aria-live="polite"></p>
+</section></div>
 <div id="view-calendar" class="app-view" hidden>
 <section class="panel">
 <h2>📅 Terminarz zleceń</h2>
@@ -1003,7 +1031,7 @@ document.addEventListener('keydown',event=>{
 
 // Nawigacja zakładkowa — nie zmienia zawartości formularzy ani zapisanych danych.
 function showAppView(view) {
-  const valid=['estimate','dashboard','saved','clients','prices','company','jobs','calendar'];
+  const valid=['estimate','dashboard','saved','clients','prices','company','jobs','calendar','reminders'];
   if(!valid.includes(view))return;
   valid.forEach(name=>{
     const panel=byId('view-'+name);
@@ -1177,6 +1205,7 @@ function readBackupState(){
     company:(()=>{try{return JSON.parse(localStorage.getItem('pewnawycena_company_profile_v1')||'null')}catch(e){return null}})(),
     branding:(()=>{try{return JSON.parse(localStorage.getItem('pewnawycena_company_brand_v1')||'null')}catch(e){return null}})(),
     jobs:jobs,
+    reminders:reminders,
     vatSettings:localStorage.getItem('pewnawycena_vat_mode_v1')||'active',
     template:localStorage.getItem('pewnawycena_pdf_template_v1')||'classic',
     draft:(()=>{try{const d=JSON.parse(localStorage.getItem(DRAFT_KEY)||'null');return validEstimate(d)?d:null;}catch(e){return null;}})()
@@ -1209,6 +1238,7 @@ function validateFullBackup(data){
   if(d.draft!==null && d.draft!==undefined && !validEstimate(d.draft))
     throw Error('Nieprawidłowa wersja robocza.');
   if(d.vatSettings!==undefined&&!['active','exempt'].includes(d.vatSettings))throw Error('Nieprawidłowy status VAT.');
+  if(d.reminders!==undefined&&(!Array.isArray(d.reminders)||d.reminders.length>3000||!d.reminders.every(validReminder)))throw Error('Nieprawidłowe przypomnienia.');
   if(d.jobs!==undefined&&(!Array.isArray(d.jobs)||d.jobs.length>5000||!d.jobs.every(validJob)))throw Error('Nieprawidłowa lista zleceń.');
   if(d.company!=null&&(!d.company||typeof d.company!=='object'||typeof d.company.name!=='string'||typeof d.company.contact!=='string'||d.company.name.length>500||d.company.contact.length>1500))throw Error('Nieprawidłowy profil firmy.');
   if(d.branding!=null&&(!d.branding||typeof d.branding!=='object'||typeof d.branding.logo!=='string'||typeof d.branding.color!=='string'||typeof d.branding.footer!=='string'||d.branding.logo.length>1600000||!(d.branding.logo===''||/^data:image\/(png|jpeg|webp);base64,/.test(d.branding.logo))||!/^#[0-9a-fA-F]{6}$/.test(d.branding.color)||d.branding.footer.length>600))throw Error('Nieprawidłowe ustawienia wyglądu.');
@@ -1218,7 +1248,7 @@ function validateFullBackup(data){
 function importFullBackup(data){
   // Import zastępuje całą bazę. Najpierw weryfikujemy plik, potem próbujemy
   // zapisać wszystkie klucze; przy błędzie odtwarzamy wcześniejszy stan.
-  const keys=[STORAGE_KEY,CLIENTS_STORAGE_KEY,PRICE_KEY,DRAFT_KEY,'pewnawycena_company_profile_v1','pewnawycena_company_brand_v1','pewnawycena_pdf_template_v1',JOBS_KEY,'pewnawycena_vat_mode_v1'];
+  const keys=[STORAGE_KEY,CLIENTS_STORAGE_KEY,PRICE_KEY,DRAFT_KEY,'pewnawycena_company_profile_v1','pewnawycena_company_brand_v1','pewnawycena_pdf_template_v1',JOBS_KEY,'pewnawycena_vat_mode_v1',REMINDERS_KEY];
   const previous=keys.map(key=>localStorage.getItem(key));
   const replacement=[
     JSON.stringify(data.estimates),JSON.stringify(data.clients),
@@ -1227,7 +1257,8 @@ function importFullBackup(data){
     data.branding?JSON.stringify(data.branding):localStorage.getItem('pewnawycena_company_brand_v1'),
     data.template||localStorage.getItem('pewnawycena_pdf_template_v1')||'classic',
     JSON.stringify(data.jobs===undefined?jobs:data.jobs),
-    data.vatSettings||localStorage.getItem('pewnawycena_vat_mode_v1')||'active'
+    data.vatSettings||localStorage.getItem('pewnawycena_vat_mode_v1')||'active',
+    JSON.stringify(data.reminders===undefined?reminders:data.reminders)
   ];
   try{
     keys.forEach((key,i)=>replacement[i]===null?localStorage.removeItem(key):localStorage.setItem(key,replacement[i]));
@@ -1240,11 +1271,12 @@ function importFullBackup(data){
   clientbook=data.clients;
   pricebook=data.prices;
   if(data.jobs!==undefined)jobs=data.jobs;
+  if(data.reminders!==undefined)reminders=data.reminders;
   byId('company-vat-mode').value=data.vatSettings||localStorage.getItem('pewnawycena_vat_mode_v1')||'active';
-  renderJobs();renderCalendar();
+  renderJobs();renderCalendar();renderReminders();
   renderSavedEstimates();renderClientbook();renderPrices();
   draftDirty=false;clearTimeout(draftTimer);
-  backupAllStatus('Przywrócono dane: '+savedEstimates.length+' wycen, '+clientbook.length+' klientów, '+pricebook.length+' pozycji cennika i '+jobs.length+' zleceń.');
+  backupAllStatus('Przywrócono dane: '+savedEstimates.length+' wycen, '+clientbook.length+' klientów, '+pricebook.length+' pozycji cennika i '+jobs.length+' zleceń i '+reminders.length+' przypomnień.');
   draftNotice('Dane przywrócone. Odśwież aplikację, aby zobaczyć przywrócone ustawienia firmy i wersję roboczą.');
 }
 byId('backup-all').addEventListener('click',downloadFullBackup);
@@ -1419,6 +1451,7 @@ function renderJobs(){
   root.append(card);
  });
  renderFinanceOverview();
+ if(remindersReady)renderReminders();
 }
 byId('jobs-filter').addEventListener('change',renderJobs);
 renderJobs();
@@ -1509,6 +1542,107 @@ byId('cal-next').addEventListener('click',()=>{calViewMonth=new Date(calViewMont
 byId('cal-today').addEventListener('click',()=>{const today=new Date();calViewMonth=new Date(today.getFullYear(),today.getMonth(),1);calSelectedDay=calIso(today.getFullYear(),today.getMonth(),today.getDate());renderCalendar()});
 byId('cal-mode').addEventListener('change',renderCalendar);
 renderCalendar();
+
+// 3.6 — terminy wyliczane ze zleceń i ręczne przypomnienia.
+var remindersReady=false;
+const REMINDERS_KEY='pewnawycena_reminders_v1';
+function validReminder(r){
+ return !!(r&&typeof r==='object'&&typeof r.id==='string'&&r.id.length<120
+ &&typeof r.title==='string'&&r.title.trim()&&r.title.length<=160
+ &&typeof r.date==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(r.date)
+ &&typeof r.jobId==='string'&&r.jobId.length<120
+ &&typeof r.done==='boolean');
+}
+let reminders=[];
+try{
+ const loaded=JSON.parse(localStorage.getItem(REMINDERS_KEY)||'[]');
+ reminders=Array.isArray(loaded)?loaded.filter(validReminder).slice(0,3000):[];
+}catch(e){reminders=[]}
+function saveReminders(){
+ try{localStorage.setItem(REMINDERS_KEY,JSON.stringify(reminders));return true}
+ catch(e){byId('rem-status').textContent='Nie można zapisać przypomnienia. Pobierz kopię zapasową.';return false}
+}
+function localToday(){const d=new Date();return calIso(d.getFullYear(),d.getMonth(),d.getDate())}
+function datePlusDays(iso,days){
+ const d=new Date(iso+'T12:00:00');d.setDate(d.getDate()+days);
+ return calIso(d.getFullYear(),d.getMonth(),d.getDate());
+}
+function reminderEntries(){
+ const entries=[];
+ for(const j of jobs){
+  if(j.status==='done')continue;
+  if(j.startDate)entries.push({id:'start-'+j.id,title:'Rozpoczęcie: '+j.number+' — '+j.client,date:j.startDate,jobId:j.id,automatic:true});
+  if(j.deadline)entries.push({id:'end-'+j.id,title:'Termin zakończenia: '+j.number+' — '+j.client,date:j.deadline,jobId:j.id,automatic:true});
+ }
+ for(const r of reminders)if(!r.done)entries.push({...r,automatic:false});
+ return entries.sort((a,b)=>a.date.localeCompare(b.date)||a.title.localeCompare(b.title));
+}
+function renderReminders(){
+ const root=byId('rem-list');if(!root)return;
+ const today=localToday(),week=datePlusDays(today,7);
+ const all=reminderEntries();
+ const overdue=all.filter(x=>x.date<today).length;
+ const now=all.filter(x=>x.date===today).length;
+ const soon=all.filter(x=>x.date>today&&x.date<=week).length;
+ const summary=byId('rem-summary');summary.replaceChildren();
+ for(const [label,value] of [['Zaległe',overdue],['Dzisiaj',now],['Najbliższe 7 dni',soon]]){
+  const box=document.createElement('div');box.className='rem-counter';
+  const number=document.createElement('strong');number.textContent=String(value);
+  const text=document.createElement('span');text.textContent=label;box.append(number,text);summary.append(box);
+ }
+ const filter=byId('rem-filter').value;
+ const filtered=all.filter(r=>filter==='all'||(filter==='overdue'&&r.date<today)
+ ||(filter==='today'&&r.date===today)||(filter==='soon'&&r.date>today&&r.date<=week)
+ ||(filter==='later'&&r.date>week));
+ root.replaceChildren();
+ if(!filtered.length){const p=document.createElement('p');p.className='hint';p.textContent='Brak przypomnień w tym widoku.';root.append(p)}
+ filtered.forEach(r=>{
+  const row=document.createElement('div');row.className='rem-item';
+  if(r.date<today)row.classList.add('rem-overdue');
+  const info=document.createElement('div');info.className='rem-item-info';
+  const title=document.createElement('strong');title.textContent=r.title;
+  const date=document.createElement('small');date.textContent=r.date+(r.automatic?' · ze zlecenia':' · własne')+(r.date<today?' · po terminie':r.date===today?' · dzisiaj':'');
+  info.append(title,date);
+  const actions=document.createElement('div');actions.className='rem-item-actions';
+  if(r.jobId){
+   const open=document.createElement('button');open.type='button';open.className='secondary';open.textContent='Zlecenie';
+   open.addEventListener('click',()=>{
+    showAppView('jobs');byId('jobs-filter').value='all';renderJobs();
+    const card=Array.from(document.querySelectorAll('.job-card')).find(el=>el.dataset.jobId===r.jobId);
+    if(card){card.scrollIntoView({behavior:'smooth',block:'start'});card.style.outline='2px solid #176b52'}
+    else byId('jobs-status').textContent='Powiązane zlecenie nie jest już dostępne.';
+   });actions.append(open);
+  }
+  if(!r.automatic){
+   const done=document.createElement('button');done.type='button';done.className='secondary';done.textContent='✓ Zrobione';
+   done.addEventListener('click',()=>{
+    const old=r.done;r.done=true;if(!saveReminders())r.done=old;renderReminders();
+   });actions.append(done);
+  }
+  row.append(info,actions);root.append(row);
+ });
+ const select=byId('rem-job'),value=select.value;select.replaceChildren();
+ const none=document.createElement('option');none.value='';none.textContent='Bez zlecenia';select.append(none);
+ jobs.forEach(j=>{const option=document.createElement('option');option.value=j.id;option.textContent=j.number+' — '+j.client;select.append(option)});
+ select.value=jobs.some(j=>j.id===value)?value:'';
+}
+byId('rem-filter').addEventListener('change',renderReminders);
+byId('rem-add').addEventListener('click',()=>{
+ const title=byId('rem-title').value.trim(),date=byId('rem-date').value,jobId=byId('rem-job').value;
+ if(!title||title.length>160||!date||!/^\d{4}-\d{2}-\d{2}$/.test(date)){
+  byId('rem-status').textContent='Wpisz nazwę zadania i wybierz termin.';return;
+ }
+ if(reminders.length>=3000){byId('rem-status').textContent='Osiągnięto limit 3000 przypomnień.';return}
+ const r={id:String(Date.now())+'-'+Math.random().toString(36).slice(2,9),title,date,jobId,done:false};
+ reminders.push(r);
+ if(!saveReminders()){reminders.pop();return}
+ byId('rem-title').value='';byId('rem-date').value='';
+ byId('rem-status').textContent='Przypomnienie zapisane.';
+ renderReminders();
+});
+remindersReady=true;
+renderReminders();
+
 
 
 
