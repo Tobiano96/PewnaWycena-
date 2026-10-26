@@ -11,7 +11,7 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
-<title>PewnaWycena 4.2 — Premium Glass</title>
+<title>PewnaWycena 4.3 — Premium Glass</title>
 <style>
 :root{--green:#176b52;--dark:#143b31;--bg:#f3f7f4;--border:#dce7df;--muted:#607269}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);font:15px/1.5 system-ui,Arial,sans-serif;color:#18251e}
@@ -344,7 +344,7 @@ body.is-home #main-heading,body.is-home #main-heading+p{display:none}
 @media print{#view-home{display:none!important}}
 
 
-/* PewnaWycena 4.2 — Midnight Navy Premium Glass, kontrast WCAG */
+/* PewnaWycena 4.3 — Midnight Navy Premium Glass, kontrast WCAG */
 :root{--text:#ecf5ff;--muted:#b7cce4;--navy:#07182f;--navy2:#102947;--blue:#6fb8ff;--aqua:#64e0d4}
 html{background:#061326;scroll-behavior:smooth}
 body{background:radial-gradient(ellipse 80% 460px at 85% 0,#163c68 0%,transparent 85%),radial-gradient(ellipse 80% 620px at 5% 650px,#0b3156 0%,transparent 85%),linear-gradient(155deg,#081c35,#061326 80%);background-attachment:fixed;color:#eaf4ff;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",Inter,system-ui,sans-serif;letter-spacing:-.01em}
@@ -389,7 +389,7 @@ input,select,textarea{background:#0a2749!important;border:1px solid #8bc6ff77!im
 @media print{body{background:#fff!important;color:#111!important}body>header,.bottom-nav,.menu-wrap{display:none!important}}
 
 
-/* PewnaWycena 4.2 — polish: mobile usability, legibility and accessibility */
+/* PewnaWycena 4.3 — polish: mobile usability, legibility and accessibility */
 :root{--green:#63c7ff;--dark:#07182f;--bg:#07182f;--border:#365c80;--muted:#bed2e8}
 .visually-hidden{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 body{line-height:1.55;-webkit-font-smoothing:antialiased}
@@ -475,10 +475,59 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
  #items-body tr,#price-rows tr{background:white!important;color:#111!important;box-shadow:none!important}
 }
 
+
+/* PewnaWycena 4.3 — premium dashboard and motion */
+.home-hero{display:flex;justify-content:space-between;align-items:center;gap:12px;isolation:isolate;min-height:225px!important}
+.home-hero-copy{position:relative;z-index:2;max-width:620px}
+.home-hero .home-eyebrow{font-size:10px;font-weight:850;letter-spacing:.18em;margin:0 0 14px;color:#8ddcff!important}
+.home-hero h2{font-size:clamp(30px,5.6vw,42px)!important;line-height:1.1;letter-spacing:-.055em;margin:0 0 10px!important}
+.home-date{color:#a5cdea!important;font-size:13px;font-weight:650;text-transform:capitalize;margin:0 0 8px}
+.home-hero-lead{color:#d7e9fb!important;font-size:14px;margin:0 0 14px}
+.home-day-status{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;border:1px solid #9bd9ff65;background:#0727459c;color:#b9e9ff;font-size:12px;font-weight:750;max-width:100%}
+.home-hero-art{position:absolute;inset:0 0 0 auto;width:43%;pointer-events:none;overflow:hidden;z-index:0}
+.hero-orbit{position:absolute;display:block;border-radius:50%;border:1px solid #9ee3ff3b;box-shadow:inset 0 0 45px #65d4ff10,0 0 38px #40b5ff16}
+.orbit-a{width:215px;height:215px;right:-38px;top:-42px;animation:pw-orbit 12s ease-in-out infinite alternate}
+.orbit-b{width:135px;height:135px;right:8px;top:6px;background:radial-gradient(circle at 30% 30%,#7cd5ff35,#1c67aa16 70%,transparent)}
+.hero-spark{position:absolute;right:75px;top:55px;font-size:68px;color:#a7eaffad;filter:drop-shadow(0 0 24px #4ac2ff);animation:pw-spark 5s ease-in-out infinite}
+@keyframes pw-orbit{to{transform:translate(-12px,15px) rotate(15deg)}}
+@keyframes pw-spark{0%,100%{opacity:.65;transform:scale(.94)}50%{opacity:1;transform:scale(1.08)}}
+.home-actions{margin-top:17px;position:relative;z-index:2}.home-actions .primary{background:linear-gradient(125deg,#a5eaff,#5cbdf8)!important}.home-actions button{border-radius:14px!important;min-height:49px;letter-spacing:.005em}
+.home-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:17px 0 23px}
+.home-stat{min-height:144px!important;padding:17px!important;border-radius:20px!important;animation:pw-stat-in .38s ease backwards;transition:transform .22s ease,box-shadow .22s ease}
+.home-stat:nth-child(2){animation-delay:.06s}.home-stat:nth-child(3){animation-delay:.12s}.home-stat:nth-child(4){animation-delay:.18s}
+@keyframes pw-stat-in{from{opacity:.45;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+.home-stat-head{display:flex;align-items:center;gap:9px;margin-bottom:10px;min-width:0}
+.home-stat-head>span:last-child{color:#e0edfc;font-size:12px;font-weight:700;line-height:1.3}
+.home-stat-icon{width:37px;height:37px;min-width:37px;border-radius:12px;display:grid;place-items:center;background:#85d8ff23;border:1px solid #a8e4ff51;color:#a9e8ff;font-size:22px;line-height:1}
+.home-stat:nth-child(3) .home-stat-icon{background:#ff9caa1a;border-color:#ffacba5c;color:#ffbac3}
+.home-stat strong{font-size:clamp(25px,4.5vw,34px)!important;line-height:1.2;color:#fff!important;margin-bottom:4px}
+.home-stat small{color:#bbd4eb!important;line-height:1.35}
+.home-sections{display:grid;grid-template-columns:1fr;gap:16px}
+.home-panel{padding:18px!important;min-width:0}
+.home-section-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:16px}
+.home-section-head h3{font-size:17px;display:flex;align-items:center;gap:9px;color:#f4faff}
+.home-section-icon{display:grid;place-items:center;width:32px;height:32px;border-radius:10px;background:#214e79;color:#9bdcff;font-size:20px}
+.home-section-head button{font-size:12px;min-height:38px;padding:8px 11px}
+.home-items{display:grid;gap:9px}
+.home-item{display:flex;align-items:center;gap:11px;padding:11px 12px!important;background:linear-gradient(110deg,#12395f,#0a2b4d)!important;border:1px solid #8cc9fa3d!important;border-radius:14px!important;min-height:68px;transition:border-color .2s ease,transform .2s ease}
+.home-item:hover{border-color:#8bd4ffb3!important;transform:translateX(2px)}
+.home-item-symbol{display:grid;place-items:center;width:38px;height:38px;min-width:38px;background:#3b8ac03d;border:1px solid #8cd9ff55;border-radius:12px;color:#a6e6ff;font-size:20px}
+.home-item-date .home-item-symbol{background:#2c758342;color:#9aece3}
+.home-item-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.home-item-text strong{color:#f1f8ff;font-size:13px;line-height:1.35}
+.home-item-text small{color:#b9d4eb!important;font-size:11px;line-height:1.45}
+.home-item-open{flex:none;width:35px;min-width:35px;min-height:35px;height:35px;border-radius:10px!important;border:1px solid #a3dcff4f!important;background:#2b5b814f!important;color:#d2efff!important;font-size:26px;line-height:1;display:grid;place-items:center;padding:0!important}
+.home-panel .home-items + button{margin-top:14px;width:100%;min-height:42px}
+.home-disclaimer{font-size:11px!important;line-height:1.6!important;color:#adc9df!important;margin-top:18px}
+@media(min-width:850px){.home-sections{grid-template-columns:1fr 1fr;align-items:start}.home-stats{grid-template-columns:repeat(4,minmax(0,1fr))}.home-stat{min-height:170px!important}}
+@media(max-width:600px){.home-hero{padding:22px!important;min-height:240px!important}.home-hero-art{width:35%;opacity:.65}.hero-spark{right:22px;top:80px;font-size:48px}.orbit-a{right:-110px}.orbit-b{right:-65px}.home-hero h2{font-size:30px!important}.home-hero-lead{max-width:240px}.home-stats{gap:9px}.home-stat{min-height:135px!important;padding:12px!important}.home-stat-head{gap:6px}.home-stat-icon{width:31px;height:31px;min-width:31px;border-radius:9px;font-size:19px}.home-stat-head>span:last-child{font-size:11px}.home-stat strong{font-size:clamp(21px,5.2vw,29px)!important}.home-stat small{font-size:10px!important}.home-section-head h3{font-size:15px}.home-section-head button{font-size:11px}.home-item-text strong{font-size:12px}}
+@media(max-width:365px){.home-hero-art{opacity:.35}.home-stat-head{flex-wrap:wrap}.home-stat{min-height:150px!important}}
+@media(prefers-reduced-motion:reduce){.home-stat,.hero-orbit,.hero-spark{animation:none!important}.home-item:hover{transform:none}}
+
 </style>
 </head>
 <body>
-<header><span class="brand-mark" aria-hidden="true">⌂</span><span class="brand-name">Pewna<span>Wycena</span><small class="brand-slogan">Twój biznes pod kontrolą</small></span><span class="header-version">4.2 <span aria-hidden="true">✦</span></span></header>
+<header><span class="brand-mark" aria-hidden="true">⌂</span><span class="brand-name">Pewna<span>Wycena</span><small class="brand-slogan">Twój biznes pod kontrolą</small></span><span class="header-version">4.3 <span aria-hidden="true">✦</span></span></header>
 <nav class="bottom-nav" aria-label="Szybka nawigacja">
 <button type="button" data-view="home" aria-label="Pulpit" aria-pressed="true"><span class="bottom-icon" aria-hidden="true">⌂</span><span>Pulpit</span></button>
 <button type="button" data-view="estimate" aria-label="Nowa wycena" aria-pressed="false"><span class="bottom-icon" aria-hidden="true">▤</span><span>Wycena</span></button>
@@ -509,18 +558,18 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 </div>
 <div id="view-home" class="app-view">
 <section class="panel home-hero">
-<div><p class="home-eyebrow">✦ TWOJE CENTRUM DOWODZENIA</p><h2>Dzień dobry! <span aria-hidden="true">👋</span></h2><p id="home-date" class="hint"></p><p>Sprawdź, co dziś dzieje się w Twojej firmie.</p></div>
+<div class="home-hero-copy"><p class="home-eyebrow">✦ TWOJE CENTRUM DOWODZENIA</p><h2><span id="home-greeting">Dzień dobry!</span> <span aria-hidden="true">👋</span></h2><p id="home-date" class="home-date"></p><p class="home-hero-lead">Sprawdź, co dziś dzieje się w Twojej firmie.</p><div id="home-day-status" class="home-day-status" role="status">Twój dzień w skrócie</div></div><div class="home-hero-art" aria-hidden="true"><span class="hero-orbit orbit-a"></span><span class="hero-orbit orbit-b"></span><span class="hero-spark">✦</span></div>
 <div class="home-actions"><button type="button" class="primary" data-home-view="estimate">＋ Nowa wycena</button><button type="button" class="secondary" data-home-view="jobs">🛠️ Zlecenia</button></div>
 </section>
 <section class="home-stats" aria-label="Najważniejsze wskaźniki">
-<div class="home-stat"><span>Aktywne zlecenia</span><strong id="home-active">0</strong><small>Do rozpoczęcia i w realizacji</small></div>
-<div class="home-stat"><span>Do otrzymania od klientów</span><strong id="home-unpaid">0,00 zł</strong><small id="home-unpaid-note">Na podstawie finansów zleceń</small></div>
-<div class="home-stat"><span>Zaległe terminy</span><strong id="home-overdue">0</strong><small>Niezakończone sprawy</small></div>
-<div class="home-stat"><span>Sprawy na dziś</span><strong id="home-today">0</strong><small>Terminy i przypomnienia</small></div>
+<div class="home-stat"><div class="home-stat-head"><span class="home-stat-icon" aria-hidden="true">▣</span><span>Aktywne zlecenia</span></div><strong id="home-active">0</strong><small>Do rozpoczęcia i w realizacji</small></div>
+<div class="home-stat"><div class="home-stat-head"><span class="home-stat-icon" aria-hidden="true">◈</span><span>Do otrzymania od klientów</span></div><strong id="home-unpaid">0,00 zł</strong><small id="home-unpaid-note">Na podstawie finansów zleceń</small></div>
+<div class="home-stat"><div class="home-stat-head"><span class="home-stat-icon" aria-hidden="true">◷</span><span>Zaległe terminy</span></div><strong id="home-overdue">0</strong><small>Niezakończone sprawy</small></div>
+<div class="home-stat"><div class="home-stat-head"><span class="home-stat-icon" aria-hidden="true">▦</span><span>Sprawy na dziś</span></div><strong id="home-today">0</strong><small>Terminy i przypomnienia</small></div>
 </section>
 <div class="home-sections">
-<section class="panel"><div class="home-section-head"><h3>📅 Najbliższe 7 dni</h3><button type="button" class="secondary" data-home-view="calendar">Terminarz</button></div><div id="home-upcoming" class="home-items"></div><button type="button" class="secondary" data-home-view="reminders">Wszystkie przypomnienia</button></section>
-<section class="panel"><div class="home-section-head"><h3>🛠️ Aktywne zlecenia</h3><button type="button" class="secondary" data-home-view="jobs">Wszystkie zlecenia</button></div><div id="home-jobs" class="home-items"></div></section>
+<section class="panel home-panel home-panel-calendar"><div class="home-section-head"><h3><span class="home-section-icon" aria-hidden="true">▦</span> Najbliższe 7 dni</h3><button type="button" class="secondary" data-home-view="calendar">Terminarz</button></div><div id="home-upcoming" class="home-items home-timeline"></div><button type="button" class="secondary" data-home-view="reminders">Wszystkie przypomnienia</button></section>
+<section class="panel home-panel home-panel-jobs"><div class="home-section-head"><h3><span class="home-section-icon" aria-hidden="true">▣</span> Aktywne zlecenia</h3><button type="button" class="secondary" data-home-view="jobs">Wszystkie zlecenia</button></div><div id="home-jobs" class="home-items home-job-list"></div></section>
 </div>
 <p class="hint home-disclaimer">Kwota „Do otrzymania” to suma dodatnich sald wpisanych w finansach zleceń, a nie automatyczny odczyt bankowy. Wprowadź wartość zlecenia i wpłaty, aby wynik był miarodajny.</p>
 </div>
@@ -2203,15 +2252,17 @@ function node(tag,cls,text){const el=document.createElement(tag);if(cls)el.class
 function openView(view){showAppView(view)}
 document.querySelectorAll('[data-home-view]').forEach(b=>b.addEventListener('click',()=>openView(b.dataset.homeView)));
 function empty(root,message){root.append(node('p','hint',message))}
-function addRow(root,title,subtitle,view){
- const row=node('div','home-item');const info=node('div','home-item-text');
- info.append(node('strong','',title),node('small','',subtitle));
- const button=node('button','secondary','Otwórz');button.type='button';
- button.addEventListener('click',()=>openView(view));row.append(info,button);root.append(row);
+function addRow(root,title,subtitle,view,kind='job'){
+ const row=node('div','home-item home-item-'+kind);
+ const symbol=node('span','home-item-symbol',kind==='date'?'▦':'▣');symbol.setAttribute('aria-hidden','true');
+ const info=node('div','home-item-text');info.append(node('strong','',title),node('small','',subtitle));
+ const button=node('button','home-item-open','›');button.type='button';button.setAttribute('aria-label','Otwórz: '+title);
+ button.addEventListener('click',()=>openView(view));row.append(symbol,info,button);root.append(row);
 }
 window.renderHome=function renderHome(){
  const today=new Date(),iso=dayISO(today),end=plusDays(today,7);
  $('home-date').textContent=dateLabel.format(today);
+ const hour=today.getHours();$('home-greeting').textContent=hour<11?'Dzień dobry!':hour<18?'Miłego dnia!':'Dobry wieczór!';
  const active=jobs.filter(j=>j.status!=='done');
  $('home-active').textContent=String(active.length);
  let unpaid=0,unpriced=0;
@@ -2224,15 +2275,17 @@ window.renderHome=function renderHome(){
  $('home-unpaid-note').textContent=unpriced?('Bez '+unpriced+' zleceń bez wpisanej wartości'):'Na podstawie finansów zleceń';
  const entries=reminderEntries();
  $('home-overdue').textContent=String(entries.filter(r=>r.date<iso).length);
- $('home-today').textContent=String(entries.filter(r=>r.date===iso).length);
+ const todayCount=entries.filter(r=>r.date===iso).length;
+ $('home-today').textContent=String(todayCount);
+ $('home-day-status').textContent=todayCount?('● '+todayCount+' '+(todayCount===1?'sprawa':todayCount<5?'sprawy':'spraw')+' na dziś'):'✓ Na dziś nie masz pilnych terminów';
  const upcoming=entries.filter(r=>r.date>=iso&&r.date<=end).slice(0,7);
  const upcomingRoot=$('home-upcoming');upcomingRoot.replaceChildren();
  if(!upcoming.length)empty(upcomingRoot,'Brak terminów na najbliższe 7 dni.');
- for(const r of upcoming)addRow(upcomingRoot,r.title,(r.date===iso?'Dzisiaj · ':'')+r.date+(r.automatic?' · ze zlecenia':' · przypomnienie'),'reminders');
+ for(const r of upcoming)addRow(upcomingRoot,r.title,(r.date===iso?'Dzisiaj · ':'')+r.date+(r.automatic?' · ze zlecenia':' · przypomnienie'),'reminders','date');
  const jobRoot=$('home-jobs');jobRoot.replaceChildren();
  const sorted=active.slice().sort((a,b)=>(a.deadline||'9999-12-31').localeCompare(b.deadline||'9999-12-31')).slice(0,5);
  if(!sorted.length)empty(jobRoot,'Brak aktywnych zleceń.');
- for(const j of sorted)addRow(jobRoot,j.number+' — '+j.client,(j.status==='progress'?'W realizacji':'Do rozpoczęcia')+(j.deadline?' · termin '+j.deadline:''),'jobs');
+ for(const j of sorted)addRow(jobRoot,j.number+' — '+j.client,(j.status==='progress'?'W realizacji':'Do rozpoczęcia')+(j.deadline?' · termin '+j.deadline:''),'jobs','job');
 };
 // Start na pulpicie dopiero po inicjalizacji wszystkich modułów.
 showAppView('home');
