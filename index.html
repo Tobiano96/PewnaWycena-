@@ -136,6 +136,12 @@ header span:not(.brand-mark){color:#b8f3d7}
   .summary{overflow-wrap:anywhere}
 }
 @media screen and (max-width:380px){.metrics{grid-template-columns:1fr}.metric strong{font-size:18px}}
+
+.status-pill{display:inline-block;padding:5px 11px;border-radius:999px;font-weight:800;font-size:12px;line-height:1.5;border:1px solid transparent;white-space:nowrap}
+.status-pill--accepted{background:#d9f7e4;color:#14532d;border-color:#86d7a5}
+.status-pill--rejected{background:#fee2e2;color:#991b1b;border-color:#fca5a5}
+.status-pill--draft{background:#dbeafe;color:#1e40af;border-color:#93c5fd}
+.status-pill--sent{background:#ffedd5;color:#9a3412;border-color:#fdba74}
 </style>
 </head>
 <body>
@@ -221,7 +227,11 @@ header span:not(.brand-mark){color:#b8f3d7}
 <input id="restore-file" type="file" accept=".json,application/json" hidden>
 </div>
 <p id="save-status" class="hint" role="status" aria-live="polite"></p>
-<div id="saved-list"></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:16px 0">
+<div><label for="saved-search">Szukaj wyceny</label><input id="saved-search" type="search" placeholder="Klient, numer, opis"></div>
+<div><label for="saved-status-filter">Status</label><select id="saved-status-filter"><option value="all">Wszystkie</option><option value="draft">Robocze</option><option value="sent">Wysłane</option><option value="accepted">Zaakceptowane</option><option value="rejected">Odrzucone</option></select></div>
+<div><label for="saved-sort">Sortuj</label><select id="saved-sort"><option value="newest">Najnowsze</option><option value="oldest">Najstarsze</option><option value="client">Klient A–Z</option></select></div>
+</div><p id="saved-results-count" class="hint" role="status"></p><div id="saved-list"></div>
 </section>
 </div>
 <div id="view-clients" class="app-view" hidden>
@@ -537,15 +547,32 @@ function restoreEstimate(record){
 }
 function renderSavedEstimates(){
   const list=byId('saved-list');list.replaceChildren();
-  if(!savedEstimates.length){const p=document.createElement('p');p.className='hint';p.textContent='Brak zapisanych wycen.';list.append(p);return;}
-  savedEstimates.forEach(record=>{
+  const query=byId('saved-search').value.trim().toLocaleLowerCase('pl-PL');
+  const filter=byId('saved-status-filter').value;
+  const order=byId('saved-sort').value;
+  const matches=savedEstimates.filter(record=>{
+    const f=record.fields||{};
+    const searchable=[f['client-name'],f['client-contact'],f['estimate-number'],f.description,f['estimate-notes']].join(' ').toLocaleLowerCase('pl-PL');
+    return (!query||searchable.includes(query))&&(filter==='all'||(f['estimate-status']||'draft')===filter);
+  }).sort((a,b)=>{
+    if(order==='client')return String(a.fields['client-name']||'').localeCompare(String(b.fields['client-name']||''),'pl');
+    const delta=(Date.parse(b.savedAt)||0)-(Date.parse(a.savedAt)||0);
+    return order==='oldest'?-delta:delta;
+  });
+  byId('saved-results-count').textContent='Wyświetlono '+matches.length+' z '+savedEstimates.length+' wycen.';
+  if(!matches.length){const p=document.createElement('p');p.className='hint';p.textContent=savedEstimates.length?'Brak wycen spełniających kryteria.':'Brak zapisanych wycen.';list.append(p);return;}
+  matches.forEach(record=>{
     const row=document.createElement('div');
     row.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px 0;border-top:1px solid #dce7df';
     const label=document.createElement('div');
     const title=document.createElement('strong');
     title.textContent=(record.fields['estimate-number']||'Bez numeru')+' — '+(record.fields['client-name']||'Klient niepodany');
     const sub=document.createElement('div');sub.className='hint';
-    sub.textContent='Status: '+statusLabel(record.fields['estimate-status'])+' · Zapisano: '+new Date(record.savedAt).toLocaleString('pl-PL')+' · '+record.items.length+' pozycji';
+    const statusValue=['draft','sent','accepted','rejected'].includes(record.fields['estimate-status'])?record.fields['estimate-status']:'draft';
+    const badge=document.createElement('span');
+    badge.className='status-pill status-pill--'+statusValue;
+    badge.textContent=statusLabel(statusValue);
+    sub.append(badge,document.createTextNode(' · Zapisano: '+new Date(record.savedAt).toLocaleString('pl-PL')+' · '+record.items.length+' pozycji'));
     label.append(title,sub);
     const buttons=document.createElement('div');buttons.className='actions';buttons.style.marginTop='0';
     const open=document.createElement('button');open.type='button';open.className='secondary';open.textContent='Otwórz';
@@ -750,6 +777,7 @@ byId('clientbook-file').addEventListener('change',async e=>{
 readClients();
 
 // PewnaWycena 1.7 — statusy ofert i automatyczne proponowanie kolejnego numeru.
+['saved-search','saved-status-filter','saved-sort'].forEach(id=>byId(id).addEventListener(id==='saved-search'?'input':'change',renderSavedEstimates));
 function statusLabel(value){return ({draft:'Robocza',sent:'Wysłana',accepted:'Zaakceptowana',rejected:'Odrzucona'})[value]||'Robocza';}
 function proposeNextNumber(){
   const year=new Date().getFullYear();
