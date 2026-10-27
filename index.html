@@ -560,6 +560,26 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 @media(prefers-reduced-motion:reduce){#tutorial-progress-bar{transition:none}}
 @media(max-width:380px){.tutorial-card{padding:18px}.tutorial-actions button{padding:9px 11px}}
 @media print{.tutorial-overlay{display:none!important}}
+
+/* 4.7 — transparentna prezentacja planów, bez fikcyjnej aktywacji */
+.pro-hero{background:linear-gradient(130deg,#1a4b7b,#0a2343)!important;border-color:#78caff77!important}
+.pro-hero h2{font-size:clamp(26px,5vw,39px);line-height:1.2;color:#fff}
+.pro-hero p{color:#d8ebfa}.pro-eyebrow,.pro-plan-tag{font-size:11px;letter-spacing:.09em;font-weight:850;color:#99e1ff!important}
+.pro-trial{margin-top:20px;padding:16px;border-radius:16px;background:#1a5274;border:1px solid #93dcff6b;display:flex;flex-direction:column;gap:7px;color:#fff}
+.pro-trial span{font-size:13px;color:#d3e9f6}
+.pro-plans{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;margin:16px 0}
+.pro-plan{display:flex;flex-direction:column;gap:10px}.pro-plan h3{font-size:27px;color:#fff;margin:0}.pro-plan p{color:#d4e8f8}
+.pro-plan-featured{background:linear-gradient(145deg,#154f7e,#0c2d50)!important;border:1px solid #82d4ff9e!important}
+.pro-price{font-size:clamp(28px,5vw,39px);font-weight:900;color:#a5e7ff;letter-spacing:-.04em}.pro-price small{font-size:14px;font-weight:500;color:#c5d9eb}
+.pro-plan ul{padding-left:22px;margin:10px 0;flex:1;color:#edf7ff}.pro-plan li{margin-bottom:10px;line-height:1.45}
+.pro-footnote{font-size:12px!important;color:#b8d2e7!important;line-height:1.5}
+.pro-feedback fieldset{border:1px solid #8fcaff65;border-radius:15px;padding:15px;margin:14px 0}
+.pro-feedback legend{color:#eff8ff;font-weight:750;padding:0 7px}
+.pro-feedback fieldset label{display:flex;align-items:center;gap:10px;margin:9px 0;color:#e4f2ff}
+.pro-feedback>label{display:block;margin:15px 0 7px;color:#eff8ff;font-weight:750}
+.pro-feedback select{width:100%;background:#123b63!important;color:#fff!important;border:1px solid #a4d5ff85!important}
+.pro-feedback-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:17px}.pro-feedback-actions button{flex:1 1 210px}
+@media(max-width:650px){.pro-plans{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -590,6 +610,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 <button type="button" class="nav-tab" data-view="reminders" aria-pressed="false">🔔 Przypomnienia</button>
 <button type="button" class="nav-tab" data-view="calendar" aria-pressed="false">📅 Terminarz</button>
 <button type="button" class="nav-tab" data-view="company" aria-pressed="false">🏢 Moja firma</button>
+<button type="button" class="nav-tab" data-view="pro" aria-pressed="false">💎 FREE i PRO</button>
 <button type="button" id="tutorial-replay" class="nav-tab tutorial-menu-button">🎓 Samouczek aplikacji</button>
 </nav>
 </div>
@@ -797,6 +818,14 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 </div>
 <p class="footer">PewnaWycena · lokalny prototyp · wyceny i cennik przechowywane w tej przeglądarce. Pobieraj kopie zapasowe.</p>
 </main>
+<section id="view-pro" class="app-view" hidden aria-labelledby="pro-title">
+<section class="panel pro-hero"><p class="pro-eyebrow">✦ PEWNAWYCENA PRO — WERSJA DEMONSTRACYJNA</p><h2 id="pro-title">Więcej możliwości. Ten sam spokój w pracy.</h2><p>Sprawdź proponowane pakiety i powiedz nam, co jest dla Ciebie wartościowe. <strong>To prezentacja planowanej oferty — płatności i blokady funkcji nie są jeszcze aktywne.</strong></p><div class="pro-trial"><strong>🎁 Plan: 7 dni PRO za 0 zł</strong><span>Bez karty i bez automatycznego obciążenia. Okres próbny zacznie działać dopiero po wdrożeniu kont i subskrypcji.</span></div></section>
+<div class="pro-plans">
+<section class="panel pro-plan"><p class="pro-plan-tag">DLA KAŻDEGO</p><h3>FREE</h3><div class="pro-price">0 zł <small>/ zawsze</small></div><p>Podstawowe narzędzia do prowadzenia usług i zachowanie własnych danych.</p><ul><li>Tworzenie wycen i podstawowy PDF</li><li>Do 10 aktywnych wycen i 15 klientów*</li><li>Do 5 aktywnych zleceń*</li><li>Podstawowy terminarz</li><li>Eksport i przywracanie kopii JSON</li></ul><p class="pro-footnote">*Proponowane limity do testów; nie są obecnie egzekwowane.</p></section>
+<section class="panel pro-plan pro-plan-featured"><p class="pro-plan-tag">WIĘCEJ DLA TWOJEJ FIRMY</p><h3>PRO</h3><div class="pro-price">29 zł <small>/ miesiąc</small></div><p>Proponowana cena do sprawdzenia z użytkownikami.</p><ul><li>Wszystko z FREE</li><li>Brak limitów produktowych wycen i klientów</li><li>Pełna personalizacja ofert i szablony PDF</li><li>Zaawansowane finanse i statystyki</li><li>Rozszerzone możliwości pracy ze zleceniami</li></ul><p class="pro-footnote">Funkcje i cena są propozycją. Rzeczywisty zakres PRO zostanie potwierdzony po testach.</p></section>
+</div>
+<section class="panel pro-feedback"><h3>🗳️ Pomóż nam dopracować PRO</h3><p>To krótka, anonimowa ankieta zapisywana tylko na Twoim urządzeniu. Nie wysyłamy odpowiedzi na serwer.</p><fieldset><legend>Czy rozważyłbyś PRO za 29 zł miesięcznie?</legend><label><input type="radio" name="pro-interest" value="tak"> Tak</label><label><input type="radio" name="pro-interest" value="moze"> Być może</label><label><input type="radio" name="pro-interest" value="nie"> Nie</label></fieldset><label for="pro-feature">Która funkcja PRO byłaby dla Ciebie najcenniejsza?</label><select id="pro-feature"><option value="">Wybierz odpowiedź</option><option value="bez-limitow">Brak limitów</option><option value="pdf">Szablony i branding PDF</option><option value="finanse">Finanse i statystyki</option><option value="zlecenia">Zlecenia i organizacja pracy</option><option value="inne">Inne</option></select><div class="pro-feedback-actions"><button id="pro-feedback-save" type="button" class="primary">Zapisz moją opinię</button><button id="pro-feedback-export" type="button" class="secondary">Pobierz opinię do udostępnienia</button></div><p id="pro-feedback-status" role="status" aria-live="polite" class="hint"></p><p class="pro-footnote">Aby opinia trafiła do twórcy, trzeba samodzielnie udostępnić pobrany plik. Nie wpisuj w ankiecie danych osobowych.</p></section>
+</section>
 <div id="tutorial-overlay" class="tutorial-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="tutorial-title" aria-describedby="tutorial-desc">
  <div class="tutorial-card">
   <div class="tutorial-top"><span class="tutorial-kicker">🎓 POZNAJ PEWNAWYCENA</span><button id="tutorial-close" type="button" aria-label="Zamknij samouczek">✕</button></div>
@@ -1349,7 +1378,7 @@ document.addEventListener('keydown',event=>{
 
 // Nawigacja zakładkowa — nie zmienia zawartości formularzy ani zapisanych danych.
 function showAppView(view) {
-  const valid=['home','estimate','dashboard','saved','clients','prices','company','jobs','calendar','reminders'];
+  const valid=['home','estimate','dashboard','saved','clients','prices','company','jobs','calendar','reminders','pro'];
   if(!valid.includes(view))return;
   valid.forEach(name=>{
     const panel=byId('view-'+name);
@@ -2437,6 +2466,35 @@ window.renderHome=function renderHome(){
  if(!sorted.length)empty(jobRoot,'Brak aktywnych zleceń.');
  for(const j of sorted)addRow(jobRoot,j.number+' — '+j.client,(j.status==='progress'?'W realizacji':'Do rozpoczęcia')+(j.deadline?' · termin '+j.deadline:''),'jobs','job');
 };
+
+// 4.7 — wyłącznie demonstracja oferty, bez aktywowania subskrypcji i bez płatności.
+const PRO_FEEDBACK_KEY='pewnawycena_pro_feedback_demo_v1';
+function getProFeedback(){
+ const interest=document.querySelector('input[name="pro-interest"]:checked');
+ return {interest:interest?interest.value:'',feature:byId('pro-feature').value};
+}
+function proFeedbackStatus(msg){byId('pro-feedback-status').textContent=msg;}
+function saveProFeedback(){
+ const data=getProFeedback();
+ if(!data.interest||!data.feature){proFeedbackStatus('Wybierz obie odpowiedzi.');return null;}
+ try{localStorage.setItem(PRO_FEEDBACK_KEY,JSON.stringify(data));proFeedbackStatus('Opinia zapisana lokalnie. Jeśli chcesz, pobierz ją i prześlij twórcy.');return data}
+ catch(e){proFeedbackStatus('Nie udało się zapisać lokalnie. Możesz pobrać odpowiedź.');return data}
+}
+byId('pro-feedback-save').addEventListener('click',saveProFeedback);
+byId('pro-feedback-export').addEventListener('click',()=>{
+ const data=saveProFeedback();if(!data)return;
+ const content='PewnaWycena — opinia o planie PRO (demo)\nZainteresowanie: '+data.interest+'\nNajcenniejsza funkcja: '+data.feature+'\n';
+ const url=URL.createObjectURL(new Blob([content],{type:'text/plain;charset=utf-8'}));
+ const a=document.createElement('a');a.href=url;a.download='PewnaWycena-opinia-PRO.txt';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
+ proFeedbackStatus('Rozpoczęto pobieranie opinii. Sprawdź zapisany plik i udostępnij go, jeśli chcesz.');
+});
+try{
+ const saved=JSON.parse(localStorage.getItem(PRO_FEEDBACK_KEY)||'null');
+ if(saved&&['tak','moze','nie'].includes(saved.interest)){
+  const radio=document.querySelector('input[name="pro-interest"][value="'+saved.interest+'"]');if(radio)radio.checked=true;
+  if([...byId('pro-feature').options].some(o=>o.value===saved.feature))byId('pro-feature').value=saved.feature;
+ }
+}catch(e){}
 
 // 4.6 — samouczek: tylko lokalna flaga ukończenia, bez zmian w danych firmy.
 const TUTORIAL_KEY='pewnawycena_tutorial_seen_v1';
