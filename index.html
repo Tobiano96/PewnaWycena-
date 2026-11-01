@@ -11,7 +11,7 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
-<title>PewnaWycena 4.5 — Premium Glass</title>
+<title>PewnaWycena 4.6 + Chmura 5.0 (test)</title>
 <style>
 :root{--green:#176b52;--dark:#143b31;--bg:#f3f7f4;--border:#dce7df;--muted:#607269}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);font:15px/1.5 system-ui,Arial,sans-serif;color:#18251e}
@@ -580,10 +580,19 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .pro-feedback select{width:100%;background:#123b63!important;color:#fff!important;border:1px solid #a4d5ff85!important}
 .pro-feedback-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:17px}.pro-feedback-actions button{flex:1 1 210px}
 @media(max-width:650px){.pro-plans{grid-template-columns:1fr}}
+
+/* PewnaWycena 5.0 — zwijany panel chmury */
+.pw-cloud-toggle{margin-left:4px;flex:none;min-height:40px;padding:8px 11px!important;background:#19476e!important;color:#eaf8ff!important;border:1px solid #83d5ff77!important;border-radius:12px!important;font-size:13px}
+.pw-cloud-overlay[hidden]{display:none!important}.pw-cloud-overlay{position:fixed;inset:0;z-index:1100;background:#031325b8;display:flex;justify-content:flex-end;align-items:stretch}
+.pw-cloud-panel{width:min(440px,100%);height:100%;overflow-y:auto;background:#0b2545;color:#eef8ff;padding:22px 18px calc(25px + env(safe-area-inset-bottom));box-shadow:-15px 0 40px #0008;border-left:1px solid #78c7ff66}
+.pw-cloud-head{display:flex;align-items:center;justify-content:space-between;gap:12px}.pw-cloud-head h2{margin:0;font-size:22px}.pw-cloud-close{background:#244969!important;color:white!important}
+.pw-cloud-panel label{display:block;margin:14px 0 5px}.pw-cloud-panel input{width:100%}.pw-cloud-panel button{min-height:44px}.pw-cloud-panel .pw-cloud-action{background:#73cfff!important;color:#072039!important;margin-top:12px;width:100%;font-weight:800}.pw-cloud-panel .pw-cloud-secondary{background:#244d72!important;color:white!important;margin-top:10px;width:100%}
+.pw-cloud-panel .pw-cloud-note{font-size:12px;line-height:1.5;color:#bdd7eb}.pw-cloud-panel .pw-cloud-status{white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;margin:12px 0;color:#bceaff}.pw-cloud-client{padding:11px;border:1px solid #6298c277;border-radius:11px;margin:9px 0;background:#143759;display:flex;gap:9px;align-items:center;justify-content:space-between}.pw-cloud-client small{display:block;color:#c3d8e8}.pw-cloud-client button{background:#703a4a!important;color:#fff!important;flex:none}
+@media(max-width:520px){.pw-cloud-toggle{padding:8px!important;font-size:12px}.pw-cloud-panel{width:100%}header .header-version{display:none}}
 </style>
 </head>
 <body>
-<header><span class="brand-mark" aria-hidden="true">⌂</span><span class="brand-name">Pewna<span>Wycena</span><small class="brand-slogan">Twój biznes pod kontrolą</small></span><span class="header-version">4.6 <span aria-hidden="true">✦</span></span></header>
+<header><span class="brand-mark" aria-hidden="true">⌂</span><span class="brand-name">Pewna<span>Wycena</span><small class="brand-slogan">Twój biznes pod kontrolą</small></span><span class="header-version">4.6 <span aria-hidden="true">✦</span></span><button type="button" id="pw-cloud-open" class="pw-cloud-toggle" aria-haspopup="dialog" aria-controls="pw-cloud-overlay">☁ Chmura</button></header>
 <nav class="bottom-nav" aria-label="Szybka nawigacja">
 <button type="button" data-view="home" aria-label="Pulpit" aria-pressed="true"><span class="bottom-icon" aria-hidden="true">⌂</span><span>Pulpit</span></button>
 <button type="button" data-view="estimate" aria-label="Nowa wycena" aria-pressed="false"><span class="bottom-icon" aria-hidden="true">▤</span><span>Wycena</span></button>
@@ -2565,6 +2574,70 @@ tutorialOverlay.addEventListener('keydown',e=>{
 // Start na pulpicie dopiero po inicjalizacji wszystkich modułów.
 showAppView('home');
 try{if(localStorage.getItem(TUTORIAL_KEY)!=='1')tutorialOpen()}catch(e){/* prywatny tryb może blokować localStorage */}
+})();
+</script>
+
+<div id="pw-cloud-overlay" class="pw-cloud-overlay" hidden>
+ <section class="pw-cloud-panel" role="dialog" aria-modal="true" aria-labelledby="pw-cloud-title">
+  <div class="pw-cloud-head"><h2 id="pw-cloud-title">☁ Chmura 5.0 — test</h2><button type="button" id="pw-cloud-close" class="pw-cloud-close" aria-label="Zamknij panel">✕</button></div>
+  <p class="pw-cloud-note">Moduł testowy klientów. Dane głównej aplikacji nadal pozostają lokalne i nie synchronizują się automatycznie. Testuj wyłącznie na fikcyjnych danych.</p>
+  <div id="pw-cloud-config">
+   <label for="pw-cloud-url">Supabase Project URL</label><input id="pw-cloud-url" type="url" placeholder="https://projekt.supabase.co" autocomplete="off">
+   <label for="pw-cloud-key">Publishable key (sb_publishable_…)</label><input id="pw-cloud-key" type="text" autocomplete="off" spellcheck="false" placeholder="sb_publishable_…">
+   <button type="button" class="pw-cloud-secondary" id="pw-cloud-connect">Połącz z projektem</button>
+  </div>
+  <div id="pw-cloud-auth" hidden>
+   <label for="pw-cloud-email">E-mail</label><input id="pw-cloud-email" type="email" autocomplete="username">
+   <label for="pw-cloud-password">Hasło</label><input id="pw-cloud-password" type="password" autocomplete="current-password">
+   <button type="button" class="pw-cloud-action" id="pw-cloud-login">Zaloguj</button>
+  </div>
+  <div id="pw-cloud-signed" hidden>
+   <p id="pw-cloud-account" class="pw-cloud-note"></p>
+   <button type="button" class="pw-cloud-secondary" id="pw-cloud-logout">Wyloguj</button>
+   <h3>Klienci testowi w chmurze</h3>
+   <label for="pw-cloud-name">Nazwa klienta</label><input id="pw-cloud-name" maxlength="180" placeholder="Test Chmura 5.0">
+   <label for="pw-cloud-contact">Kontakt / notatka</label><input id="pw-cloud-contact" maxlength="500" placeholder="Dane fikcyjne">
+   <button type="button" class="pw-cloud-action" id="pw-cloud-save">Zapisz w chmurze</button>
+   <button type="button" class="pw-cloud-secondary" id="pw-cloud-refresh">Odśwież listę</button>
+   <div id="pw-cloud-list" aria-live="polite"></div>
+  </div>
+  <p id="pw-cloud-status" class="pw-cloud-status" role="status" aria-live="polite">Wprowadź URL projektu i klucz publiczny, aby rozpocząć.</p>
+ </section>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+(()=>{
+'use strict';
+const el=id=>document.getElementById(id);
+const overlay=el('pw-cloud-overlay'), status=el('pw-cloud-status');
+const setStatus=msg=>{status.textContent=msg};
+let client=null, user=null, lastFocus=null;
+const confKey='pw_cloud_config_v5';
+function show(id,visible){el(id).hidden=!visible}
+function setAuthUI(){show('pw-cloud-auth',!!client&&!user);show('pw-cloud-signed',!!user);el('pw-cloud-account').textContent=user?'Zalogowano: '+(user.email||user.id):''}
+function open(){lastFocus=document.activeElement;overlay.hidden=false;document.body.style.overflow='hidden';el('pw-cloud-close').focus()}
+function close(){overlay.hidden=true;document.body.style.overflow='';if(lastFocus&&lastFocus.focus)lastFocus.focus()}
+el('pw-cloud-open').addEventListener('click',open);el('pw-cloud-close').addEventListener('click',close);
+overlay.addEventListener('click',e=>{if(e.target===overlay)close()});
+overlay.addEventListener('keydown',e=>{if(e.key==='Escape')close();if(e.key==='Tab'){const focusable=[...overlay.querySelectorAll('button:not([disabled]):not([hidden]),input:not([disabled]):not([hidden])')].filter(x=>x.getClientRects().length);if(!focusable.length)return;const first=focusable[0],last=focusable[focusable.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}});
+async function connect(){
+ const url=el('pw-cloud-url').value.trim().replace(/\/+$/,''), key=el('pw-cloud-key').value.trim();
+ if(!/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(url)){setStatus('Podaj Project URL bez /rest/v1, np. https://projekt.supabase.co');return}
+ if(!key.startsWith('sb_publishable_')&&!key.startsWith('eyJ')){setStatus('Wprowadź klucz publishable lub legacy anon. Nigdy nie wpisuj service_role ani secret key.');return}
+ if(!window.supabase?.createClient){setStatus('Nie udało się wczytać biblioteki Supabase. Sprawdź połączenie z internetem.');return}
+ try{
+  client=window.supabase.createClient(url,key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false},global:{headers:{'X-Client-Info':'pewnawycena-cloud-test-5'}}});
+  localStorage.setItem(confKey,JSON.stringify({url,key}));
+  const result=await client.auth.getUser();user=result.data?.user||null;setAuthUI();setStatus(user?'Połączono. Możesz testować klientów.':'Połączono. Zaloguj się na konto Supabase.');
+  if(user)await refresh();
+ }catch(e){setStatus('Błąd połączenia: '+e.message)}
+}
+async function login(){if(!client)return;setStatus('Logowanie…');const {data,error}=await client.auth.signInWithPassword({email:el('pw-cloud-email').value.trim(),password:el('pw-cloud-password').value});if(error){setStatus('Logowanie: '+error.message);return}user=data.user;el('pw-cloud-password').value='';setAuthUI();setStatus('Zalogowano.');await refresh()}
+async function refresh(){if(!client||!user)return;const {data,error}=await client.from('pw_cloud_clients').select('id,name,contact').order('name',{ascending:true});if(error){setStatus('Odczyt: '+error.message);return}const list=el('pw-cloud-list');list.replaceChildren();if(!data.length){const p=document.createElement('p');p.textContent='Brak klientów w chmurze.';list.append(p)}for(const item of data){const row=document.createElement('div');row.className='pw-cloud-client';const details=document.createElement('div');const strong=document.createElement('strong');strong.textContent=item.name||'Bez nazwy';const small=document.createElement('small');small.textContent=item.contact||'';details.append(strong,small);const del=document.createElement('button');del.type='button';del.textContent='Usuń';del.addEventListener('click',async()=>{if(!confirm('Usunąć klienta testowego?'))return;const {error}=await client.from('pw_cloud_clients').delete().eq('id',item.id).eq('user_id',user.id);if(error)setStatus('Usuwanie: '+error.message);else{setStatus('Usunięto klienta.');await refresh()}});row.append(details,del);list.append(row)}}
+async function save(){const name=el('pw-cloud-name').value.trim(),contact=el('pw-cloud-contact').value.trim();if(!name){setStatus('Wpisz nazwę klienta.');return}const auth=await client.auth.getUser();if(auth.error||!auth.data?.user){user=null;setAuthUI();setStatus('Sesja wygasła. Zaloguj się ponownie.');return}user=auth.data.user;setStatus('Zapisywanie…');const {error}=await client.from('pw_cloud_clients').insert({name,contact,user_id:user.id});if(error){setStatus('Zapis: '+error.message);return}el('pw-cloud-name').value='';el('pw-cloud-contact').value='';setStatus('Klient zapisany w chmurze.');await refresh()}
+el('pw-cloud-connect').addEventListener('click',connect);el('pw-cloud-login').addEventListener('click',login);el('pw-cloud-save').addEventListener('click',save);el('pw-cloud-refresh').addEventListener('click',refresh);
+el('pw-cloud-logout').addEventListener('click',async()=>{if(client)await client.auth.signOut();user=null;setAuthUI();el('pw-cloud-list').replaceChildren();setStatus('Wylogowano.')});
+try{const cfg=JSON.parse(localStorage.getItem(confKey)||'null');if(cfg?.url&&cfg?.key){el('pw-cloud-url').value=cfg.url;el('pw-cloud-key').value=cfg.key;connect()}}catch(e){}
 })();
 </script>
 </body>
