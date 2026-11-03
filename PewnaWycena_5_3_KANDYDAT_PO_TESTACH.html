@@ -11,7 +11,7 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
-<title>PewnaWycena 5.3 — kandydat po testach — Konto i bezpieczeństwo — bezpłatne testy</title>
+<title>PewnaWycena 5.3 — test konta i synchronizacji — bezpłatne testy</title>
 <style>
 :root{--green:#176b52;--dark:#143b31;--bg:#f3f7f4;--border:#dce7df;--muted:#607269}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);font:15px/1.5 system-ui,Arial,sans-serif;color:#18251e}
@@ -2644,12 +2644,12 @@ tutorialOverlay.addEventListener('keydown',e=>{
 
 // Start na pulpicie dopiero po inicjalizacji wszystkich modułów.
 showAppView('home');
-try{if(localStorage.getItem(TUTORIAL_KEY)!=='1')tutorialOpen()}catch(e){/* prywatny tryb może blokować localStorage */}
+window.addEventListener('pw-start-tutorial',()=>{try{if(localStorage.getItem(TUTORIAL_KEY)!=='1')tutorialOpen()}catch(e){}});
 })();
 </script>
 
 <div id="pw-beta-gate" role="dialog" aria-modal="true" aria-labelledby="pw-beta-title">
- <div class="pw-beta-card"><div style="font-size:38px">☁️</div><h1 id="pw-beta-title">PewnaWycena 5.2 BETA — Konto i bezpieczeństwo</h1>
+ <div class="pw-beta-card"><div style="font-size:38px">☁️</div><h1 id="pw-beta-title">PewnaWycena 5.3 — test konta i synchronizacji</h1>
  <p>Twój biznes pod kontrolą. Pełny pulpit i narzędzia do wycen — w bezpłatnej wersji testowej.</p>
  <p id="pw-beta-storage-error" hidden role="alert" style="color:#ffb3b3"></p>
  <button type="button" id="pw-beta-register">Utwórz darmowe konto</button>
@@ -2897,7 +2897,7 @@ function launchAuth(){ $('pw-cloud-open').click(); }
 $('pw-beta-register').addEventListener('click',()=>{launchAuth();$('pw-cloud-email').focus()});
 $('pw-beta-login').addEventListener('click',()=>{launchAuth();$('pw-cloud-email').focus()});
 $('pw-cloud-open').setAttribute('aria-label','Zaloguj się, zarejestruj lub zarządzaj kontem');
-$('pw-beta-start').addEventListener('click',()=>{if(activeUser){try{localStorage.setItem('pw53_pilot_beta_welcome_v51_'+activeUser,'1')}catch(_){}welcome.hidden=true}});
+$('pw-beta-start').addEventListener('click',()=>{if(activeUser){try{localStorage.setItem('pw53_pilot_beta_welcome_v51_'+activeUser,'1')}catch(_){}welcome.hidden=true;window.dispatchEvent(new Event('pw-start-tutorial'))}});
 // The Supabase connection can be unavailable; never reveal the private workspace by timeout.
 
 })();
