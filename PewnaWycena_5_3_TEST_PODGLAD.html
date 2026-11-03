@@ -11,7 +11,7 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
-<title>TEST 5.3 — PewnaWycena 5.2 BETA — Konto i bezpieczeństwo — bezpłatne testy</title>
+<title>TEST 5.3 — PewnaWycena 5.3 — test synchronizacji — bezpłatne testy</title>
 <style>
 :root{--green:#176b52;--dark:#143b31;--bg:#f3f7f4;--border:#dce7df;--muted:#607269}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);font:15px/1.5 system-ui,Arial,sans-serif;color:#18251e}
@@ -602,7 +602,7 @@ html.pw-beta-pending body>header,html.pw-beta-pending body>main,html.pw-beta-pen
 </style>
 <script>document.documentElement.classList.add('pw-beta-pending');</script>
 <script>try{if(!localStorage.getItem("pw53_staging_cloud_config_v5"))localStorage.setItem("pw53_staging_cloud_config_v5",JSON.stringify({"url": "https://xmsadmocxvlzjtsowuln.supabase.co", "key": "sb_publishable_gv_HwN174J3IfDHRShI42A_WyvFrZre"}));}catch(_){}</script></head>
-<body><div role="status" style="padding:12px 16px;background:#244d72;color:#fff;text-align:center;font:600 14px system-ui">TEST 5.3 — wysyłanie synchronizacji wyłączone. Osobne dane i logowanie testowe.</div>
+<body><div role="status" style="padding:12px 16px;background:#244d72;color:#fff;text-align:center;font:600 14px system-ui">TEST 5.3 — synchronizacja testowa włączona. Używaj wyłącznie fikcyjnych danych.</div>
 <header><span class="brand-mark" aria-hidden="true">⌂</span><span class="brand-name">Pewna<span>Wycena</span><small class="brand-slogan">Twój biznes pod kontrolą</small></span><span class="header-version">4.6 <span aria-hidden="true">✦</span></span><button type="button" id="pw-cloud-open" class="pw-cloud-toggle" aria-haspopup="dialog" aria-controls="pw-cloud-overlay">Zaloguj / Zarejestruj</button></header>
 <nav class="bottom-nav" aria-label="Szybka nawigacja">
 <button type="button" data-view="home" aria-label="Pulpit" aria-pressed="true"><span class="bottom-icon" aria-hidden="true">⌂</span><span>Pulpit</span></button>
@@ -2588,14 +2588,14 @@ try{if(localStorage.getItem(TUTORIAL_KEY)!=='1')tutorialOpen()}catch(e){/* prywa
 </script>
 
 <div id="pw-beta-gate" role="dialog" aria-modal="true" aria-labelledby="pw-beta-title">
- <div class="pw-beta-card"><div style="font-size:38px">☁️</div><h1 id="pw-beta-title">PewnaWycena 5.2 BETA — Konto i bezpieczeństwo</h1>
+ <div class="pw-beta-card"><div style="font-size:38px">☁️</div><h1 id="pw-beta-title">PewnaWycena 5.3 — test synchronizacji</h1>
  <p>Twój biznes pod kontrolą. Pełny pulpit i narzędzia do wycen — w bezpłatnej wersji testowej.</p>
  <p id="pw-beta-storage-error" hidden role="alert" style="color:#ffb3b3"></p>
  <button type="button" id="pw-beta-register">Utwórz darmowe konto</button>
  <button type="button" class="pw-beta-alt" id="pw-beta-login">Zaloguj się</button>
  <p style="font-size:12px">Bez opłat i bez karty. Dane wycen, zleceń i terminarza pozostają lokalnie na tym urządzeniu. Nie wpisuj danych prawdziwych klientów podczas testów.</p>
  </div></div>
-<div id="pw-beta-welcome" hidden role="dialog" aria-modal="true" aria-labelledby="pw-beta-welcome-title"><div class="pw-beta-card"><div style="font-size:38px">🎉</div><h1 id="pw-beta-welcome-title">Witaj w PewnaWycena BETA!</h1><p>Masz bezpłatny dostęp do wersji testowej. Twórz wyceny, poznawaj zlecenia i terminarz. Dziękujemy, że pomagasz rozwijać aplikację!</p><p style="font-size:12px">Uwaga: wyceny, zlecenia i terminarz zapisują się lokalnie, nie w chmurze. Dane lokalne są rozdzielane według kont na tym urządzeniu; nie stanowi to szyfrowania ani synchronizacji. Testuj wyłącznie na fikcyjnych danych.</p><button type="button" id="pw-beta-start">Rozpocznij pracę 🚀</button></div></div>
+<div id="pw-beta-welcome" hidden role="dialog" aria-modal="true" aria-labelledby="pw-beta-welcome-title"><div class="pw-beta-card"><div style="font-size:38px">🎉</div><h1 id="pw-beta-welcome-title">Witaj w PewnaWycena BETA!</h1><p>Masz bezpłatny dostęp do wersji testowej. Twórz wyceny, poznawaj zlecenia i terminarz. Dziękujemy, że pomagasz rozwijać aplikację!</p><p style="font-size:12px">Test 5.3: zapis lokalny jest oddzielony od głównej aplikacji. Synchronizacja z chmurą uruchamia się tylko przyciskiem w panelu konta, po potwierdzeniu. Testuj wyłącznie na fikcyjnych danych.</p><button type="button" id="pw-beta-start">Rozpocznij pracę 🚀</button></div></div>
 <div id="pw-cloud-overlay" class="pw-cloud-overlay" hidden>
  <section class="pw-cloud-panel" role="dialog" aria-modal="true" aria-labelledby="pw-cloud-title">
   <div class="pw-cloud-head"><h2 id="pw-cloud-title">Moje konto PewnaWycena</h2><button type="button" id="pw-cloud-close" class="pw-cloud-close" aria-label="Zamknij panel">✕</button></div>
@@ -2922,7 +2922,7 @@ if(typeof module!=='undefined')module.exports=api;else root.PW53=api;
 /* Staging integration for the existing 5.2 application. */
 (()=>{
 'use strict';
-const WRITES_ENABLED=false; // Enable only after API-session and browser acceptance tests.
+const WRITES_ENABLED=true; // Enabled for the isolated test page with owner approval on 2026-11-03.
 const PROJECT='https://xmsadmocxvlzjtsowuln.supabase.co';
 const KEYS=['pw53_staging_pewnawycena_saved_estimates_v1','pw53_staging_pewnawycena_pricebook_v1','pw53_staging_pewnawycena_clients_v1','pw53_staging_pewnawycena_draft_v1','pw53_staging_pewnawycena_jobs_v1','pw53_staging_pewnawycena_reminders_v1','pw53_staging_pewnawycena_company_profile_v1','pw53_staging_pewnawycena_company_brand_v1','pw53_staging_pewnawycena_pdf_template_v1','pw53_staging_pewnawycena_vat_mode_v1'];
 const ACTIVE='pw53_staging_beta_active_local_account_v513';
@@ -2930,7 +2930,7 @@ let epoch=0,busy=false;
 window.addEventListener('storage',e=>{if(e.key===ACTIVE||KEYS.includes(e.key)){epoch++;draftPaused=true;clearTimeout(draftTimer);const warning=document.createElement('div');Object.assign(warning.style,{position:'fixed',inset:'0',zIndex:'12000',background:'#071c36',color:'white',padding:'30px'});warning.textContent='Inna karta zmieniła dane. Zamknij pozostałe karty i odśwież aplikację przed dalszą pracą.';document.body.append(warning);}});
 window.addEventListener('pw-beta-auth',()=>{epoch++;});
 const panel=document.createElement('section');panel.className='panel';
-panel.innerHTML='<h3>Synchronizacja 5.3 — test integracji</h3><p>Najpierw pobierz kopię. Podgląd niczego nie wysyła. Synchronizacja wymaga potwierdzenia i zatrzymuje się przy konflikcie. Nie używaj równolegle drugiej karty aplikacji.</p><button type="button" id="pw53-backup">Pobierz kopię przed testem</button><button type="button" id="pw53-preview">Sprawdź zmiany</button><button type="button" id="pw53-sync">Synchronizuj po potwierdzeniu</button><button type="button" id="pw53-journal">Eksportuj kolejkę i kopię awaryjną</button><pre id="pw53-status" style="white-space:pre-wrap;overflow-wrap:anywhere" role="status">Wariant testowy. Wysyłanie zablokowane do testów odbiorczych. Kopia i podgląd są dostępne.</pre>';
+panel.innerHTML='<h3>Synchronizacja 5.3 — test integracji</h3><p>Najpierw pobierz kopię. Podgląd niczego nie wysyła. Synchronizacja wymaga potwierdzenia i zatrzymuje się przy konflikcie. Nie używaj równolegle drugiej karty aplikacji.</p><button type="button" id="pw53-backup">Pobierz kopię przed testem</button><button type="button" id="pw53-preview">Sprawdź zmiany</button><button type="button" id="pw53-sync">Synchronizuj po potwierdzeniu</button><button type="button" id="pw53-journal">Eksportuj kolejkę i kopię awaryjną</button><pre id="pw53-status" style="white-space:pre-wrap;overflow-wrap:anywhere" role="status">Wariant testowy. Synchronizacja włączona na Twoje żądanie. Zacznij od kopii i jednej fikcyjnej wyceny.</pre>';
 document.getElementById('pw-cloud-signed').append(panel);
 const status=panel.querySelector('pre');
 function download(value,name){const url=URL.createObjectURL(new Blob([JSON.stringify(value,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),3000);}
