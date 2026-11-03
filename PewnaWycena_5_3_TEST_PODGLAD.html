@@ -2963,7 +2963,7 @@ async function commit(records,options,scope,guard){
  else{
   const before=rawState();
   if(!PW53.equal(await encode(),options.expectedLocal))throw Error('Dane zmieniły się przed zapisem lokalnym');
-  const d=decode(records);const next=[JSON.stringify(d.estimates),JSON.stringify(d.prices),JSON.stringify(d.clients),localStorage.getItem(KEYS[3]),JSON.stringify(d.jobs),JSON.stringify(d.reminders),d.company?JSON.stringify(d.company):null,d.branding?JSON.stringify(d.branding):null,d.template,d.vatSettings];
+  const d=decode(records);const hasCompanyRecord=records.some(r=>r.type==='company'&&r.id===PW53.NS+'settings');const next=[JSON.stringify(d.estimates),JSON.stringify(d.prices),JSON.stringify(d.clients),localStorage.getItem(KEYS[3]),JSON.stringify(d.jobs),JSON.stringify(d.reminders),d.company?JSON.stringify(d.company):null,d.branding?JSON.stringify(d.branding):null,hasCompanyRecord?d.template:null,hasCompanyRecord?d.vatSettings:null];
   intent={scope,target:PW53.index(records),before,after:Object.fromEntries(KEYS.map((k,i)=>[k,next[i]]))};
   await guard();if(!PW53.equal(before,rawState()))throw Error('Dane zmieniły się podczas przygotowania zapisu');
   const raw=JSON.stringify(intent);localStorage.setItem(key,raw);if(localStorage.getItem(key)!==raw)throw Error('Nie zapisano zamiaru zmiany danych');
