@@ -32,7 +32,9 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 @media print{
   @page{size:A4 portrait;margin:22mm 20mm 22mm 20mm}
   html,body{margin:0!important;padding:0!important;width:auto!important;background:#fff!important;color:#1d2c25!important;font:10.5pt/1.5 Arial,Helvetica,sans-serif!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  body>header,body>main{display:none!important}
+  /* Print only the prepared document; exclude account panels and preview notices. */
+  body>:not(#print-document){display:none!important}
+  #print-document .print-title,#print-document #print-description{color:#1d2c25!important;text-shadow:none!important}
   .print-document{display:block!important;width:100%!important;max-width:100%!important;margin:0!important;padding:0!important;overflow:visible!important}
   .print-header{display:flex;align-items:flex-start;justify-content:space-between;gap:16mm;border-bottom:2px solid #176b52;padding:0 0 9mm;margin:0 0 10mm}
   .print-brand{font-size:21pt;line-height:1.1;letter-spacing:-.5px}
